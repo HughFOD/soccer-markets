@@ -38,6 +38,12 @@ SPORTS = {"soccer_epl": "Premier League", "soccer_efl_champ": "Championship", "s
           "soccer_france_ligue_one": "Ligue 1"}
 EXCHANGES = {"betfair_ex_eu", "betfair_ex_uk", "betfair_ex_au", "matchbook", "smarkets", "betfair"}
 PINNACLE_SHARE = 0.7
+# American companies licensed in US states. Other bookmakers the Odds API lists in its "us" region
+# (Bovada, BetOnline, BetUS, MyBookie, LowVig) are offshore sites: they count toward the fair price
+# but are not flagged.
+US_LICENSED = {"draftkings", "fanduel", "betmgm", "betrivers", "williamhill_us", "espnbet", "fanatics", "hardrockbet",
+               "ballybet", "betparx", "fliff", "windcreek", "superbook", "unibet_us", "pointsbetus", "wynnbet",
+               "twinspires", "betfred_us", "circasports"}
 
 
 def api_key() -> str | None:
@@ -92,6 +98,7 @@ def to_table(raw: dict) -> pd.DataFrame:
         return t
     # a bookmaker listed in both regions counts once, as American if it appears in the US region
     t = t.sort_values("region", key=lambda s: s.map({"us": 0, "eu": 1})).drop_duplicates(["id", "book"])
+    t.loc[(t["region"] == "us") & ~t["book"].isin(US_LICENSED), "region"] = "offshore"
     return t[~t["book"].isin(EXCHANGES)].reset_index(drop=True)
 
 

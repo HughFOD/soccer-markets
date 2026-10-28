@@ -80,8 +80,8 @@ def us_page(tab: pd.DataFrame, stamp: str, threshold: float, remaining) -> str:
 <header class=hero><div class=wrap>
 <div class=kicker>Fair-price engine · American sportsbooks · updated {stamp}</div>
 <h1>This Week's Fair Prices</h1>
-<p class=lede>Fair odds for {len(tab)} upcoming matches, compared with DraftKings, FanDuel, BetMGM, Caesars and the other American sportsbooks. {f"{len(flagged)} have a sportsbook price at least {threshold:.0%} better than fair (highlighted)." if len(flagged) else f"No American sportsbook price is {threshold:.0%} or more better than fair right now."}</p>
-<p class=note>Each cell shows the fair odds in American format, the fair chance, and the best American sportsbook price. The fair price is mostly Pinnacle's, with the margin removed, blended with the other bookmakers; betting exchanges are left out. Odds from The Odds API. <a href="index.html" style="color:#9fb4d4">How it works and its track record</a>.</p>
+<p class=lede>Fair odds for {len(tab)} upcoming matches, compared with DraftKings, FanDuel, BetMGM, BetRivers and the other US-licensed sportsbooks. {(f"{len(flagged)} {'match has' if len(flagged) == 1 else 'matches have'} a sportsbook price at least {threshold:.0%} better than fair (highlighted).") if len(flagged) else f"No American sportsbook price is {threshold:.0%} or more better than fair right now."}</p>
+<p class=note>Each cell shows the fair odds in American format, the fair chance, and the best American sportsbook price. The fair price is mostly Pinnacle's, with the margin removed, blended with the other bookmakers (including offshore sites such as Bovada, which are never flagged); betting exchanges are left out. Odds from The Odds API. <a href="index.html" style="color:#9fb4d4">How it works and its track record</a>.</p>
 </div></header>
 <main class=wrap>
 {f"<h2>Flagged prices</h2><ul>{flag_list}</ul>" if flag_list else ""}

@@ -55,11 +55,11 @@ final price, your prices were genuinely good, whoever won.
 
 | Flag when the price is | Prices | Predicted edge | Edge vs closing price (95% range) | Beat close |
 |---|---|---|---|---|
-| More than 0% better | 11,820 | +1.8% | +1.7% (+1.6% to +1.9%) | 61% |
-| More than 1% better | 6,427 | +2.9% | +2.9% (+2.7% to +3.1%) | 67% |
-| More than 2% better | 3,616 | +4.1% | +4.1% (+3.8% to +4.4%) | 72% |
-| More than 3% better | 2,124 | +5.3% | +5.2% (+4.7% to +5.6%) | 75% |
-| More than 5% better | 847 | +7.4% | +7.1% (+6.3% to +7.9%) | 79% |
+| More than 0% better | 11,777 | +1.8% | +1.7% (+1.6% to +1.9%) | 61% |
+| More than 1% better | 6,381 | +2.9% | +2.9% (+2.7% to +3.1%) | 67% |
+| More than 2% better | 3,563 | +4.1% | +4.1% (+3.8% to +4.4%) | 72% |
+| More than 3% better | 2,094 | +5.2% | +5.2% (+4.7% to +5.7%) | 75% |
+| More than 5% better | 829 | +7.4% | +7.3% (+6.5% to +8.1%) | 79% |
 
 The fair price is also closer to the closing price than any single bookmaker:
 
@@ -70,31 +70,31 @@ The fair price is also closer to the closing price than any single bookmaker:
 | Pinnacle alone | 0.00255 | +1% |
 | Bet365 alone | 0.00288 | +14% |
 
-**The edge has shrunk.** Up to 2018/19 the engine flagged about 472 prices a season. Since then, as bookmakers have copied the sharpest prices faster, it has flagged about 112 a season. Those that remain still beat the closing price by 3.4% on average. Single seasons are noisy with so few flags (the weakest, 2025/26, was 1.9%), but the edge has held up in every one. On today's prices this is a tool for spotting the occasional mistake, not a steady stream of them.
+**The edge has shrunk.** Up to 2018/19 the engine flagged about 467 prices a season. Since then, as bookmakers have copied the sharpest prices faster, it has flagged about 109 a season. Those that remain still beat the closing price by 3.3% on average. Single seasons are noisy with so few flags (the weakest, 2025/26, was 1.9%), but the edge has held up in every one. On today's prices this is a tool for spotting the occasional mistake, not a steady stream of them.
 
 ![By season](docs/images/fair_by_season.png)
 
-The profit on the 2% flags was +6.8% per bet, but its 95% range
-(+1.2% to +12.6%) is wide, which is why the closing price is the better test.
+The profit on the 2% flags was +6.6% per bet, but its 95% range
+(+0.9% to +12.6%) is wide, which is why the closing price is the better test.
 In practice, bookmakers limit customers who consistently beat their prices.
 
 ## The best types of bets
 
 | Type | Flags | Edge vs close | Beat close | Return per bet (95% range) |
 |---|---|---|---|---|
-| Strong favourite (odds under 1.67, -150 or shorter) | 541 | +3.6% | 81% | +1.3% (-4.5% to +6.6%) |
-| Slight favourite (1.67-2.50, -150 to +150) | 1,042 | +4.6% | 78% | +12.6% (+6.5% to +18.6%) |
-| Underdog (2.50-4.00, +150 to +300) | 971 | +4.1% | 73% | +9.7% (+0.9% to +19.5%) |
-| Long shot (over 4.00, +300 or longer) | 1,062 | +3.9% | 60% | +1.3% (-14.7% to +17.8%) |
-| Bundesliga | 653 | +4.8% | 77% | +10.1% (-0.9% to +21.3%) |
-| Premier League | 598 | +4.0% | 75% | +15.0% (-0.3% to +31.1%) |
-| Championship | 493 | +2.5% | 65% | +0.1% (-13.8% to +13.7%) |
-| Ligue 1 | 636 | +3.8% | 70% | +5.1% (-7.6% to +18.2%) |
-| Serie A | 618 | +4.7% | 71% | -2.1% (-12.8% to +9.8%) |
-| La Liga | 618 | +4.4% | 72% | +11.5% (-6.0% to +32.1%) |
-| Gap 2-4% | 2,269 | +2.8% | 68% | +7.1% (+0.7% to +13.8%) |
-| Gap 4-7% | 1,008 | +5.3% | 77% | +3.9% (-7.6% to +15.9%) |
-| Gap over 7% | 339 | +9.1% | 80% | +13.8% (-12.0% to +43.6%) |
+| Strong favourite (odds under 1.67, -150 or shorter) | 534 | +3.6% | 81% | +0.7% (-4.9% to +6.4%) |
+| Slight favourite (1.67-2.50, -150 to +150) | 1,039 | +4.6% | 78% | +12.6% (+6.0% to +18.9%) |
+| Underdog (2.50-4.00, +150 to +300) | 957 | +4.2% | 73% | +9.2% (-0.1% to +19.1%) |
+| Long shot (over 4.00, +300 or longer) | 1,033 | +3.8% | 60% | +1.3% (-14.1% to +19.5%) |
+| Bundesliga | 646 | +4.8% | 77% | +8.3% (-2.6% to +18.9%) |
+| Premier League | 597 | +3.9% | 74% | +14.4% (-1.6% to +30.6%) |
+| Championship | 481 | +2.5% | 64% | +0.7% (-13.1% to +14.6%) |
+| Ligue 1 | 624 | +3.7% | 70% | +4.9% (-8.2% to +18.4%) |
+| Serie A | 612 | +4.8% | 72% | -2.7% (-13.4% to +8.7%) |
+| La Liga | 603 | +4.4% | 73% | +13.1% (-5.3% to +33.6%) |
+| Gap 2-4% | 2,234 | +2.8% | 68% | +6.3% (+0.1% to +12.7%) |
+| Gap 4-7% | 998 | +5.4% | 78% | +4.7% (-6.5% to +17.6%) |
+| Gap over 7% | 331 | +9.2% | 80% | +15.2% (-10.5% to +44.8%) |
 
 ![Bet types](docs/images/bet_types.png)
 
