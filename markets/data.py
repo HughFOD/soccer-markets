@@ -27,10 +27,11 @@ import pandas as pd
 
 OUTCOMES = ("H", "D", "A")
 # bookmaker prefixes used by football-data.co.uk over the years
-BOOKS = ("B365", "BW", "IW", "LB", "PS", "WH", "SJ", "VC", "GB", "BS", "SB", "SY", "SO", "BF", "1XB", "CL", "BV")
+BOOKS = ("B365", "BW", "IW", "LB", "PS", "WH", "SJ", "VC", "GB", "BS", "SB", "SY", "SO", "BF", "1XB", "CL", "BV",
+         "BFD", "BMGM", "PP", "SKB", "BFE")
 
 # low-margin bookmakers / exchanges that take large bets; everything else is a "soft" (retail) bookmaker
-SHARP = ("PS", "BF")
+SHARP = ("PS", "BF", "BFE")  # Pinnacle, Betfair and the Betfair Exchange
 
 LEAGUES = {  # football-data.co.uk code -> readable name
     "E0": "England Premier League", "E1": "England Championship", "SP1": "Spain La Liga",
@@ -41,7 +42,7 @@ FILE_LEAGUE = {"Premier": "E0", "Championship": "E1"}
 SEASON_RE = re.compile(r"(\d{4})-(\d{4})")
 
 
-def download(dest: Path, leagues=("E0", "E1", "SP1", "D1", "I1", "F1"), first=2005, last=2025) -> list[Path]:
+def download(dest: Path, leagues=("E0", "E1", "SP1", "D1", "I1", "F1"), first=2005, last=2026) -> list[Path]:
     """Download league-season files from football-data.co.uk (run on a normal internet connection).
 
     Saves as {league}_{YYYY-YYYY}.csv. Files already present are skipped,
@@ -77,9 +78,14 @@ def _league_and_season(path: Path) -> tuple[str, str]:
 
 
 def _read(path: Path) -> pd.DataFrame:
-    raw = path.read_bytes().decode("latin-1")
+    b = path.read_bytes()
+    try:
+        raw = b.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        raw = b.decode("latin-1")
     d = pd.read_csv(io.StringIO(raw), on_bad_lines="skip", low_memory=False)
-    d = d.loc[:, ~d.columns.astype(str).str.startswith("Unnamed")]
+    d.columns = d.columns.astype(str).str.replace("\ufeff", "", regex=False).str.replace("ï»¿", "", regex=False).str.strip()
+    d = d.loc[:, ~d.columns.str.startswith("Unnamed")]
     return d.dropna(how="all")
 
 
@@ -103,9 +109,9 @@ def tidy(d: pd.DataFrame, league: str, season: str) -> pd.DataFrame:
         "league": d["Div"].iloc[0] if "Div" in d.columns and len(d) else league,
         "home": d["HomeTeam"] if "HomeTeam" in d.columns else d.get("HT"),
         "away": d["AwayTeam"] if "AwayTeam" in d.columns else d.get("AT"),
-        "hg": pd.to_numeric(d["FTHG"], errors="coerce"),
-        "ag": pd.to_numeric(d["FTAG"], errors="coerce"),
-        "result": d["FTR"],
+        "hg": pd.to_numeric(d["FTHG"], errors="coerce") if "FTHG" in d.columns else np.nan,
+        "ag": pd.to_numeric(d["FTAG"], errors="coerce") if "FTAG" in d.columns else np.nan,
+        "result": d["FTR"] if "FTR" in d.columns else None,
         "ht_hg": pd.to_numeric(d["HTHG"], errors="coerce") if "HTHG" in d.columns else np.nan,
         "ht_ag": pd.to_numeric(d["HTAG"], errors="coerce") if "HTAG" in d.columns else np.nan,
         "h_red": pd.to_numeric(d["HR"], errors="coerce") if "HR" in d.columns else np.nan,
@@ -147,6 +153,14 @@ def tidy(d: pd.DataFrame, league: str, season: str) -> pd.DataFrame:
         out[f"pin_{o}"] = _num(d, f"PS{OUTCOMES[i]}").to_numpy()
         out[f"pinc_{o}"] = _num(d, f"PSC{OUTCOMES[i]}").to_numpy()
         out[f"soft_{o}"] = soft_best[:, i]
+    # every bookmaker's own odds (and closing odds, where the file has them), for the fair-price engine
+    for b in BOOKS:
+        if _num(d, f"{b}H").isna().all():
+            continue
+        for i, o in enumerate("hda"):
+            out[f"bk_{b}_{o}"] = _num(d, f"{b}{OUTCOMES[i]}").to_numpy()
+            if f"{b}C{OUTCOMES[i]}" in d.columns:
+                out[f"bkc_{b}_{o}"] = _num(d, f"{b}C{OUTCOMES[i]}").to_numpy()
     out["n_books"] = n
     return out
 
@@ -183,3 +197,27 @@ def load(raw_dir: Path) -> pd.DataFrame:
 def outcome_matrix(m: pd.DataFrame) -> np.ndarray:
     """One-hot results, columns H, D, A."""
     return np.column_stack([(m["result"] == o).to_numpy() for o in OUTCOMES]).astype(float)
+
+
+FIXTURES_URL = "https://www.football-data.co.uk/fixtures.csv"
+
+
+def download_fixtures(dest: Path) -> Path:
+    """This week's upcoming matches with current odds (football-data.co.uk updates it twice a week)."""
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    with urllib.request.urlopen(FIXTURES_URL, timeout=30) as r:
+        dest.write_bytes(r.read())
+    return dest
+
+
+def load_fixtures(path: Path, leagues: tuple[str, ...] | None = None) -> pd.DataFrame:
+    """Upcoming matches in the same layout as `load`, without results."""
+    d = _read(Path(path))
+    f = tidy(d, "", "upcoming")
+    f["league"] = d["Div"].to_numpy() if "Div" in d.columns else ""
+    if "Time" in d.columns:
+        f["time"] = d["Time"].to_numpy()
+    f = f.dropna(subset=["date", "home", "away"])
+    if leagues:
+        f = f[f["league"].isin(leagues)]
+    return f.sort_values(["date", "league", "home"]).reset_index(drop=True)

@@ -12,7 +12,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 PY = HERE / ".venv" / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
 
-CODE = "from pathlib import Path; from markets import data; data.download(Path('data/raw'), leagues=('E0','E1','SP1','D1','I1','F1'), first=2005, last=2025)"
+CODE = "from pathlib import Path; from markets import data; data.download(Path('data/raw'), leagues=('E0','E1','SP1','D1','I1','F1'), first=2005, last=2026)"
 
 if __name__ == "__main__":
     subprocess.check_call([str(PY), "-c", CODE], cwd=HERE)

@@ -163,4 +163,48 @@ def run(m: pd.DataFrame) -> dict:
             "test_matches": int(te.sum()),
             "log_loss": {"pre_match": float(ll_pre.mean()), "half_time_naive": float(ll_naive.mean()),
                          "half_time_adjusted": float(ll_adj.mean())},
-            "adjusted_gain": ef.mean_ci(ll_naive - ll_adj)}
+            "adjusted_gain": ef.mean_ci(ll_naive - ll_adj),
+            "robustness": robustness(d)}
+
+
+# ---------- robustness: is it the score, or something else about these matches? ----------
+#
+# Matches with a goal at half-time may simply be more open, or played in
+# conditions where everyone scores more. Comparing the two teams *within the
+# same match* cancels anything that raises both teams' scoring. Given the
+# number of second-half goals in a match, the trailing team's expected share
+# is its expected rate divided by the two teams' combined rate. If the score
+# changes how teams play, it takes a larger share than that.
+
+def within_match(d: pd.DataFrame, mask: np.ndarray | None = None, seed: int = 0) -> dict:
+    mask = np.ones(len(d), bool) if mask is None else np.asarray(mask, bool)
+    marg = (d["ht_hg"] - d["ht_ag"]).to_numpy()
+    s = mask & (marg != 0)
+    home_trails = marg < 0
+    rt = np.where(home_trails, d["rem_h"], d["rem_a"])[s]
+    rl = np.where(home_trails, d["rem_a"], d["rem_h"])[s]
+    gt = np.where(home_trails, d["sh_h"], d["sh_a"])[s].astype(float)
+    gl = np.where(home_trails, d["sh_a"], d["sh_h"])[s].astype(float)
+    n = gt + gl
+    exp_share = rt / (rt + rl)
+    ratio, lo, hi = ef.ratio_ci(gt, n * exp_share, n_boot=1000, seed=seed)
+    return {"matches": int(s.sum()), "second_half_goals": int(n.sum()),
+            "expected_share": float((n * exp_share).sum() / n.sum()), "actual_share": float(gt.sum() / n.sum()),
+            "ratio": ratio, "lo": lo, "hi": hi}
+
+
+def robustness(d: pd.DataFrame) -> pd.DataFrame:
+    marg = (d["ht_hg"] - d["ht_ag"]).abs().to_numpy()
+    tot = (d["ht_hg"] + d["ht_ag"]).to_numpy()
+    red = ((d["h_red"].fillna(0) + d["a_red"].fillna(0)) > 0).to_numpy()
+    home_trails = (d["ht_hg"] < d["ht_ag"]).to_numpy()
+    early = (d["date"] < pd.Timestamp("2010-07-01")).to_numpy()
+    lg = d["league"].to_numpy()
+    checks = [("All matches with a lead at half-time", None),
+              ("Lead of one goal", marg == 1), ("Lead of two or more", marg >= 2),
+              ("One goal in the first half (1–0)", tot == 1), ("Three or more first-half goals", tot >= 3),
+              ("No red card in the match", ~red),
+              ("Home team trailing", home_trails), ("Away team trailing", ~home_trails),
+              ("2000–2010", early), ("2010–2020", ~early),
+              ("Premier League", lg == "E0"), ("Championship", lg == "E1")]
+    return pd.DataFrame([{"check": label, **within_match(d, mask, seed=i)} for i, (label, mask) in enumerate(checks)])

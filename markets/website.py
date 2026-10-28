@@ -10,7 +10,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 REPO_URL = "https://github.com/HughFOD/soccer-markets"
-CHARTS = ("calibration", "longshot", "margins", "line_moves", "value_bets", "soft_vs_sharp", "slope_by_season", "score_effects")
+CHARTS = ("fair_clv", "fair_weights", "fair_by_season", "calibration", "longshot", "margins", "line_moves", "value_bets", "soft_vs_sharp", "slope_by_season", "score_effects", "score_effect_checks")
+
+
+LG = {"E0": "English Premier League", "E1": "English Championship", "SP1": "La Liga", "D1": "Bundesliga",
+      "I1": "Serie A", "F1": "Ligue 1", "N1": "Eredivisie", "P1": "Primeira Liga"}
+
+
+def _join(xs):
+    return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
 
 
 def p(x, d=1, sign=True):
@@ -30,7 +38,7 @@ def facts(R: dict) -> dict:
         "matches": f"{R['matches']:,}",
         "years": f"{R['seasons'][0][:4]} to {R['seasons'][1][-4:]}",
         "n_seasons": len(mg),
-        "leagues": " and ".join({"E0": "Premier League", "E1": "Championship"}.get(x, x) for x in R["leagues"]),
+        "leagues": _join([LG.get(x, x) for x in R["leagues"]]),
         "slope": f"{c['pooled']['slope']:.2f}", "slope_lo": f"{c['pooled']['slope_lo']:.2f}",
         "slope_hi": f"{c['pooled']['slope_hi']:.2f}",
         "top_priced": p(t[-1]["priced"], 0, False), "top_happened": p(t[-1]["happened"], 0, False),
@@ -91,156 +99,228 @@ a{color:var(--accent)}footer{border-top:1px solid var(--line);margin-top:56px;pa
 """
 
 
+def pence(x) -> str:
+    """-0.02 -> '2p' (profit or loss per £1, as a positive number)."""
+    return f"{abs(100 * x):.0f}p"
+
+
 def more_findings(R: dict, start: int) -> str:
-    """Findings from markets/sharp.py: Pinnacle vs retail bookmakers, change over time, league comparison."""
+    """Findings from markets/sharp.py and markets/live.py."""
     html, n = [], start
     sh, sb = R.get("sharp"), R.get("soft_bets")
     if sh and sb:
         rules = {r["edge"]: r for r in sb["rules"]}
         r0, r2 = rules[0.0], rules[0.02]
-        d = sh["average_minus_pinnacle"]
         html.append(f"""
 <div class=finding><div class=n>FINDING {n}</div>
-<h3>Pinnacle's price can find generous retail prices, but the evidence is weak</h3>
-<p>Pinnacle charges a margin of {p(sh['margin_pinnacle'], 1, False)}; the average bookmaker charges {p(sh['margin_average'], 1, False)}. With the margin removed, the two are equally accurate (log loss {sh['log_loss_pinnacle']:.4f} against {sh['log_loss_average']:.4f}), and the average adds nothing to Pinnacle.</p>
-<p>Retail bookmakers do not all move their prices at once, so sometimes one offers better odds than Pinnacle's fair price. Betting only those prices returned {p(r0['return'])} per bet (95% interval {p(r0['lo'])} to {p(r0['hi'])}, {r0['bets']:,} bets over {sb['matches']:,} matches). When the retail price was at least 2% better, the return was {p(r2['return'])} ({p(r2['lo'])} to {p(r2['hi'])}).</p>
-<img src="images/soft_vs_sharp.png" alt="Return from retail prices that beat Pinnacle's fair price">
-<p>Every estimate is positive and close to what Pinnacle's price predicted, but every interval touches zero, and most of the profit came in 2012–2014. In practice, retail bookmakers limit customers who do this.</p></div>""")
+<h3>Pinnacle's prices hint at bargains elsewhere, but the evidence is weak</h3>
+<p>Once the margin is removed, Pinnacle and the average bookmaker are equally accurate. But bookmakers don't all update their prices at the same moment, so sometimes one offers better odds than Pinnacle's prices say are fair.</p>
+<p>Betting only on those made {p(r0['return'])} per bet over {r0['bets']:,} bets (95% range {p(r0['lo'])} to {p(r0['hi'])}). When the gap was at least 2%, it made {p(r2['return'])} ({p(r2['lo'])} to {p(r2['hi'])}).</p>
+<img src="images/soft_vs_sharp.png" alt="Return from bookmaker prices that beat Pinnacle's fair price">
+<p>Every result is positive and roughly matches what Pinnacle's prices predicted. But the range always includes zero, most of the profit came in 2012–2014, and bookmakers restrict customers who bet this way.</p></div>""")
         n += 1
     bs = R.get("by_season")
     if bs:
         t = bs["table"]
-        tr = bs["slope_trend_per_decade"]
+        over = sum(r["longshot_return"] < r["fav_return"] for r in t)
         html.append(f"""
 <div class=finding><div class=n>FINDING {n}</div>
-<h3>Margins fell, but the long-shot bias did not</h3>
-<p>Measured season by season, the calibration slope shows no clear trend: {tr[0]:+.2f} per decade (standard error {tr[1]:.2f}). Long shots were overpriced in {sum(r['longshot_return'] < r['fav_return'] for r in t)} of {len(t)} seasons. Cheaper betting did not make the prices more accurate.</p>
+<h3>Margins fell, but the long-shot bias didn't</h3>
+<p>Season by season, there's no sign the odds have become more accurate. Long shots were the worse bet in {over} of {len(t)} seasons. Cheaper betting didn't mean better prices.</p>
 <img src="images/slope_by_season.png" alt="Calibration slope by season"></div>""")
         n += 1
     bl = {r["league"]: r for r in R.get("by_league", [])}
     if {"E0", "E1"} <= set(bl):
         e0, e1 = bl["E0"], bl["E1"]
-        g = R["model"].get("by_league", {})
         html.append(f"""
 <div class=finding><div class=n>FINDING {n}</div>
-<h3>The Championship is not priced less efficiently</h3>
-<p>I expected the second division, with less attention and smaller bets, to be easier to beat. It was not. Its calibration slope ({e1['slope']:.2f}, interval {e1['slope_lo']:.2f}–{e1['slope_hi']:.2f}) is no further from 1 than the Premier League's ({e0['slope']:.2f}, {e0['slope_lo']:.2f}–{e0['slope_hi']:.2f}), and the model from past scores added nothing in either league.</p>
-<table><tr><th>League</th><th class=num>Matches</th><th class=num>Margin</th><th class=num>Calibration slope</th><th class=num>Bet everything</th></tr>
-<tr><td>Premier League</td><td class=num>{e0['matches']:,}</td><td class=num>{p(e0['margin'], 1, False)}</td><td class=num>{e0['slope']:.2f}</td><td class=num>{p(e0['bet_everything'])}</td></tr>
-<tr><td>Championship</td><td class=num>{e1['matches']:,}</td><td class=num>{p(e1['margin'], 1, False)}</td><td class=num>{e1['slope']:.2f}</td><td class=num>{p(e1['bet_everything'])}</td></tr></table></div>""")
+<h3>The second division isn't easier to beat</h3>
+<p>I expected the Championship to be priced less accurately than the Premier League, since fewer people follow it and less money is bet on it. The data says no. Its odds are just as accurate, and my model didn't help in either league.</p>
+<table><tr><th>League</th><th class=num>Matches</th><th class=num>Margin</th><th class=num>Calibration slope</th><th class=num>Loss betting on everything</th></tr>
+<tr><td>Premier League</td><td class=num>{e0['matches']:,}</td><td class=num>{p(e0['margin'], 1, False)}</td><td class=num>{e0['slope']:.2f}</td><td class=num>{pence(e0['bet_everything'])} per £1</td></tr>
+<tr><td>Championship</td><td class=num>{e1['matches']:,}</td><td class=num>{p(e1['margin'], 1, False)}</td><td class=num>{e1['slope']:.2f}</td><td class=num>{pence(e1['bet_everything'])} per £1</td></tr></table></div>""")
         n += 1
     lv = R.get("live")
     if lv:
         se = {r["margin"]: r for r in lv["score_effects"]}
         st = {(r["favourite"], r["half_time"]): r for r in lv["by_state"]}
-        lead = st.get(("narrow favourite", "leading by 1"))
-        lvl = st.get(("narrow favourite", "level"))
-        g = lv["adjusted_gain"]
+        lead = st[("narrow favourite", "leading by 1")]
+        lvl = st[("narrow favourite", "level")]
+        rb = {r["check"]: r for r in lv.get("robustness", [])}
+        allr = rb.get("All matches with a lead at half-time")
+        checks = ""
+        if allr:
+            checks = f"""
+<p><b>Is it really the scoreline?</b> Maybe games with early goals are just more open, and both teams score more. To rule that out, I compared the two teams in the same match. That cancels out anything that affects both sides, like an open game, the weather or the referee. The team that was behind was expected to score {p(allr['expected_share'], 1, False)} of the second-half goals. It actually scored {p(allr['actual_share'], 1, False)}.</p>
+<img src="images/score_effect_checks.png" alt="The same test under twelve different checks">
+<p>The pattern holds in all {len(rb)} checks: with or without red cards, in both decades, in both leagues, and after quiet or busy first halves. It's stronger when the lead is bigger, and stronger when the away team is the one chasing the game. If anything, the test is stacked against the finding. A team losing at half-time is probably weaker than its odds suggested, so you'd expect it to score less, not more.</p>"""
         html.append(f"""
 <div class=finding><div class=n>FINDING {n}</div>
-<h3>In-play: a half-time lead is less safe than a simple model thinks</h3>
-<p>The data have half-time scores, so I tested a simple way to price a match at half-time: turn the pre-match odds into each team's expected goals, assume the second half is the rest of the same match ({p(lv['share_second_half'], 0, False)} of goals come after half-time), and add the half-time score.</p>
-<p>Teams do not play the second half the same way whatever the score. A team losing by two or more scored {p(se[-2]['ratio'] - 1, 0)} more second-half goals than expected; a team winning by two or more scored {p(1 - se[2]['ratio'], 0, False)} fewer. The trailing team attacks and the leading team defends.</p>
-<img src="images/score_effects.png" alt="Second-half goals versus expected by half-time situation">
-<p>So the simple model overrates leads. When a narrow pre-match favourite led by one goal at half-time, the model gave it a {p(lead['model_win'], 0, False)} chance of winning; it won {p(lead['actual_win'], 0, False)} of {lead['matches']:,} matches. From level at half-time, draws happened {p(lvl['actual_draw'], 0, False)} of the time against {p(lvl['model_draw'], 0, False)} predicted. Adding the score effect, estimated on seasons before 2010, improved the half-time forecasts on the {lv['test_matches']:,} later matches (log loss gain {g[0]:.4f}, 95% interval {g[1]:.4f} to {g[2]:.4f}).</p>
-<p>The data have no in-play odds, so this shows what a naive in-play price would get wrong, not whether bookmakers make the same mistake.</p></div>""")
+<h3>After half-time, the team that's behind scores more than expected</h3>
+<p>The data includes half-time scores, so I tested the simplest way to price a match at half-time. Work out each team's expected goals from the pre-match odds, assume they keep scoring at that rate in the second half, and add the result to the half-time score.</p>
+<p>That assumption is wrong. Teams losing by two or more goals scored {p(se[-2]['ratio'] - 1, 0, False)} more in the second half than expected. Teams winning by two or more scored {p(1 - se[2]['ratio'], 0, False)} fewer. Teams that are behind push forward, and teams that are ahead sit back.</p>
+<img src="images/score_effects.png" alt="Second-half goals compared with expected, by half-time score">{checks}
+<p>This means the simple model overrates the team in front. A slight favourite leading 1–0 at half-time was given a {p(lead['model_win'], 0, False)} chance of winning, and won {p(lead['actual_win'], 0, False)} of the time over {lead['matches']:,} matches. Games level at half-time ended in a draw {p(lvl['actual_draw'], 0, False)} of the time, not the {p(lvl['model_draw'], 0, False)} predicted. Adjusting for the scoreline, using only seasons before 2010, made the half-time predictions measurably better for the {lv['test_matches']:,} matches after that.</p>
+<p>The data doesn't include live odds, so this shows where a simple live price goes wrong, not whether bookmakers make the same mistake.</p></div>""")
     return "".join(html)
+
+
+def engine_section(R: dict) -> tuple[str, dict]:
+    fr = R.get("fair")
+    if not fr:
+        return "", {}
+    bt = fr["backtest"]
+    rules = {r["threshold"]: r for r in bt["rules"]}
+    r2 = rules[0.02]
+    acc = {r["source"]: r for r in fr["accuracy"]}
+    seasons = [r["season"] for r in bt["by_season"]]
+    yrs = f"{seasons[0][:4]} to {seasons[-1][-4:]}" if seasons else ""
+    w = fr["latest_weights"]
+    from .report import BOOK_NAMES as names
+    top = sorted(w.items(), key=lambda kv: -kv[1])
+    tot = sum(w.values())
+    rows = "".join(f"<tr><td>More than {100 * r['threshold']:.0f}% better</td><td class=num>{r['bets']:,}</td>"
+                   f"<td class=num>{p(r['expected'])}</td><td class=num>{p(r['clv'])}</td><td class=num>{100 * r['beat_close']:.0f}%</td></tr>"
+                   for r in bt["rules"])
+    bs = bt["by_season"]
+    early = [r for r in bs if r["season"] < "2019"]
+    late = [r for r in bs if r["season"] >= "2019"]
+    def pooled(rows):
+        n = sum(r["bets"] for r in rows)
+        return n, (sum(r["bets"] * r["clv"] for r in rows) / n if n else float("nan"))
+    ne, ce = pooled(early)
+    nl, cl_ = pooled(late)
+    if late:
+        worst = min(late, key=lambda r: r["clv"])
+        recent = (f"Up to 2018/19 the engine flagged about {ne / max(len(early), 1):.0f} prices a season. Since then, as bookmakers have "
+                  f"copied the sharpest prices faster, it has flagged about {nl / max(len(late), 1):.0f} a season. Those that remain still beat "
+                  f"the closing price by {p(cl_, 1, False)} on average. Single seasons are noisy with so few flags (the weakest, "
+                  f"{worst['season'][:4]}/{worst['season'][-2:]}, was {p(worst['clv'], 1, False)}), but the edge has held up in every one. "
+                  f"On today's prices this is a tool for spotting the occasional mistake, not a steady stream of them.")
+    else:
+        recent = ""
+    k = dict(recent=recent, n=bt["matches"], weeks=bt["weeks"], yrs=yrs, beat=f"{100 * r2['beat_close']:.0f}%", clv=p(r2["clv"]),
+             clv_lo=p(r2["clv_lo"]), clv_hi=p(r2["clv_hi"]), exp=p(r2["expected"]), per_week=f"{r2['bets_per_week']:.1f}",
+             ret=p(r2["return"]), ret_lo=p(r2["lo"]), ret_hi=p(r2["hi"]), bets=r2["bets"])
+    html = f"""
+<h2>How it works</h2>
+<div class=cards>
+<div class=card><h3>1. Remove each bookmaker's cut</h3><p>Every bookmaker's odds are turned into fair chances, taking more of the margin off long shots, where bookmakers put most of it.</p></div>
+<div class=card><h3>2. Blend the bookmakers</h3><p>The chances are combined into one fair price. Each bookmaker's weight is learned from how well its prices predicted the sharpest closing price (Pinnacle's, and now the Betfair Exchange's) in the previous two seasons.</p></div>
+<div class=card><h3>3. Flag out-of-line prices</h3><p>Any regular bookmaker offering odds more than 2% better than the fair price is flagged, along with how big the gap is.</p></div>
+</div>
+<p style="color:var(--ink2)">Why learn from closing prices and not results? Results are mostly luck, so learning from them needs decades of data and still jumps around. I tried it first, and the weights were unstable and worse than using Pinnacle alone. The closing price, set just before kick-off, is the market's final and best-informed view, so it is a much cleaner target. Today the blend is {', '.join(f"{names.get(b, b)} {100 * v / tot:.0f}%" for b, v in top[:3])}, with small weights for the rest.</p>
+<p style="color:var(--ink2)">One practical change: in 2026/27 the data stopped including Pinnacle. The engine now learns from, and is tested against, the Betfair Exchange closing price, where bettors trade with each other and prices are the sharpest left in the data. The exchange now carries most of the weight.</p>
+<div class=finding><img src="images/fair_weights.png" alt="Each bookmaker's share of the fair price"></div>
+
+<h2>Track record</h2>
+<p style="color:var(--ink2)">The test is whether flagged prices were really better than fair. Profit is a poor test because it depends on who won, so it takes thousands of bets to mean anything. The standard test is the <b>closing price</b>: if you regularly get better odds than the market's final price, your prices were genuinely good, whoever won.</p>
+<div class=finding>
+<h3>Flagged prices beat the closing price by almost exactly the predicted amount</h3>
+<p>Across {k['n']:,} matches from {k['yrs']}, using weights learned only from earlier seasons, the engine flagged {k['bets']:,} prices as more than 2% better than fair. {k['beat']} of them beat the closing price. On average they beat it by {k['clv'].lstrip('+')} (95% range {k['clv_lo'].lstrip('+')} to {k['clv_hi'].lstrip('+')}), against the {k['exp'].lstrip('+')} the engine predicted. Higher thresholds flag fewer prices with bigger edges, and the prediction holds at every level.</p>
+<img src="images/fair_clv.png" alt="Edge over the closing price for flagged prices">
+<table><tr><th>Flag when the price is</th><th class=num>Prices</th><th class=num>Predicted edge</th><th class=num>Edge vs close</th><th class=num>Beat close</th></tr>{rows}</table>
+<p>The fair price itself is also closer to the closing price than any single bookmaker, including Pinnacle's own earlier price ({100 * acc['Pinnacle alone']['vs_fair']:.0f}% further away) and Bet365 ({100 * acc['Bet365 alone']['vs_fair']:.0f}% further).</p>
+<p><b>The edge has shrunk.</b> {k['recent']}</p>
+<img src="images/fair_by_season.png" alt="Flags and edge over the closing price, season by season">
+<p>The profit on the 2% flags was {k['ret']} per bet, but the 95% range ({k['ret_lo']} to {k['ret_hi']}) is wide, which is exactly why the closing price is the better test. Flags have also become rarer as bookmakers' prices have tightened, and in practice bookmakers limit customers who consistently beat their prices.</p>
+</div>"""
+    return html, k
 
 
 def build(R: dict) -> str:
     f = facts(R)
     extra = more_findings(R, 6 if R["closing"] else 5)
+    engine, k = engine_section(R)
     sc = R["model"]["scores"]
-    names = {"uniform": "Equal chances (⅓ each)", "model": "Model from past scores", "market": "Betting market",
-             "market_recalibrated": "Market, recalibrated", "market_plus_model": "Market + model combined"}
+    names = {"uniform": "Equal chances (⅓ each)", "model": "My model", "market": "The odds",
+             "market_recalibrated": "The odds, recalibrated", "market_plus_model": "The odds and my model combined"}
     rows = "".join(f"<tr><td>{names[k]}</td><td class=num>{v['log_loss']:.4f}</td><td class=num>{v['rps']:.4f}</td></tr>"
                    for k, v in sc.items())
+    avg = R["longshot"]["average"]
     closing = ""
     if R["closing"]:
         closing = f"""
 <div class=finding><div class=n>FINDING 4</div>
-<h3>Late price moves point the right way</h3>
-<p>Pinnacle publishes an opening price and a closing price just before kick-off. Over {f['cl_matches']} matches ({f['cl_years']}) the closing odds were the better forecast (log loss {f['ll_close']} against {f['ll_open']}). When an outcome's probability rose by at least 3 percentage points before kick-off, a bet at the <i>opening</i> odds returned {f['short_ret']} (95% interval {f['short_lo']} to {f['short_hi']}, {f['short_n']} bets). When it fell by 3 points, the return was {f['drift_ret']}.</p>
-<img src="images/line_moves.png" alt="Return at opening odds after the price moved">
-<p>Nobody knows the move in advance, so this is not a strategy. It shows that new information (team news, injuries, informed money) arrives before kick-off and that the opening price has not absorbed it yet. Several thresholds were tested, so the 3-point result should be read alongside the others: every “shortened” estimate is positive and every “drifted” one is negative.</p></div>"""
+<h3>Prices that move before kick-off move the right way</h3>
+<p>Pinnacle records an opening price and a closing price just before kick-off. Across {f['cl_matches']} matches from {f['cl_years']}, the closing price was the better prediction. When an outcome's chance rose by 3 percentage points or more before kick-off, a bet at the opening price made {f['short_ret']} per bet (95% range {f['short_lo']} to {f['short_hi']}). When its chance fell by 3 points, the same bet lost {f['drift_ret'].lstrip('-')}.</p>
+<img src="images/line_moves.png" alt="Return at the opening price after the price moved">
+<p>This isn't a strategy, because you can't know the move in advance. What it shows is that real information, such as team news and injuries, arrives before kick-off and the opening price hasn't caught up. I tried several cut-offs, not just 3 points, and they all point the same way.</p></div>"""
     return f"""<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
-<title>Football Betting Market Efficiency</title>
-<meta name=description content="A test of whether bookmakers' odds are accurate forecasts, using {f['matches']} English league matches.">
+<title>A Fair-Price Engine for Football Odds</title>
+<meta name=description content="Combines about ten bookmakers into one fair price for every upcoming football match, and flags prices that are better than fair.">
 <link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel=stylesheet>
-<style>{CSS}</style></head><body>
+<style>{CSS}.cta{{display:inline-block;margin-top:22px;background:#eb6834;color:#fff;font-weight:600;padding:10px 18px;border-radius:8px;text-decoration:none}}</style></head><body>
 <header class=hero><div class=wrap>
 <div class=kicker>Data science project · Python</div>
-<h1>Testing the Efficiency of Football Betting Odds</h1>
-<p class=lede>Bookmakers set odds on every professional football match. Odds can be read as probabilities, so they are a forecast. This project tests that forecast on {f['matches']} English {f['leagues']} matches from {f['years']}. If the market is efficient, outcomes happen as often as the odds say, and no simple rule makes money.</p>
-<div class=result><b>Main result</b>The odds are close to calibrated, and a statistical model built from past scores could not improve on them. The market has two consistent weaknesses: long shots are overpriced, and the opening price lags behind news that arrives before kick-off. Neither weakness has faded over 20 years.</div>
-<p class=note><code>Odds</code> Decimal odds of 2.50 return £2.50 for every £1 staked, including the stake. They imply a probability of 1 ÷ 2.50 = 40%. The three probabilities for a match (home win, draw, away win) add up to slightly more than 100%. The excess is the bookmaker's <i>margin</i>, its built-in profit.</p>
+<h1>A Fair-Price Engine for Football Odds</h1>
+<p class=lede>Bookmakers often disagree about the same match. This tool combines about ten of them into one fair price for every upcoming game, then flags any bookmaker whose odds are better than fair. It is built the way a market maker thinks: work out what something is really worth, then look for prices that are out of line.</p>
+<div class=result><b>Main result</b>When the engine flagged a price as more than 2% better than fair, that price beat the market's closing price {k.get('beat', '')} of the time, by {k.get('clv', '').lstrip('+')} on average. That is almost exactly the {k.get('exp', '').lstrip('+')} the engine predicted, tested on {k.get('n', 0):,} matches it had never seen.</div>
+<a class=cta href="this-week.html">See this week's fair prices →</a>
+<p class=note><code>How odds work</code> Odds of 2.50 pay £2.50 for every £1 bet, including your stake. That implies a 40% chance (1 ÷ 2.50). Add up the chances for a home win, a draw and an away win and you get a little over 100%. The extra is the bookmaker's cut, called the <i>margin</i>.</p>
 </div></header>
 <main class=wrap>
 <div class=stats>
-<div class=stat><div class=v>{f['matches']}</div><div class=l>matches</div></div>
-<div class=stat><div class=v>{f['n_seasons']}</div><div class=l>seasons</div></div>
-<div class=stat><div class=v>{f['slope']}</div><div class=l>calibration slope (1 = perfect)</div></div>
-<div class=stat><div class=v>{f['vb_avg']}</div><div class=l>return from model's “value” bets</div></div>
+<div class=stat><div class=v>{k.get('n', 0):,}</div><div class=l>matches in the backtest</div></div>
+<div class=stat><div class=v>{k.get('beat', '')}</div><div class=l>of flagged prices beat the closing price</div></div>
+<div class=stat><div class=v>{k.get('clv', '')}</div><div class=l>average edge over the closing price</div></div>
+<div class=stat><div class=v>{k.get('bets', 0):,}</div><div class=l>prices flagged in the backtest</div></div>
 </div>
+{engine}
 
-<h2>The questions</h2>
-<ul>
-<li><b>Calibration.</b> Do outcomes priced at 30% happen 30% of the time?</li>
-<li><b>Bias.</b> Does betting on some kinds of outcome lose less than others?</li>
-<li><b>Information.</b> Do prices that move before kick-off move the right way?</li>
-<li><b>Forecasting.</b> Can a model built only from past scores beat the market, or add to it?</li>
-<li><b>Sharp vs retail.</b> Can the price of a low-margin bookmaker find mistakes at the others?</li>
-<li><b>In-play.</b> After half-time, do teams keep scoring at the rate the pre-match odds implied?</li>
-<li><b>Change.</b> Has the market become more accurate over 20 years, and is the second division easier to beat?</li>
-</ul>
+<h2>What {f['n_seasons']} seasons of odds show</h2>
+<p style="color:var(--ink2)">Before building the engine, I studied how accurate the odds are, using {f['matches']} matches from the {f['leagues']} between {f['years'].replace(' to ', ' and ')}. These findings explain why the engine is designed the way it is.</p>
 
-<h2>What I found</h2>
 <div class=finding><div class=n>FINDING 1</div>
-<h3>The odds are close to calibrated</h3>
-<p>Each point groups about 4,000 outcomes with similar prices. Outcomes priced at {f['top_priced']} happened {f['top_happened']} of the time. Outcomes priced at {f['low_priced']} happened {f['low_happened']} of the time. The calibration slope is {f['slope']} (95% interval {f['slope_lo']}–{f['slope_hi']}). A slope above 1 means favourites win slightly more often than priced and long shots slightly less.</p>
-<img src="images/calibration.png" alt="Calibration of betting odds"></div>
+<h3>The odds are accurate</h3>
+<p>I grouped every outcome by the chance the odds gave it, then checked how often it happened. Outcomes given a {f['top_priced']} chance happened {f['top_happened']} of the time. Outcomes given a {f['low_priced']} chance happened {f['low_happened']} of the time. Perfect predictions would sit on the diagonal line, and these are close. They're slightly too steep: favourites win a little more often than the odds say, and long shots a little less.</p>
+<img src="images/calibration.png" alt="How often outcomes happened, against the chance the odds gave them"></div>
 
 <div class=finding><div class=n>FINDING 2</div>
-<h3>Long shots are overpriced</h3>
-<p>Betting £1 on every heavy favourite (odds 1–1.5) at the average bookmaker's price lost {f['fav_ret']}. Betting on every long shot (odds {f['long_band']}) lost {f['long_ret']}. This is the favourite–long-shot bias. It is explained by how bookmakers load their margin: if the margin is assumed to sit mostly on long shots (the “power” method), the calibration slope falls from {f['prop_slope']} to {f['power_slope']}.</p>
-<img src="images/longshot.png" alt="Return by odds band">
-<p>At the best price across about ten bookmakers, favourites roughly break even. That needs accounts at every bookmaker, and the best price is sometimes a mistake that would be cancelled or limited.</p></div>
+<h3>Long shots are a bad bet</h3>
+<p>Betting £1 on every heavy favourite (odds below 1.5) at the average bookmaker's price lost {pence(avg[0]['return'])} per bet. Betting £1 on every long shot (odds of 10 or more) lost {pence(avg[-1]['return'])}. This is the favourite–long-shot bias, which also shows up in horse racing and other betting markets.</p>
+<p>It comes from how bookmakers spread their margin: they put more of it on long shots. Removing the margin that way makes the odds almost perfectly accurate (a slope of {f['power_slope']} instead of {f['prop_slope']}).</p>
+<img src="images/longshot.png" alt="Profit or loss by odds">
+<p>Taking the best price from about ten bookmakers gets favourites to roughly break even. In practice that needs an account with every bookmaker, and the very best price is sometimes a mistake that gets cancelled.</p></div>
 
 <div class=finding><div class=n>FINDING 3</div>
-<h3>Margins have fallen by more than half</h3>
-<p>The average bookmaker's margin fell from {f['margin_first']} in {R['seasons'][0][:4]} to {f['margin_last']} by {R['seasons'][1][-4:]}. Pinnacle, which takes large bets and profits from volume, charges about {f['pin_margin']}.</p>
+<h3>Bookmakers take a smaller cut than they used to</h3>
+<p>The average bookmaker's margin fell from {f['margin_first']} in {R['seasons'][0][:4]} to {f['margin_last']} by {R['seasons'][1][-4:]}. Pinnacle, which aims for high volume at low margins, takes about {f['pin_margin']}.</p>
 <img src="images/margins.png" alt="Bookmaker margin by season"></div>
 {closing}
 <div class=finding><div class=n>FINDING {5 if R['closing'] else 4}</div>
-<h3>A model from past scores cannot beat the market</h3>
-<p>The model gives each team an attack and a defence rating, fitted to past goals (a Poisson model, as in Dixon &amp; Coles, 1997). It is refitted every week using only earlier matches, and its one setting (how fast old results fade, {f['half_life']} days) was chosen on seasons before 2008 and never adjusted on the test seasons.</p>
-<table><tr><th>Forecast ({f['eval_matches']} matches from {f['eval_from']})</th><th class=num>Log loss</th><th class=num>RPS</th></tr>{rows}</table>
-<p>Lower is better for both scores. The model is far better than guessing but clearly worse than the market. Combining the two changed log loss by {f['gain']} (95% interval {f['gain_lo']} to {f['gain_hi']}), so the model adds nothing the odds do not already contain.</p>
-<img src="images/value_bets.png" alt="Cumulative profit from the model's value bets">
-<p>Betting whenever the model rated an outcome at least 5% more likely than the odds did, lost {f['vb_avg'].lstrip('-')} per bet at average odds and {f['vb_pin'].lstrip('-')} at Pinnacle. At the best price across all bookmakers it returned {f['vb_best']}, which is break-even within the uncertainty.</p></div>
+<h3>A model built from past results can't beat the odds</h3>
+<p>The model rates each team's attack and defence from its recent goals, a standard approach from Dixon and Coles (1997). Every week it is refitted using only matches already played, so it never sees the future. Its one setting, how quickly old results fade, was chosen using seasons before 2008 and then left alone.</p>
+<table><tr><th>Prediction ({f['eval_matches']} matches from {f['eval_from']})</th><th class=num>Log loss</th><th class=num>RPS</th></tr>{rows}</table>
+<p>Lower scores are better. The model is much better than guessing, but clearly worse than the odds, and adding it to the odds didn't help at all.</p>
+<img src="images/value_bets.png" alt="Running profit from betting the model's picks">
+<p>Betting on every outcome the model rated at least 5% more likely than the odds did lost {pence(float(f['vb_avg'].rstrip('%')) / 100)} per £1 at average prices and {pence(float(f['vb_pin'].rstrip('%')) / 100)} at Pinnacle. Even at the best available price, it only broke even.</p></div>
 {extra}
 
 <h2>What I learned</h2>
 <div class=cards>
-<div class=card><h3>Score the probabilities</h3><p>Accuracy (“picked the winner”) hides most of the information. Log loss and the ranked probability score reward a forecast for being confident only when it should be.</p></div>
-<div class=card><h3>Never let the future leak</h3><p>The model only sees matches before each week, the setting was tuned on separate early seasons, and a test checks this. Without these rules a backtest can look profitable by accident.</p></div>
-<div class=card><h3>Report the uncertainty</h3><p>Betting returns are noisy. Every number here has a bootstrap interval that resamples whole matches, and several promising-looking strategies turned out to be inside the noise.</p></div>
+<div class=card><h3>Test against the closing price</h3><p>Results are mostly luck. My first version learned from results and was unstable; learning from and testing against the closing price made the engine both steadier and measurable.</p></div>
+<div class=card><h3>Never let the model see the future</h3><p>The model only uses matches already played, its setting was chosen on separate early seasons, and a test checks both. Without that, a backtest can look profitable by accident.</p></div>
+<div class=card><h3>Always show the uncertainty</h3><p>Betting returns are noisy. Every number here comes with a 95% range, and several strategies that looked promising turned out to be noise.</p></div>
 </div>
 
 <h2>How it's built</h2>
 <ul>
 <li><b>Data:</b> results and odds from up to ten bookmakers per match, from <a href="https://www.football-data.co.uk">football-data.co.uk</a>.</li>
-<li><b>Margin removal:</b> three methods compared (proportional, power, Shin 1993).</li>
-<li><b>Model:</b> weekly walk-forward Poisson ratings with time decay, in scikit-learn.</li>
-<li><b>Combination:</b> multinomial logistic regression, refitted each season on earlier seasons only.</li>
-<li><b>Tests:</b> nine pytest checks, including that the model never sees a match on or after the one it predicts.</li>
+<li><b>Removing the margin:</b> three methods compared (proportional, power and Shin's 1993 model).</li>
+<li><b>Fair price:</b> a weighted logarithmic pool of bookmakers, with weights fitted to closing prices each season (SciPy).</li>
+<li><b>Model:</b> team ratings refitted every week on past matches only, in scikit-learn.</li>
+<li><b>Combining forecasts:</b> logistic regression, refitted each season on earlier seasons only.</li>
+<li><b>Uncertainty:</b> 95% ranges from resampling whole matches (the bootstrap).</li>
+<li><b>Tests:</b> fourteen automated checks, including one that the model never sees a match before predicting it.</li>
 </ul>
 <h2>Limits</h2>
 <ul>
-<li>English leagues only in the included data. <code>step2_download_more_data.py</code> adds Spain, Germany, Italy and France and the seasons since 2020.</li>
-<li>The odds are snapshots collected by football-data.co.uk, not every price that was available.</li>
-<li>This is a study of forecasting, not betting advice. The results show how hard the market is to beat.</li>
+<li>The track record needs closing prices, which the included files have from 2015. Running <code>step2_download_more_data.py</code> extends it to the current season and four more leagues.</li>
+{"<li>The included data covers English football only. <code>update_everything.py</code> adds Spain, Germany, Italy, France and the seasons since 2020.</li>" if set(R["leagues"]) <= {"E0", "E1"} else ""}
+<li>The odds are snapshots collected by football-data.co.uk, not every price on offer.</li>
+<li>This is a study of forecasting, not betting advice. Mostly, it shows how hard the market is to beat.</li>
 </ul>
 </main>
 <footer><div class=wrap>Code and data: <a href="{REPO_URL}">{REPO_URL.replace('https://', '')}</a></div></footer>

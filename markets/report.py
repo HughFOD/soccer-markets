@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
-from . import data, efficiency as ef, live, margin, model, sharp
+from . import data, efficiency as ef, fairprice, live, margin, model, sharp
 
 BLUE, ORANGE, AQUA, INK, MUTED, GRID = "#2a78d6", "#eb6834", "#1baf7a", "#0b0b0b", "#52514e", "#e4e3df"
 HDA = ["h", "d", "a"]
@@ -298,6 +298,66 @@ def chart_score_effects(t: pd.DataFrame, path: Path):
     _save(fig, path)
 
 
+def chart_robustness(t: pd.DataFrame, path: Path):
+    fig, ax = plt.subplots(figsize=(7.4, 5.4))
+    y = np.arange(len(t))[::-1]
+    ax.errorbar(100 * (t["ratio"] - 1), y, xerr=[100 * (t["ratio"] - t["lo"]), 100 * (t["hi"] - t["ratio"])],
+                fmt="o", color=BLUE, ms=6, lw=1.5, capsize=0)
+    ax.axvline(0, color=INK, lw=1)
+    ax.set_yticks(y, t["check"])
+    ax.set_xlim(-2, None)
+    _style(ax, "The trailing team's extra share holds in every check",
+           "trailing team's share of second-half goals vs expected (%)", "")
+    ax.grid(axis="y", visible=False)
+    _save(fig, path)
+
+
+BOOK_NAMES = {"PS": "Pinnacle", "B365": "Bet365", "BW": "Bet&Win", "IW": "Interwetten", "LB": "Ladbrokes",
+              "VC": "VC Bet", "WH": "William Hill", "SJ": "Stan James", "GB": "Gamebookers", "BS": "Blue Square",
+              "SB": "Sportingbet", "SO": "Sporting Odds", "SY": "Stanleybet", "1XB": "1xBet", "BF": "Betfair",
+              "CL": "Coral", "BV": "BetVictor", "BFD": "Betfred", "BMGM": "BetMGM", "PP": "Paddy Power",
+              "SKB": "Sky Bet", "BFE": "Betfair Exchange"}
+
+
+def chart_clv(rules: pd.DataFrame, path: Path):
+    fig, ax = plt.subplots(figsize=(7.2, 4.4))
+    x = np.arange(len(rules))
+    ax.plot(x - 0.1, 100 * rules["expected"], color=AQUA, lw=0, marker="D", ms=7, label="edge the engine predicted")
+    ax.errorbar(x + 0.1, 100 * rules["clv"], yerr=[100 * (rules["clv"] - rules["clv_lo"]), 100 * (rules["clv_hi"] - rules["clv"])],
+                fmt="o", color=ORANGE, ms=7, lw=1.5, capsize=0, label="edge over the closing price (95% range)")
+    ax.axhline(0, color=INK, lw=1)
+    ax.set_xticks(x, [f">{100 * t:.0f}%\n{b:,} prices\n{100 * c:.0f}% beat close" for t, b, c in
+                      zip(rules["threshold"], rules["bets"], rules["beat_close"])])
+    _style(ax, "Flagged prices beat the closing price by what the engine predicted",
+           "flag when a price beats the fair price by more than", "edge per bet (%)")
+    ax.legend(frameon=False, loc="upper left")
+    _save(fig, path)
+
+
+def chart_flags_by_season(t: pd.DataFrame, path: Path):
+    fig, (a1, a2) = plt.subplots(2, 1, figsize=(7.4, 5.4), sharex=True, gridspec_kw={"height_ratios": [1, 1.4]})
+    x = np.arange(len(t))
+    a1.bar(x, t["bets"], color=BLUE, width=0.6)
+    _style(a1, "Flags have become rarer, but still beat the closing price", "", "flagged prices")
+    a2.errorbar(x, 100 * t["clv"], yerr=[100 * (t["clv"] - t["clv_lo"]), 100 * (t["clv_hi"] - t["clv"])],
+                fmt="o", color=ORANGE, ms=6, lw=1.5, capsize=0)
+    a2.axhline(0, color=INK, lw=1)
+    a2.set_xticks(x, [s[2:4] + "/" + s[-2:] for s in t["season"]])
+    _style(a2, "", "season", "edge vs closing price (%)")
+    _save(fig, path)
+
+
+def chart_weights(w: dict, path: Path):
+    items = sorted(w.items(), key=lambda kv: kv[1])
+    fig, ax = plt.subplots(figsize=(6.4, 0.32 * len(items) + 1.3))
+    y = np.arange(len(items))
+    ax.barh(y, [100 * v / sum(w.values()) for _, v in items], color=BLUE, height=0.6)
+    ax.set_yticks(y, [BOOK_NAMES.get(k, k) for k, _ in items])
+    _style(ax, "How much each bookmaker counts in the fair price", "share of the weight (%)", "")
+    ax.grid(axis="y", visible=False)
+    _save(fig, path)
+
+
 def chart_moves(mv: pd.DataFrame, path: Path):
     fig, ax = plt.subplots(figsize=(7.0, 4.2))
     for direction, color, dx in (("shortened", ORANGE, -0.08), ("drifted", BLUE, 0.08)):
@@ -359,6 +419,11 @@ def run(raw_dir: Path, out_dir: Path, tune_cutoff: str = "2008-07-01", eval_from
     R["by_season"] = {"table": seasons, "slope_trend_per_decade": seasons.attrs["trend_per_decade"]}
     R["by_league"] = sharp.by_league(m, Y)
     print("half-time (in-play) analysis..."); R["live"] = live.run(m)
+    print("fair-price engine...")
+    books = fairprice.books_in(m)
+    P_fair, W = fairprice.walk_forward(m, books)
+    R["fair"] = {"accuracy": fairprice.accuracy(m, Y, P_fair, books), "backtest": fairprice.backtest(m, Y, P_fair, books),
+                 "weights_by_season": W.reset_index(), "latest_weights": fairprice.latest_weights(m, books)}
 
     chart_calibration(R["calibration"]["table"], out_dir / "calibration.png")
     chart_longshot(R["longshot"], out_dir / "longshot.png")
@@ -370,6 +435,10 @@ def run(raw_dir: Path, out_dir: Path, tune_cutoff: str = "2008-07-01", eval_from
         chart_soft(R["soft_bets"]["rules"], out_dir / "soft_vs_sharp.png")
     chart_seasons(seasons, out_dir / "slope_by_season.png")
     chart_score_effects(R["live"]["score_effects"], out_dir / "score_effects.png")
+    chart_robustness(R["live"]["robustness"], out_dir / "score_effect_checks.png")
+    chart_clv(R["fair"]["backtest"]["rules"], out_dir / "fair_clv.png")
+    chart_weights(R["fair"]["latest_weights"], out_dir / "fair_weights.png")
+    chart_flags_by_season(R["fair"]["backtest"]["by_season"], out_dir / "fair_by_season.png")
     curve = R["model"].pop("curve")
     curve.to_csv(out_dir / "value_bet_curve.csv", index=False)
     (out_dir / "results.json").write_text(json.dumps(_clean(R), indent=1))
@@ -443,8 +512,24 @@ def write_report(R: dict) -> str:
         L += ["", "| Favourite | Half-time | Matches | Model win | Actual win | Gap (CI) | Model draw | Actual draw |", "|---|---|---|---|---|---|---|---|"]
         L += [f"| {r['favourite']} | {r['half_time']} | {r['matches']:,} | {r['model_win']:.3f} | {r['actual_win']:.3f} | {pct(r['win_gap'])} ({pct(r['win_lo'])} to {pct(r['win_hi'])}) | {r['model_draw']:.3f} | {r['actual_draw']:.3f} |"
               for r in lv["by_state"]]
+        L += ["", "Within-match test: the trailing team's share of second-half goals, actual vs expected.", "",
+              "| Check | Matches | Expected share | Actual share | Ratio | 95% CI |", "|---|---|---|---|---|---|"]
+        L += [f"| {r['check']} | {r['matches']:,} | {r['expected_share']:.3f} | {r['actual_share']:.3f} | {r['ratio']:.3f} | {r['lo']:.3f}–{r['hi']:.3f} |"
+              for r in lv["robustness"]]
         L += ["", f"Log loss on {lv['test_matches']:,} test matches: pre-match {lv['log_loss']['pre_match']:.4f}, half-time naive {lv['log_loss']['half_time_naive']:.4f}, "
               f"with score effects {lv['log_loss']['half_time_adjusted']:.4f} (gain {g[0]:.4f}, CI {g[1]:.4f} to {g[2]:.4f})."]
+    fr = R.get("fair")
+    if fr:
+        bt = fr["backtest"]
+        L += ["", "Flags by season (2% threshold):", "", "| Season | Flags | Edge vs close (CI) | Beat close | Return |", "|---|---|---|---|---|"]
+        L += [f"| {r['season']} | {r['bets']:,} | {pct(r['clv'])} ({pct(r['clv_lo'])} to {pct(r['clv_hi'])}) | {r['beat_close']:.0%} | {pct(r['return'])} |" for r in bt["by_season"]]
+        L += ["", "## Fair-price engine", "", f"Backtest: {bt['matches']:,} matches over {bt['weeks']} weeks with closing prices.", "",
+              "| Source | Distance to closing price | vs engine | Log loss |", "|---|---|---|---|"]
+        L += [f"| {r['source']} | {r['distance_to_close']:.5f} | {pct(r['vs_fair'])} | {r['log_loss']:.4f} |" for r in fr["accuracy"]]
+        L += ["", "| Flag threshold | Prices | Per week | Predicted edge | Edge vs close (CI) | Beat close | Return (CI) |", "|---|---|---|---|---|---|---|"]
+        L += [f"| {r['threshold']:.0%} | {r['bets']:,} | {r['bets_per_week']:.1f} | {pct(r['expected'])} | {pct(r['clv'])} ({pct(r['clv_lo'])} to {pct(r['clv_hi'])}) | {r['beat_close']:.0%} | {pct(r['return'])} ({pct(r['lo'])} to {pct(r['hi'])}) |"
+              for r in bt["rules"]]
+        L += ["", "Latest weights: " + ", ".join(f"{k} {v:.2f}" for k, v in sorted(fr["latest_weights"].items(), key=lambda kv: -kv[1]))]
     if R.get("no_crowds"):
         L += ["", "## Matches without crowds (June 2020 – May 2021)", "", "| Period | Matches | Home wins | Priced | Gap (CI) | Home goal diff |", "|---|---|---|---|---|---|"]
         for k, v in R["no_crowds"].items():
