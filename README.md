@@ -35,9 +35,8 @@ In 2026/27 the data stopped including Pinnacle, so the engine now learns from
 and is tested against the Betfair Exchange closing price, the sharpest price
 left.
 
-Why learn from closing prices and not results? Results are mostly luck. My
-first version learned from results, and its weights were unstable and worse
-than using Pinnacle alone. The closing price, set just before kick-off, is the
+Why learn from closing prices and not results? Results are mostly luck, so
+weights learned from them are noisy and unstable. The closing price, set just before kick-off, is the
 market's final and best-informed view, so it is a much cleaner target.
 
 ![Weights](docs/images/fair_weights.png)

@@ -135,7 +135,7 @@ def more_findings(R: dict, start: int) -> str:
         html.append(f"""
 <div class=finding><div class=n>FINDING {n}</div>
 <h3>The second division isn't easier to beat</h3>
-<p>I expected the Championship to be priced less accurately than the Premier League, since fewer people follow it and less money is bet on it. The data says no. Its odds are just as accurate, and my model didn't help in either league.</p>
+<p>Fewer people follow the Championship and less money is bet on it, so it could be priced less accurately than the Premier League. It isn't. Its odds are just as accurate, and my model didn't help in either league.</p>
 <table><tr><th>League</th><th class=num>Matches</th><th class=num>Margin</th><th class=num>Calibration slope</th><th class=num>Loss betting on everything</th></tr>
 <tr><td>Premier League</td><td class=num>{e0['matches']:,}</td><td class=num>{p(e0['margin'], 1, False)}</td><td class=num>{e0['slope']:.2f}</td><td class=num>{pence(e0['bet_everything'])} per £1</td></tr>
 <tr><td>Championship</td><td class=num>{e1['matches']:,}</td><td class=num>{p(e1['margin'], 1, False)}</td><td class=num>{e1['slope']:.2f}</td><td class=num>{pence(e1['bet_everything'])} per £1</td></tr></table></div>""")
@@ -209,7 +209,7 @@ def engine_section(R: dict) -> tuple[str, dict]:
 <div class=card><h3>2. Blend the bookmakers</h3><p>The chances are combined into one fair price. Each bookmaker's weight is learned from how well its prices predicted the sharpest closing price (Pinnacle's, and now the Betfair Exchange's) in the previous two seasons.</p></div>
 <div class=card><h3>3. Flag out-of-line prices</h3><p>Any regular bookmaker offering odds more than 2% better than the fair price is flagged, along with how big the gap is.</p></div>
 </div>
-<p style="color:var(--ink2)">Why learn from closing prices and not results? Results are mostly luck, so learning from them needs decades of data and still jumps around. I tried it first, and the weights were unstable and worse than using Pinnacle alone. The closing price, set just before kick-off, is the market's final and best-informed view, so it is a much cleaner target. Today the blend is {', '.join(f"{names.get(b, b)} {100 * v / tot:.0f}%" for b, v in top[:3])}, with small weights for the rest.</p>
+<p style="color:var(--ink2)">Why learn from closing prices and not results? Results are mostly luck, so learning from them needs decades of data and still jumps around. The closing price, set just before kick-off, is the market's final and best-informed view, so it is a much cleaner target. Today the blend is {', '.join(f"{names.get(b, b)} {100 * v / tot:.0f}%" for b, v in top[:3])}, with small weights for the rest.</p>
 <p style="color:var(--ink2)">One practical change: in 2026/27 the data stopped including Pinnacle. The engine now learns from, and is tested against, the Betfair Exchange closing price, where bettors trade with each other and prices are the sharpest left in the data. The exchange now carries most of the weight.</p>
 <div class=finding><img src="images/fair_weights.png" alt="Each bookmaker's share of the fair price"></div>
 
@@ -300,7 +300,7 @@ def build(R: dict) -> str:
 
 <h2>What I learned</h2>
 <div class=cards>
-<div class=card><h3>Test against the closing price</h3><p>Results are mostly luck. My first version learned from results and was unstable; learning from and testing against the closing price made the engine both steadier and measurable.</p></div>
+<div class=card><h3>Test against the closing price</h3><p>Results are mostly luck. Learning from and testing against the closing price makes the engine steady and its accuracy measurable.</p></div>
 <div class=card><h3>Never let the model see the future</h3><p>The model only uses matches already played, its setting was chosen on separate early seasons, and a test checks both. Without that, a backtest can look profitable by accident.</p></div>
 <div class=card><h3>Always show the uncertainty</h3><p>Betting returns are noisy. Every number here comes with a 95% range, and several strategies that looked promising turned out to be noise.</p></div>
 </div>
