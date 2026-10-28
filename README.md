@@ -1,21 +1,22 @@
 # A Fair-Price Engine for Football Odds
 
-Bookmakers often disagree about the same match. This tool combines about ten
-of them into one fair price for every upcoming game, then flags any bookmaker
-whose odds are better than fair. It is built the way a market maker thinks:
+Bookmakers often disagree about the same match. This tool combines them into
+one fair price for every upcoming game, then flags any American sportsbook
+(DraftKings, FanDuel, BetMGM, Caesars and others) whose odds are better than
+fair. It is built the way a market maker thinks:
 work out what something is really worth, then look for prices that are out of
 line.
 
 **Main result.** When the engine flagged a price as more than 2% better than
 fair, that price beat the market's closing price 72% of the time, by
 4.1% on average (95% range 3.8% to 4.4%). That is almost exactly the
-4.1% the engine predicted, tested on 30,976 matches (2013–2027) it had never seen.
+4.1% the engine predicted, tested on 29,450 matches (2013–2026) it had never seen.
 
 - Website: https://hughfod.github.io/soccer-markets/
-- This week's prices: https://hughfod.github.io/soccer-markets/this-week.html
+- This week's prices at American sportsbooks: https://hughfod.github.io/soccer-markets/this-week.html
 
-> **How odds work.** Odds of 2.50 pay £2.50 for every £1 bet, including your
-> stake. That implies a 40% chance (1 ÷ 2.50). The chances for a home win, a
+> **How odds work.** American odds of +150 mean a $100 bet wins $150; −200
+> means you bet $200 to win $100. +150 implies a 40% chance. The chances for a home win, a
 > draw and an away win add up to a little over 100%. The extra is the
 > bookmaker's cut, called the margin.
 
@@ -27,13 +28,16 @@ fair, that price beat the market's closing price 72% of the time, by
 2. **Blend the bookmakers.** The chances are combined into one fair price (a
    weighted logarithmic pool). Each bookmaker's weight is learned from how well
    its prices predicted the sharpest closing price in the previous two seasons.
-   Today the blend is Betfair Exchange 79%, Bet365 9%, Pinnacle 4%, BetVictor 2%.
+   Today the blend is Pinnacle 69%, Bet365 6%, Betfred 5%, BetVictor 4%.
 3. **Flag out-of-line prices.** Any regular bookmaker offering odds more than
    2% better than the fair price is flagged.
 
-In 2026/27 the data stopped including Pinnacle, so the engine now learns from
-and is tested against the Betfair Exchange closing price, the sharpest price
-left.
+Betting exchanges such as Betfair are left out: in thin markets their prices
+swing a lot, and with them in, one exchange took most of the weight. Leaving
+them out changed the results by less than a tenth of a point. The track record
+uses European bookmakers (2013/14 to 2025/26), because free historical odds
+from American sportsbooks don't exist; the weekly page applies the same method
+to American sportsbooks.
 
 Why learn from closing prices and not results? Results are mostly luck, so
 weights learned from them are noisy and unstable. The closing price, set just before kick-off, is the
@@ -51,28 +55,48 @@ final price, your prices were genuinely good, whoever won.
 
 | Flag when the price is | Prices | Predicted edge | Edge vs closing price (95% range) | Beat close |
 |---|---|---|---|---|
-| More than 0% better | 11,969 | +1.8% | +1.7% (+1.6% to +1.9%) | 61% |
-| More than 1% better | 6,462 | +2.9% | +3.0% (+2.7% to +3.2%) | 67% |
-| More than 2% better | 3,609 | +4.1% | +4.1% (+3.8% to +4.4%) | 72% |
-| More than 3% better | 2,122 | +5.3% | +5.2% (+4.8% to +5.7%) | 75% |
-| More than 5% better | 847 | +7.4% | +7.2% (+6.4% to +8.0%) | 79% |
+| More than 0% better | 11,820 | +1.8% | +1.7% (+1.6% to +1.9%) | 61% |
+| More than 1% better | 6,427 | +2.9% | +2.9% (+2.7% to +3.1%) | 67% |
+| More than 2% better | 3,616 | +4.1% | +4.1% (+3.8% to +4.4%) | 72% |
+| More than 3% better | 2,124 | +5.3% | +5.2% (+4.7% to +5.6%) | 75% |
+| More than 5% better | 847 | +7.4% | +7.1% (+6.3% to +7.9%) | 79% |
 
 The fair price is also closer to the closing price than any single bookmaker:
 
 | Price | Distance to closing price | vs this engine |
 |---|---|---|
 | Fair price (this engine) | 0.00253 | +0% |
-| Equal-weight average | 0.00265 | +5% |
+| Equal-weight average | 0.00266 | +5% |
 | Pinnacle alone | 0.00255 | +1% |
 | Bet365 alone | 0.00288 | +14% |
 
-**The edge has shrunk.** Up to 2018/19 the engine flagged about 472 prices a season. Since then, as bookmakers have copied the sharpest prices faster, it has flagged about 97 a season. Those that remain still beat the closing price by 3.6% on average. Single seasons are noisy with so few flags (the weakest, 2023/24, was 2.1%), but the edge has held up in every one. On today's prices this is a tool for spotting the occasional mistake, not a steady stream of them.
+**The edge has shrunk.** Up to 2018/19 the engine flagged about 472 prices a season. Since then, as bookmakers have copied the sharpest prices faster, it has flagged about 112 a season. Those that remain still beat the closing price by 3.4% on average. Single seasons are noisy with so few flags (the weakest, 2025/26, was 1.9%), but the edge has held up in every one. On today's prices this is a tool for spotting the occasional mistake, not a steady stream of them.
 
 ![By season](docs/images/fair_by_season.png)
 
-The profit on the 2% flags was +7.2% per bet, but its 95% range
-(+1.5% to +12.8%) is wide, which is why the closing price is the better test.
+The profit on the 2% flags was +6.8% per bet, but its 95% range
+(+1.2% to +12.6%) is wide, which is why the closing price is the better test.
 In practice, bookmakers limit customers who consistently beat their prices.
+
+## The best types of bets
+
+| Type | Flags | Edge vs close | Beat close | Return per bet (95% range) |
+|---|---|---|---|---|
+| Strong favourite (odds under 1.67, -150 or shorter) | 541 | +3.6% | 81% | +1.3% (-4.5% to +6.6%) |
+| Slight favourite (1.67-2.50, -150 to +150) | 1,042 | +4.6% | 78% | +12.6% (+6.5% to +18.6%) |
+| Underdog (2.50-4.00, +150 to +300) | 971 | +4.1% | 73% | +9.7% (+0.9% to +19.5%) |
+| Long shot (over 4.00, +300 or longer) | 1,062 | +3.9% | 60% | +1.3% (-14.7% to +17.8%) |
+| Bundesliga | 653 | +4.8% | 77% | +10.1% (-0.9% to +21.3%) |
+| Premier League | 598 | +4.0% | 75% | +15.0% (-0.3% to +31.1%) |
+| Championship | 493 | +2.5% | 65% | +0.1% (-13.8% to +13.7%) |
+| Ligue 1 | 636 | +3.8% | 70% | +5.1% (-7.6% to +18.2%) |
+| Serie A | 618 | +4.7% | 71% | -2.1% (-12.8% to +9.8%) |
+| La Liga | 618 | +4.4% | 72% | +11.5% (-6.0% to +32.1%) |
+| Gap 2-4% | 2,269 | +2.8% | 68% | +7.1% (+0.7% to +13.8%) |
+| Gap 4-7% | 1,008 | +5.3% | 77% | +3.9% (-7.6% to +15.9%) |
+| Gap over 7% | 339 | +9.1% | 80% | +13.8% (-12.0% to +43.6%) |
+
+![Bet types](docs/images/bet_types.png)
 
 ## What 27 seasons of odds show
 
@@ -119,6 +143,7 @@ From a terminal: `pip install -r requirements.txt && python update_everything.py
 ```
 markets/fairprice.py   the engine: margin removal, weighted pool, weights from closing prices, flags, backtest
 markets/weekly.py      prices this week's matches -> docs/this-week.html
+markets/usbooks.py     American sportsbook odds from The Odds API (needs a free key in odds_api_key.txt)
 markets/data.py        loads and downloads football-data.co.uk files
 markets/margin.py      odds to fair chances: proportional, power, Shin
 markets/efficiency.py  scores, calibration, returns, bootstrap ranges
@@ -127,7 +152,7 @@ markets/sharp.py       Pinnacle vs other bookmakers, by season, by league
 markets/live.py        half-time scores and score effects
 markets/report.py      runs every analysis; charts, results.json, report.md
 markets/website.py     builds the website; markets/readme.py builds this README
-tests/                 fourteen checks, including that nothing is fitted on the matches it is tested on
+tests/                 sixteen checks, including that nothing is fitted on the matches it is tested on
 ```
 
 ## Limits

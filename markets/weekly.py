@@ -6,6 +6,7 @@ Writes output/this_week.csv and docs/this-week.html.
 from __future__ import annotations
 
 import html
+import json
 from datetime import datetime
 from pathlib import Path
 
@@ -42,7 +43,7 @@ def page(tab: pd.DataFrame, weights: dict, stamp: str, threshold: float) -> str:
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel=stylesheet>
 <style>{css}</style></head><body>
 <header class=hero><div class=wrap>
-<div class=kicker>Fair-price engine · updated {stamp}</div>
+<div class=kicker>Fair-price engine · European bookmakers · updated {stamp}</div>
 <h1>This Week's Fair Prices</h1>
 <p class=lede>Fair odds for {len(tab)} upcoming matches, built from {int(tab['n_books'].median()) if len(tab) else 0} bookmakers per match. {f"{len(flagged)} have a bookmaker price at least {threshold:.0%} better than fair (highlighted)." if len(flagged) else f"No bookmaker price is {threshold:.0%} or more better than fair right now."}</p>
 <p class=note>Covers the leagues the engine was tested on ({', '.join(sorted({LEAGUE_NAMES.get(x, x) for x in tab['league']})) if len(tab) else 'none this week'}). Each cell shows the fair odds, the fair chance, and the best price from a regular bookmaker. Weights: {wtxt}. <a href="index.html" style="color:#9fb4d4">How it works and its track record</a>.</p>
@@ -55,8 +56,60 @@ def page(tab: pd.DataFrame, weights: dict, stamp: str, threshold: float) -> str:
 </main></body></html>"""
 
 
+def us_page(tab: pd.DataFrame, stamp: str, threshold: float, remaining) -> str:
+    """This week's prices at American sportsbooks."""
+    from zoneinfo import ZoneInfo
+    flagged = tab[tab["flag"] != ""] if len(tab) else tab
+    rows = []
+    for _, r in tab.iterrows():
+        cells = []
+        for o in ("h", "d", "a"):
+            e = r.get(f"edge_{o}", np.nan)
+            hot = " class='num hot'" if (np.isfinite(e) and threshold < e <= fairprice.MAX_EDGE) else " class=num"
+            best = (f"best {r[f'best_us_{o}']} {html.escape(str(r[f'best_book_{o}']))}" if r[f"best_us_{o}"] else "no US price")
+            cells.append(f"<td{hot}>{r[f'fair_us_{o}']}<br><small>{100 * r[f'fair_{o}']:.0f}% · {best}</small></td>")
+        ko = pd.Timestamp(r["kickoff"]).tz_convert(ZoneInfo("America/New_York"))
+        rows.append(f"<tr><td>{ko.strftime('%a %d %b, %-I:%M %p')} ET<br><small>{html.escape(r['league'])}</small></td>"
+                    f"<td>{html.escape(r['home'])} v {html.escape(r['away'])}</td>{''.join(cells)}</tr>")
+    flag_list = "".join(f"<li><b>{html.escape(r['home'])} v {html.escape(r['away'])}</b>: {html.escape(r['flag'])}</li>" for _, r in flagged.iterrows())
+    css = CSS + ".hot{background:#fff1e8;color:#9a3a10;font-weight:600}td small{color:var(--muted);font-weight:400}.tablewrap{overflow-x:auto}"
+    return f"""<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>This Week's Fair Prices</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel=stylesheet>
+<style>{css}</style></head><body>
+<header class=hero><div class=wrap>
+<div class=kicker>Fair-price engine · American sportsbooks · updated {stamp}</div>
+<h1>This Week's Fair Prices</h1>
+<p class=lede>Fair odds for {len(tab)} upcoming matches, compared with DraftKings, FanDuel, BetMGM, Caesars and the other American sportsbooks. {f"{len(flagged)} have a sportsbook price at least {threshold:.0%} better than fair (highlighted)." if len(flagged) else f"No American sportsbook price is {threshold:.0%} or more better than fair right now."}</p>
+<p class=note>Each cell shows the fair odds in American format, the fair chance, and the best American sportsbook price. The fair price is mostly Pinnacle's, with the margin removed, blended with the other bookmakers; betting exchanges are left out. Odds from The Odds API. <a href="index.html" style="color:#9fb4d4">How it works and its track record</a>.</p>
+</div></header>
+<main class=wrap>
+{f"<h2>Flagged prices</h2><ul>{flag_list}</ul>" if flag_list else ""}
+<div class=tablewrap><table>
+<tr><th>Kick-off</th><th>Match</th><th class=num>Home</th><th class=num>Draw</th><th class=num>Away</th></tr>
+{''.join(rows)}
+</table></div>
+<p style="color:var(--muted);font-size:.9rem"><b>Note on the track record.</b> The engine was tested on European bookmakers from 2013 to 2026, because free historical odds from American sportsbooks do not exist. This page applies the same method to American sportsbooks; how well it does on them will only be known as their prices are tracked over time. Prices move, so check before acting. This is a study of pricing, not betting advice.</p>
+</main></body></html>"""
+
+
 def run(raw_dir: Path = ROOT / "data" / "raw", fixtures: Path | None = None, out_dir: Path = ROOT / "output",
         docs: Path = ROOT / "docs", threshold: float = 0.02, download: bool = True) -> pd.DataFrame:
+    from . import usbooks
+    key = usbooks.api_key()
+    stamp = datetime.now().strftime("%d %b %Y")
+    if key or (ROOT / "data" / "us_odds.json").exists():
+        path = ROOT / "data" / "us_odds.json"
+        if key and download:
+            usbooks.download(key, path)
+        saved = json.loads(path.read_text())
+        tab = usbooks.price(usbooks.to_table(saved["data"]), threshold)
+        out_dir.mkdir(parents=True, exist_ok=True)
+        tab.to_csv(out_dir / "this_week_us.csv", index=False)
+        (docs / "this-week.html").write_text(us_page(tab, stamp, threshold, saved.get("remaining")))
+        print(f"{len(tab)} matches priced at American sportsbooks, {int((tab['flag'] != '').sum()) if len(tab) else 0} flagged -> docs/this-week.html")
+        return tab
+    print("No Odds API key (odds_api_key.txt), so pricing against European bookmakers from football-data.co.uk instead.")
     fixtures = fixtures or ROOT / "data" / "fixtures.csv"
     if download:
         data.download_fixtures(fixtures)

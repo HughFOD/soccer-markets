@@ -347,6 +347,23 @@ def chart_flags_by_season(t: pd.DataFrame, path: Path):
     _save(fig, path)
 
 
+def chart_bet_types(t: pd.DataFrame, path: Path):
+    t = t[t["group"].isin(["Price", "Result", "League"])].reset_index(drop=True)
+    fig, ax = plt.subplots(figsize=(7.6, 0.36 * len(t) + 1.4))
+    y = np.arange(len(t))[::-1]
+    ax.errorbar(100 * t["clv"], y, xerr=[100 * (t["clv"] - t["clv_lo"]), 100 * (t["clv_hi"] - t["clv"])],
+                fmt="o", color=BLUE, ms=6, lw=1.5, capsize=0)
+    ax.set_yticks(y, [lab.split(" (")[0] for lab in t["type"]])
+    ax.axvline(0, color=INK, lw=1)
+    for g in ("Result", "League"):
+        first = t.index[t["group"] == g].min()
+        ax.axhline(y[first] + 0.5, color=GRID, lw=1)
+    ax.set_xlim(0, None)
+    _style(ax, "Edge over the closing price, by type of bet", "edge vs closing price (%)", "")
+    ax.grid(axis="y", visible=False)
+    _save(fig, path)
+
+
 def chart_weights(w: dict, path: Path):
     items = sorted(w.items(), key=lambda kv: kv[1])
     fig, ax = plt.subplots(figsize=(6.4, 0.32 * len(items) + 1.3))
@@ -423,7 +440,8 @@ def run(raw_dir: Path, out_dir: Path, tune_cutoff: str = "2008-07-01", eval_from
     books = fairprice.books_in(m)
     P_fair, W = fairprice.walk_forward(m, books)
     R["fair"] = {"accuracy": fairprice.accuracy(m, Y, P_fair, books), "backtest": fairprice.backtest(m, Y, P_fair, books),
-                 "weights_by_season": W.reset_index(), "latest_weights": fairprice.latest_weights(m, books)}
+                 "weights_by_season": W.reset_index(), "latest_weights": fairprice.latest_weights(m, books),
+                 "bet_types": fairprice.bet_types(m, Y, P_fair, books)}
 
     chart_calibration(R["calibration"]["table"], out_dir / "calibration.png")
     chart_longshot(R["longshot"], out_dir / "longshot.png")
@@ -439,6 +457,7 @@ def run(raw_dir: Path, out_dir: Path, tune_cutoff: str = "2008-07-01", eval_from
     chart_clv(R["fair"]["backtest"]["rules"], out_dir / "fair_clv.png")
     chart_weights(R["fair"]["latest_weights"], out_dir / "fair_weights.png")
     chart_flags_by_season(R["fair"]["backtest"]["by_season"], out_dir / "fair_by_season.png")
+    chart_bet_types(R["fair"]["bet_types"], out_dir / "bet_types.png")
     curve = R["model"].pop("curve")
     curve.to_csv(out_dir / "value_bet_curve.csv", index=False)
     (out_dir / "results.json").write_text(json.dumps(_clean(R), indent=1))

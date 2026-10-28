@@ -35,6 +35,10 @@ def build(R: dict) -> str:
     mm = R["model"]
     from .website import engine_section
     recent = "**The edge has shrunk.** " + engine_section(R)[1].get("recent", "")
+    tt = fr.get("bet_types", [])
+    types_md = "| Type | Flags | Edge vs close | Beat close | Return per bet (95% range) |\n|---|---|---|---|---|\n" + "\n".join(
+        f"| {r['type']} | {r['bets']:,} | {p(r['clv'])} | {100 * r['beat_close']:.0f}% | {p(r['return'])} ({p(r['lo'])} to {p(r['hi'])}) |"
+        for r in tt if r["group"] in ("Price", "Size of gap", "League"))
     rule_rows = "\n".join(
         f"| More than {100 * r['threshold']:.0f}% better | {r['bets']:,} | {p(r['expected'])} | "
         f"{p(r['clv'])} ({p(r['clv_lo'])} to {p(r['clv_hi'])}) | {100 * r['beat_close']:.0f}% |" for r in bt["rules"])
@@ -42,9 +46,10 @@ def build(R: dict) -> str:
 
     L = [f"""# A Fair-Price Engine for Football Odds
 
-Bookmakers often disagree about the same match. This tool combines about ten
-of them into one fair price for every upcoming game, then flags any bookmaker
-whose odds are better than fair. It is built the way a market maker thinks:
+Bookmakers often disagree about the same match. This tool combines them into
+one fair price for every upcoming game, then flags any American sportsbook
+(DraftKings, FanDuel, BetMGM, Caesars and others) whose odds are better than
+fair. It is built the way a market maker thinks:
 work out what something is really worth, then look for prices that are out of
 line.
 
@@ -54,10 +59,10 @@ fair, that price beat the market's closing price {100 * r2['beat_close']:.0f}% o
 {p(r2['expected'], 1, False)} the engine predicted, tested on {bt['matches']:,} matches ({yrs}) it had never seen.
 
 - Website: https://hughfod.github.io/soccer-markets/
-- This week's prices: https://hughfod.github.io/soccer-markets/this-week.html
+- This week's prices at American sportsbooks: https://hughfod.github.io/soccer-markets/this-week.html
 
-> **How odds work.** Odds of 2.50 pay £2.50 for every £1 bet, including your
-> stake. That implies a 40% chance (1 ÷ 2.50). The chances for a home win, a
+> **How odds work.** American odds of +150 mean a $100 bet wins $150; −200
+> means you bet $200 to win $100. +150 implies a 40% chance. The chances for a home win, a
 > draw and an away win add up to a little over 100%. The extra is the
 > bookmaker's cut, called the margin.
 
@@ -73,9 +78,12 @@ fair, that price beat the market's closing price {100 * r2['beat_close']:.0f}% o
 3. **Flag out-of-line prices.** Any regular bookmaker offering odds more than
    2% better than the fair price is flagged.
 
-In 2026/27 the data stopped including Pinnacle, so the engine now learns from
-and is tested against the Betfair Exchange closing price, the sharpest price
-left.
+Betting exchanges such as Betfair are left out: in thin markets their prices
+swing a lot, and with them in, one exchange took most of the weight. Leaving
+them out changed the results by less than a tenth of a point. The track record
+uses European bookmakers (2013/14 to 2025/26), because free historical odds
+from American sportsbooks don't exist; the weekly page applies the same method
+to American sportsbooks.
 
 Why learn from closing prices and not results? Results are mostly luck, so
 weights learned from them are noisy and unstable. The closing price, set just before kick-off, is the
@@ -108,6 +116,12 @@ The fair price is also closer to the closing price than any single bookmaker:
 The profit on the 2% flags was {p(r2['return'])} per bet, but its 95% range
 ({p(r2['lo'])} to {p(r2['hi'])}) is wide, which is why the closing price is the better test.
 In practice, bookmakers limit customers who consistently beat their prices.
+
+## The best types of bets
+
+{types_md}
+
+![Bet types](docs/images/bet_types.png)
 
 ## What {len(R['margins'])} seasons of odds show
 
@@ -160,6 +174,7 @@ From a terminal: `pip install -r requirements.txt && python update_everything.py
 ```
 markets/fairprice.py   the engine: margin removal, weighted pool, weights from closing prices, flags, backtest
 markets/weekly.py      prices this week's matches -> docs/this-week.html
+markets/usbooks.py     American sportsbook odds from The Odds API (needs a free key in odds_api_key.txt)
 markets/data.py        loads and downloads football-data.co.uk files
 markets/margin.py      odds to fair chances: proportional, power, Shin
 markets/efficiency.py  scores, calibration, returns, bootstrap ranges
@@ -168,7 +183,7 @@ markets/sharp.py       Pinnacle vs other bookmakers, by season, by league
 markets/live.py        half-time scores and score effects
 markets/report.py      runs every analysis; charts, results.json, report.md
 markets/website.py     builds the website; markets/readme.py builds this README
-tests/                 fourteen checks, including that nothing is fitted on the matches it is tested on
+tests/                 sixteen checks, including that nothing is fitted on the matches it is tested on
 ```
 
 ## Limits

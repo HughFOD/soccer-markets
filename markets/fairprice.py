@@ -43,8 +43,13 @@ HDA = ["h", "d", "a"]
 MAX_EDGE = 0.25
 
 
+# Betting exchanges are left out of the fair price: their prices in thin markets swing a lot, and
+# in the newest data the exchange would otherwise carry most of the weight on its own.
+EXCLUDED = ("BF", "BFE")
+
+
 def books_in(m: pd.DataFrame) -> list[str]:
-    return sorted({c.split("_")[1] for c in m.columns if c.startswith("bk_")})
+    return sorted({c.split("_")[1] for c in m.columns if c.startswith("bk_")} - set(EXCLUDED))
 
 
 def book_probs(m: pd.DataFrame, books: list[str]) -> np.ndarray:
@@ -105,21 +110,15 @@ def fit_weights(Pb: np.ndarray, target: np.ndarray, min_rows: int = 50) -> np.nd
 
 
 def closing_fair(m: pd.DataFrame) -> np.ndarray:
-    """The target: the sharpest closing price available for each match, margin removed.
+    """The target: Pinnacle's closing price (margin removed), the sharpest bookmaker price in the data.
 
-    Pinnacle's closing price where the data has it; otherwise the Betfair
-    Exchange closing price (football-data.co.uk stopped publishing Pinnacle in
-    2026/27, and the exchange, where bettors trade with each other, is the
-    sharpest price left).
+    football-data.co.uk stopped publishing Pinnacle in 2026/27, so matches from
+    then on have no target and are not part of the backtest.
     """
-    out = np.full((len(m), 3), np.nan)
-    for cols in (["pinc_h", "pinc_d", "pinc_a"], [f"bkc_BFE_{o}" for o in HDA]):
-        if set(cols) <= set(m.columns):
-            O = m[cols].to_numpy(float)
-            ok = ~np.isfinite(out).all(1) & np.isfinite(O).all(1)
-            if ok.any():
-                out[ok] = margin.power(O[ok])
-    return out
+    cols = ["pinc_h", "pinc_d", "pinc_a"]
+    if not set(cols) <= set(m.columns):
+        return np.full((len(m), 3), np.nan)
+    return margin.power(m[cols].to_numpy(float))
 
 
 def walk_forward(m: pd.DataFrame, books: list[str], train_seasons: int = 2) -> tuple[np.ndarray, pd.DataFrame]:
@@ -278,4 +277,47 @@ def this_week(fx: pd.DataFrame, weights: dict[str, float], threshold: float = 0.
         row["flag"] = ", ".join(f"{lab} @ {row[f'best_{o}']:.2f} ({row[f'best_book_{o}']}, {row[f'edge_{o}']:+.1%})"
                                 for o, lab in zip(HDA, ("Home", "Draw", "Away")) if threshold < row[f"edge_{o}"] <= MAX_EDGE)
         rows.append(row)
+    return pd.DataFrame(rows)
+
+
+ODDS_GROUPS = ((1.0, 1.67, "Strong favourite (odds under 1.67, -150 or shorter)"),
+               (1.67, 2.5, "Slight favourite (1.67-2.50, -150 to +150)"),
+               (2.5, 4.0, "Underdog (2.50-4.00, +150 to +300)"),
+               (4.0, 1000.0, "Long shot (over 4.00, +300 or longer)"))
+
+
+def bet_types(m: pd.DataFrame, Y: np.ndarray, P: np.ndarray, books: list[str], threshold: float = 0.02) -> pd.DataFrame:
+    """Which flagged bets carry the real edge: by result, price, league and bookmaker."""
+    from .report import BOOK_NAMES
+    from .weekly import LEAGUE_NAMES
+    e, odds, jbest = _best_retail(m, P, books)
+    Pc = closing_fair(m)
+    flag = (np.isfinite(P).all(1) & np.isfinite(Pc).all(1))[:, None] & (e > threshold)
+    n = len(m)
+    rows = []
+
+    def add(group, label, mask):
+        f = flag & mask
+        if f.sum() < 40:
+            return
+        num = np.where(f, odds * Pc - 1, 0).sum(1)
+        den = f.sum(1).astype(float)
+        k = den > 0
+        c = ef.ratio_ci(num[k], den[k], n_boot=1000, seed=len(rows))
+        r = ef.flat_return(np.where(f, odds, np.nan), Y, f, seed=len(rows))
+        rows.append({"group": group, "type": label, "bets": int(f.sum()), "clv": c[0], "clv_lo": c[1], "clv_hi": c[2],
+                     "beat_close": float((odds * Pc > 1)[f].mean()), "return": r["return"], "lo": r["lo"], "hi": r["hi"]})
+
+    for k, lab in enumerate(("Home win", "Draw", "Away win")):
+        mask = np.zeros((n, 3), bool)
+        mask[:, k] = True
+        add("Result", lab, mask)
+    for lo, hi, lab in ODDS_GROUPS:
+        add("Price", lab, (odds >= lo) & (odds < hi))
+    for lg in sorted(m["league"].unique()):
+        add("League", LEAGUE_NAMES.get(lg, lg), np.repeat((m["league"] == lg).to_numpy()[:, None], 3, 1))
+    for j, b in enumerate(books):
+        add("Bookmaker", BOOK_NAMES.get(b, b), jbest == j)
+    for lo, hi, lab in ((0.02, 0.04, "Gap 2-4%"), (0.04, 0.07, "Gap 4-7%"), (0.07, MAX_EDGE, "Gap over 7%")):
+        add("Size of gap", lab, (e > lo) & (e <= hi))
     return pd.DataFrame(rows)

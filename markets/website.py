@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 REPO_URL = "https://github.com/HughFOD/soccer-markets"
-CHARTS = ("fair_clv", "fair_weights", "fair_by_season", "calibration", "longshot", "margins", "line_moves", "value_bets", "soft_vs_sharp", "slope_by_season", "score_effects", "score_effect_checks")
+CHARTS = ("bet_types", "fair_clv", "fair_weights", "fair_by_season", "calibration", "longshot", "margins", "line_moves", "value_bets", "soft_vs_sharp", "slope_by_season", "score_effects", "score_effect_checks")
 
 
 LG = {"E0": "English Premier League", "E1": "English Championship", "SP1": "La Liga", "D1": "Bundesliga",
@@ -165,6 +165,9 @@ def more_findings(R: dict, start: int) -> str:
     return "".join(html)
 
 
+ODDS_LONG = "Long shot (over 4.00, +300 or longer)"
+
+
 def engine_section(R: dict) -> tuple[str, dict]:
     fr = R.get("fair")
     if not fr:
@@ -206,11 +209,11 @@ def engine_section(R: dict) -> tuple[str, dict]:
 <h2>How it works</h2>
 <div class=cards>
 <div class=card><h3>1. Remove each bookmaker's cut</h3><p>Every bookmaker's odds are turned into fair chances, taking more of the margin off long shots, where bookmakers put most of it.</p></div>
-<div class=card><h3>2. Blend the bookmakers</h3><p>The chances are combined into one fair price. Each bookmaker's weight is learned from how well its prices predicted the sharpest closing price (Pinnacle's, and now the Betfair Exchange's) in the previous two seasons.</p></div>
+<div class=card><h3>2. Blend the bookmakers</h3><p>The chances are combined into one fair price. Each bookmaker's weight is learned from how well its prices predicted Pinnacle's closing price, the sharpest in the data, over the previous two seasons.</p></div>
 <div class=card><h3>3. Flag out-of-line prices</h3><p>Any regular bookmaker offering odds more than 2% better than the fair price is flagged, along with how big the gap is.</p></div>
 </div>
 <p style="color:var(--ink2)">Why learn from closing prices and not results? Results are mostly luck, so learning from them needs decades of data and still jumps around. The closing price, set just before kick-off, is the market's final and best-informed view, so it is a much cleaner target. Today the blend is {', '.join(f"{names.get(b, b)} {100 * v / tot:.0f}%" for b, v in top[:3])}, with small weights for the rest.</p>
-<p style="color:var(--ink2)">One practical change: in 2026/27 the data stopped including Pinnacle. The engine now learns from, and is tested against, the Betfair Exchange closing price, where bettors trade with each other and prices are the sharpest left in the data. The exchange now carries most of the weight.</p>
+<p style="color:var(--ink2)">Betting exchanges such as Betfair are left out. In thin markets their prices swing a lot, and with them in, one exchange took most of the weight on its own. Leaving them out changed the results by less than a tenth of a point. The backtest runs to 2025/26, the last season the data includes Pinnacle's closing price.</p>
 <div class=finding><img src="images/fair_weights.png" alt="Each bookmaker's share of the fair price"></div>
 
 <h2>Track record</h2>
@@ -225,6 +228,29 @@ def engine_section(R: dict) -> tuple[str, dict]:
 <img src="images/fair_by_season.png" alt="Flags and edge over the closing price, season by season">
 <p>The profit on the 2% flags was {k['ret']} per bet, but the 95% range ({k['ret_lo']} to {k['ret_hi']}) is wide, which is exactly why the closing price is the better test. Flags have also become rarer as bookmakers' prices have tightened, and in practice bookmakers limit customers who consistently beat their prices.</p>
 </div>"""
+    bt_types = fr.get("bet_types") or []
+    if bt_types:
+        T = {(r["group"], r["type"]): r for r in bt_types}
+        price = [r for r in bt_types if r["group"] == "Price"]
+        best = max(price, key=lambda r: r["lo"])  # the type whose profit is most clearly above zero
+        lg = [r for r in bt_types if r["group"] == "League"]
+        lg_best, lg_worst = max(lg, key=lambda r: r["clv"]), min(lg, key=lambda r: r["clv"])
+        gaps = [r for r in bt_types if r["group"] == "Size of gap"]
+        trows = "".join(f"<tr><td>{r['type'].split(' (')[0]}<br><small>{r['type'].split(' (')[1].rstrip(')') if ' (' in r['type'] else ''}</small></td><td class=num>{r['bets']:,}</td>"
+                        f"<td class=num>{p(r['clv'])}</td><td class=num>{100 * r['beat_close']:.0f}%</td><td class=num>{p(r['return'])}<br><small>{p(r['lo'])} to {p(r['hi'])}</small></td></tr>" for r in price)
+        html += f"""
+<h2>The best types of bets</h2>
+<p style="color:var(--ink2)">Not every flagged price is equally good. Splitting the {k['bets']:,} flagged prices by type shows where the edge is most reliable.</p>
+<div class=finding>
+<h3>{best['type'].split(' (')[0]}s are the most reliable</h3>
+<p>Prices on {best['type'].split(' (')[0].lower()}s ({best['type'].split(' (')[1].rstrip(')')}) beat the closing price {100 * best['beat_close']:.0f}% of the time and returned {p(best['return'])} per bet (95% range {p(best['lo'])} to {p(best['hi'])}). Long shots have a similar average edge, but only {100 * T[('Price', ODDS_LONG)]['beat_close']:.0f}% beat the close and their profit swings widely, because a few results decide everything.</p>
+<table><tr><th>Price</th><th class=num>Flags</th><th class=num>Edge vs close</th><th class=num>Beat close</th><th class=num>Return per bet</th></tr>{trows}</table>
+<img src="images/bet_types.png" alt="Edge over the closing price by type of bet">
+<ul>
+<li><b>Bigger gaps are worth more.</b> Prices {gaps[0]['type'][4:]} better than fair beat the close by {p(gaps[0]['clv'], 1, False)}; gaps {gaps[-1]['type'][4:]} beat it by {p(gaps[-1]['clv'], 1, False)}.</li>
+<li><b>League matters a little.</b> The edge is largest in the {lg_best['type']} ({p(lg_best['clv'], 1, False)}) and smallest in the {lg_worst['type']} ({p(lg_worst['clv'], 1, False)}).</li>
+<li><b>Home, draw and away are similar.</b> Each beats the close by {p(min(T[('Result', x)]['clv'] for x in ('Home win', 'Draw', 'Away win')), 1, False)} to {p(max(T[('Result', x)]['clv'] for x in ('Home win', 'Draw', 'Away win')), 1, False)}.</li>
+</ul></div>"""
     return html, k
 
 
@@ -255,10 +281,10 @@ def build(R: dict) -> str:
 <header class=hero><div class=wrap>
 <div class=kicker>Data science project · Python</div>
 <h1>A Fair-Price Engine for Football Odds</h1>
-<p class=lede>Bookmakers often disagree about the same match. This tool combines about ten of them into one fair price for every upcoming game, then flags any bookmaker whose odds are better than fair. It is built the way a market maker thinks: work out what something is really worth, then look for prices that are out of line.</p>
+<p class=lede>Bookmakers often disagree about the same match. This tool combines them into one fair price for every upcoming game, then flags any American sportsbook (DraftKings, FanDuel, BetMGM, Caesars and others) whose odds are better than fair. It is built the way a market maker thinks: work out what something is really worth, then look for prices that are out of line.</p>
 <div class=result><b>Main result</b>When the engine flagged a price as more than 2% better than fair, that price beat the market's closing price {k.get('beat', '')} of the time, by {k.get('clv', '').lstrip('+')} on average. That is almost exactly the {k.get('exp', '').lstrip('+')} the engine predicted, tested on {k.get('n', 0):,} matches it had never seen.</div>
-<a class=cta href="this-week.html">See this week's fair prices →</a>
-<p class=note><code>How odds work</code> Odds of 2.50 pay £2.50 for every £1 bet, including your stake. That implies a 40% chance (1 ÷ 2.50). Add up the chances for a home win, a draw and an away win and you get a little over 100%. The extra is the bookmaker's cut, called the <i>margin</i>.</p>
+<a class=cta href="this-week.html">See this week's prices at American sportsbooks →</a>
+<p class=note><code>How odds work</code> American odds of +150 mean a $100 bet wins $150; −200 means you bet $200 to win $100. +150 implies a 40% chance. Add up the chances for a home win, a draw and an away win and you get a little over 100%. The extra is the bookmaker's cut, called the <i>margin</i>. The track record below is from European bookmakers, because free historical odds from American sportsbooks don't exist.</p>
 </div></header>
 <main class=wrap>
 <div class=stats>
@@ -313,7 +339,7 @@ def build(R: dict) -> str:
 <li><b>Model:</b> team ratings refitted every week on past matches only, in scikit-learn.</li>
 <li><b>Combining forecasts:</b> logistic regression, refitted each season on earlier seasons only.</li>
 <li><b>Uncertainty:</b> 95% ranges from resampling whole matches (the bootstrap).</li>
-<li><b>Tests:</b> fourteen automated checks, including one that the model never sees a match before predicting it.</li>
+<li><b>Tests:</b> sixteen automated checks, including one that the model never sees a match before predicting it.</li>
 </ul>
 <h2>Limits</h2>
 <ul>

@@ -4,3 +4,5 @@ __pycache__/
 output/
 .idea/
 data/fixtures.csv
+odds_api_key.txt
+data/us_odds.json
