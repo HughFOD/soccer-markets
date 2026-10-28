@@ -1,0 +1,112 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>Football Betting Market Efficiency</title>
+<meta name=description content="A test of whether bookmakers' odds are accurate forecasts, using 16,670 English league matches.">
+<link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel=stylesheet>
+<style>
+:root{--bg:#fbfaf7;--ink:#14161a;--ink2:#4a4d55;--muted:#767a83;--line:#e3e1db;--card:#ffffff;--accent:#2a78d6;--accent2:#eb6834;--hero:#101722;--heroink:#eef1f6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121417;--ink:#eceef2;--ink2:#b7bbc4;--muted:#8a8f99;--line:#2a2e35;--card:#1a1d22;--accent:#3987e5;--accent2:#d95926;--hero:#0b0f16}}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 'Instrument Sans',system-ui,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px}
+header.hero{background:var(--hero);color:var(--heroink);padding:56px 0 44px}
+.kicker{font:500 12px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9fb4d4}
+h1{font:700 clamp(1.6rem,2.9vw,2.3rem)/1.2 Archivo,system-ui,sans-serif;margin:14px 0 18px;letter-spacing:-.01em}
+.lede{font-size:1.08rem;color:#d3d9e3;max-width:760px}
+.result{margin-top:26px;border-left:3px solid var(--accent2);padding:10px 0 10px 18px;max-width:760px}
+.result b{display:block;font:600 12px/1.4 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#f3a37f;margin-bottom:4px}
+.note{margin-top:22px;font-size:.92rem;color:#aab4c3;max-width:760px}
+.note code{font-family:'JetBrains Mono',monospace;background:#1d2633;padding:1px 6px;border-radius:4px;color:#e6ebf2}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:-22px 0 40px;position:relative}
+.stat{background:var(--card);padding:16px 18px}.stat .v{font:700 1.5rem/1.1 Archivo,sans-serif}.stat .l{font-size:.82rem;color:var(--muted);margin-top:4px}
+h2{font:700 1.45rem/1.25 Archivo,sans-serif;margin:52px 0 12px}
+h3{font:650 1.1rem/1.35 Archivo,sans-serif;margin:0 0 6px}
+.finding{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 22px 14px;margin:18px 0}
+.finding .n{font:600 12px 'JetBrains Mono',monospace;color:var(--accent);letter-spacing:.1em}
+.finding img{width:100%;height:auto;border-radius:6px;margin:10px 0 6px;background:#fff}
+.finding p{margin:6px 0 10px;color:var(--ink2)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}.card p{margin:0;color:var(--ink2);font-size:.95rem}
+table{border-collapse:collapse;width:100%;font-size:.93rem;margin:10px 0}td,th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left}th{color:var(--muted);font-weight:600}
+td.num,th.num{text-align:right;font-family:'JetBrains Mono',monospace}
+ul{padding-left:20px;color:var(--ink2)}li{margin:4px 0}
+a{color:var(--accent)}footer{border-top:1px solid var(--line);margin-top:56px;padding:26px 0 40px;color:var(--muted);font-size:.9rem}
+@media (max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}}
+</style></head><body>
+<header class=hero><div class=wrap>
+<div class=kicker>Data science project · Python</div>
+<h1>Testing the Efficiency of Football Betting Odds</h1>
+<p class=lede>Bookmakers set odds on every professional football match. Odds can be read as probabilities, so they are a forecast. This project tests that forecast on 16,670 English Premier League and Championship matches from 2000 to 2020. If the market is efficient, outcomes happen as often as the odds say, and no simple rule makes money.</p>
+<div class=result><b>Main result</b>The odds are close to calibrated, and a statistical model built from past scores could not improve on them. The market has two consistent weaknesses: long shots are overpriced, and the opening price lags behind news that arrives before kick-off.</div>
+<p class=note><code>Odds</code> Decimal odds of 2.50 return £2.50 for every £1 staked, including the stake. They imply a probability of 1 ÷ 2.50 = 40%. The three probabilities for a match (home win, draw, away win) add up to slightly more than 100%. The excess is the bookmaker's <i>margin</i>, its built-in profit.</p>
+</div></header>
+<main class=wrap>
+<div class=stats>
+<div class=stat><div class=v>16,670</div><div class=l>matches</div></div>
+<div class=stat><div class=v>20</div><div class=l>seasons</div></div>
+<div class=stat><div class=v>1.10</div><div class=l>calibration slope (1 = perfect)</div></div>
+<div class=stat><div class=v>-6.7%</div><div class=l>return from model's “value” bets</div></div>
+</div>
+
+<h2>The questions</h2>
+<ul>
+<li><b>Calibration.</b> Do outcomes priced at 30% happen 30% of the time?</li>
+<li><b>Bias.</b> Does betting on some kinds of outcome lose less than others?</li>
+<li><b>Information.</b> Do prices that move before kick-off move the right way?</li>
+<li><b>Forecasting.</b> Can a model built only from past scores beat the market, or add to it?</li>
+</ul>
+
+<h2>What I found</h2>
+<div class=finding><div class=n>FINDING 1</div>
+<h3>The odds are close to calibrated</h3>
+<p>Each point groups about 4,000 outcomes with similar prices. Outcomes priced at 64% happened 67% of the time. Outcomes priced at 13% happened 12% of the time. The calibration slope is 1.10 (95% interval 1.06–1.14). A slope above 1 means favourites win slightly more often than priced and long shots slightly less.</p>
+<img src="images/calibration.png" alt="Calibration of betting odds"></div>
+
+<div class=finding><div class=n>FINDING 2</div>
+<h3>Long shots are overpriced</h3>
+<p>Betting £1 on every heavy favourite (odds 1–1.5) at the average bookmaker's price lost -2.0%. Betting on every long shot (odds 10+) lost -22.0%. This is the favourite–long-shot bias. It is explained by how bookmakers load their margin: if the margin is assumed to sit mostly on long shots (the “power” method), the calibration slope falls from 1.10 to 1.01.</p>
+<img src="images/longshot.png" alt="Return by odds band">
+<p>At the best price across about ten bookmakers, favourites roughly break even. That needs accounts at every bookmaker, and the best price is sometimes a mistake that would be cancelled or limited.</p></div>
+
+<div class=finding><div class=n>FINDING 3</div>
+<h3>Margins have fallen by more than half</h3>
+<p>The average bookmaker's margin fell from 13.0% in 2000 to 5.2% by 2020. Pinnacle, which takes large bets and profits from volume, charges about 2.4%.</p>
+<img src="images/margins.png" alt="Bookmaker margin by season"></div>
+
+<div class=finding><div class=n>FINDING 4</div>
+<h3>Late price moves point the right way</h3>
+<p>Pinnacle publishes an opening price and a closing price just before kick-off. Over 4,658 matches (2015 to 2020) the closing odds were the better forecast (log loss 0.9962 against 0.9987). When an outcome's probability rose by at least 3 percentage points before kick-off, a bet at the <i>opening</i> odds returned +11.2% (95% interval +2.5% to +20.7%, 878 bets). When it fell by 3 points, the return was -18.9%.</p>
+<img src="images/line_moves.png" alt="Return at opening odds after the price moved">
+<p>Nobody knows the move in advance, so this is not a strategy. It shows that new information (team news, injuries, informed money) arrives before kick-off and that the opening price has not absorbed it yet. Several thresholds were tested, so the 3-point result should be read alongside the others: every “shortened” estimate is positive and every “drifted” one is negative.</p></div>
+<div class=finding><div class=n>FINDING 5</div>
+<h3>A model from past scores cannot beat the market</h3>
+<p>The model gives each team an attack and a defence rating, fitted to past goals (a Poisson model, as in Dixon &amp; Coles, 1997). It is refitted every week using only earlier matches, and its one setting (how fast old results fade, 730 days) was chosen on seasons before 2008 and never adjusted on the test seasons.</p>
+<table><tr><th>Forecast (9,320 matches from 2010)</th><th class=num>Log loss</th><th class=num>RPS</th></tr><tr><td>Equal chances (⅓ each)</td><td class=num>1.0986</td><td class=num>0.2339</td></tr><tr><td>Model from past scores</td><td class=num>1.0390</td><td class=num>0.2122</td></tr><tr><td>Betting market</td><td class=num>1.0083</td><td class=num>0.2057</td></tr><tr><td>Market, recalibrated</td><td class=num>1.0085</td><td class=num>0.2057</td></tr><tr><td>Market + model combined</td><td class=num>1.0087</td><td class=num>0.2057</td></tr></table>
+<p>Lower is better for both scores. The model is far better than guessing but clearly worse than the market. Combining the two changed log loss by +0.0002 (95% interval -0.0004 to +0.0009), so the model adds nothing the odds do not already contain.</p>
+<img src="images/value_bets.png" alt="Cumulative profit from the model's value bets">
+<p>Betting whenever the model rated an outcome at least 5% more likely than the odds did lost -6.7% per bet at average odds and -3.6% at Pinnacle. At the best price across all bookmakers it returned +0.2%, which is break-even within the uncertainty.</p></div>
+
+<h2>What I learned</h2>
+<div class=cards>
+<div class=card><h3>Score the probabilities</h3><p>Accuracy (“picked the winner”) hides most of the information. Log loss and the ranked probability score reward a forecast for being confident only when it should be.</p></div>
+<div class=card><h3>Never let the future leak</h3><p>The model only sees matches before each week, the setting was tuned on separate early seasons, and a test checks this. Without these rules a backtest can look profitable by accident.</p></div>
+<div class=card><h3>Report the uncertainty</h3><p>Betting returns are noisy. Every number here has a bootstrap interval that resamples whole matches, and several promising-looking strategies turned out to be inside the noise.</p></div>
+</div>
+
+<h2>How it's built</h2>
+<ul>
+<li><b>Data:</b> results and odds from up to ten bookmakers per match, from <a href="https://www.football-data.co.uk">football-data.co.uk</a>.</li>
+<li><b>Margin removal:</b> three methods compared (proportional, power, Shin 1993).</li>
+<li><b>Model:</b> weekly walk-forward Poisson ratings with time decay, in scikit-learn.</li>
+<li><b>Combination:</b> multinomial logistic regression, refitted each season on earlier seasons only.</li>
+<li><b>Tests:</b> six pytest checks, including that the model never sees a match on or after the one it predicts.</li>
+</ul>
+<h2>Limits</h2>
+<ul>
+<li>English leagues only in the included data. <code>step2_download_more_data.py</code> adds Spain, Germany, Italy and France and the seasons since 2020.</li>
+<li>The odds are snapshots collected by football-data.co.uk, not every price that was available.</li>
+<li>This is a study of forecasting, not betting advice. The results show how hard the market is to beat.</li>
+</ul>
+</main>
+<footer><div class=wrap>Code and data: <a href="https://github.com/HughFOD/soccer-markets">github.com/HughFOD/soccer-markets</a></div></footer>
+</body></html>
