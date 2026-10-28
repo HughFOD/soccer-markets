@@ -63,3 +63,39 @@ def test_model_recovers_who_is_stronger():
     reg, teams = model.fit(m, m["date"].max() + pd.Timedelta(days=1), half_life=10000)
     att = dict(zip(teams, reg.coef_[: len(teams)]))
     assert np.corrcoef([att[t] for t in teams], [strength[t] for t in teams])[0, 1] > 0.8
+
+
+def _synthetic_market(soft_factor, n=20000, seed=4):
+    from markets import sharp  # noqa: F401
+    rng = np.random.default_rng(seed)
+    P = rng.dirichlet([4, 2.5, 3], size=n)
+    Y = np.array([rng.multinomial(1, p) for p in P], dtype=float)
+    pin = 1 / (P * 1.025)                      # Pinnacle: fair price with a 2.5% margin
+    soft = soft_factor / P                     # retail price: fair price times soft_factor
+    m = pd.DataFrame({"season": np.repeat(["a", "b", "c", "d"], n // 4)})
+    for i, o in enumerate("hda"):
+        m[f"pin_{o}"], m[f"soft_{o}"] = pin[:, i], soft[:, i]
+    return m, Y
+
+
+def test_generous_retail_prices_are_found_and_pay():
+    from markets import sharp
+    m, Y = _synthetic_market(1.05)
+    rules = sharp.soft_vs_sharp_bets(m, Y)["rules"]
+    r = rules[rules["edge"] == 0.0].iloc[0]
+    assert r["bets"] > 0.9 * Y.size and abs(r["return"] - 0.05) < 0.03
+
+
+def test_mean_retail_prices_are_not_bet():
+    from markets import sharp
+    m, Y = _synthetic_market(0.93)
+    rules = sharp.soft_vs_sharp_bets(m, Y)["rules"]
+    assert rules["bets"].sum() == 0
+
+
+def test_implied_rates_recover_expected_goals():
+    from markets import live
+    lh, la = np.array([1.6, 0.9, 2.4]), np.array([1.1, 1.3, 0.6])
+    P = live.final_probs(np.zeros(3), np.zeros(3), lh, la)  # full match from 0-0
+    eh, ea = live.implied_rates(P)
+    assert np.allclose(eh, lh, atol=0.03) and np.allclose(ea, la, atol=0.03)

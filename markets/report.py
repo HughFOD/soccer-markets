@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
-from . import data, efficiency as ef, margin, model
+from . import data, efficiency as ef, live, margin, model, sharp
 
 BLUE, ORANGE, AQUA, INK, MUTED, GRID = "#2a78d6", "#eb6834", "#1baf7a", "#0b0b0b", "#52514e", "#e4e3df"
 HDA = ["h", "d", "a"]
@@ -157,6 +157,13 @@ def model_vs_market(m: pd.DataFrame, Y: np.ndarray, half_life: float, eval_from:
                         "brier": float(ef.brier(P, Ye).mean())}
     gain = ef.mean_ci(ef.log_loss(P_mkt_recal[ev], Ye) - ef.log_loss(P_both[ev], Ye))
     gain_raw = ef.mean_ci(ef.log_loss(Pc[ev], Ye) - ef.log_loss(Pm[ev], Ye))
+    lg_ev = sub.loc[ev, "league"].to_numpy()
+    by_league = {lg: {"matches": int((lg_ev == lg).sum()),
+                      "gain_from_model": ef.mean_ci(ef.log_loss(P_mkt_recal[ev][lg_ev == lg], Ye[lg_ev == lg])
+                                                    - ef.log_loss(P_both[ev][lg_ev == lg], Ye[lg_ev == lg])),
+                      "model_minus_market": float(ef.log_loss(Pm[ev][lg_ev == lg], Ye[lg_ev == lg]).mean()
+                                                  - ef.log_loss(Pc[ev][lg_ev == lg], Ye[lg_ev == lg]).mean())}
+                 for lg in sorted(set(lg_ev))}
 
     # value betting: bet 1 when a forecast says the odds are generous by more than `edge`
     e = sub[ev].reset_index(drop=True)
@@ -177,7 +184,7 @@ def model_vs_market(m: pd.DataFrame, Y: np.ndarray, half_life: float, eval_from:
         curve[f"bets_{oname}"] = np.cumsum(mask.sum(1))
     leak_ok = bool((w.loc[has, "model_fit_end"] < m.loc[has, "date"]).all())
     return {"matches": int(ev.sum()), "eval_from": eval_from, "scores": scores,
-            "gain_from_model": gain, "market_minus_model_raw": gain_raw,
+            "gain_from_model": gain, "market_minus_model_raw": gain_raw, "by_league": by_league,
             "bets": pd.DataFrame(bets.values()), "curve": curve, "no_lookahead": leak_ok}
 
 
@@ -252,6 +259,45 @@ def chart_curve(curve: pd.DataFrame, path: Path):
     _save(fig, path)
 
 
+def chart_soft(rules: pd.DataFrame, path: Path):
+    fig, ax = plt.subplots(figsize=(7.0, 4.2))
+    x = np.arange(len(rules))
+    ax.errorbar(x, 100 * rules["return"], yerr=[100 * (rules["return"] - rules["lo"]), 100 * (rules["hi"] - rules["return"])],
+                fmt="o", color=ORANGE, ms=6, lw=1.5, capsize=0, label="actual return (95% interval)")
+    ax.plot(x, 100 * rules["expected"], color=AQUA, lw=0, marker="D", ms=6, label="return Pinnacle's price predicted")
+    ax.axhline(0, color=INK, lw=1)
+    ax.set_xticks(x, [f">{100 * e:.0f}%\n{b:,} bets" for e, b in zip(rules["edge"], rules["bets"])])
+    _style(ax, "Retail prices that beat Pinnacle's price", "how much better than Pinnacle's fair price",
+           "profit per 100 staked")
+    ax.legend(frameon=False, loc="upper left")
+    _save(fig, path)
+
+
+def chart_seasons(t: pd.DataFrame, path: Path):
+    fig, ax = plt.subplots(figsize=(7.4, 4.2))
+    x = np.arange(len(t))
+    ax.errorbar(x, t["slope"], yerr=[t["slope"] - t["slope_lo"], t["slope_hi"] - t["slope"]],
+                fmt="o", color=BLUE, ms=5, lw=1.5, capsize=0, label="calibration slope (95% interval)")
+    ax.axhline(1, color=MUTED, lw=1, ls="--", label="perfect calibration")
+    ax.set_xticks(x[::2], [s[2:4] + "/" + s[-2:] for s in t["season"]][::2])
+    _style(ax, "No clear improvement in calibration", "season", "calibration slope")
+    ax.legend(frameon=False, loc="upper right")
+    _save(fig, path)
+
+
+def chart_score_effects(t: pd.DataFrame, path: Path):
+    fig, ax = plt.subplots(figsize=(7.0, 4.2))
+    x = np.arange(len(t))
+    ax.errorbar(x, 100 * (t["ratio"] - 1), yerr=[100 * (t["ratio"] - t["lo"]), 100 * (t["hi"] - t["ratio"])],
+                fmt="o", color=BLUE, ms=7, lw=1.5, capsize=0)
+    ax.axhline(0, color=INK, lw=1)
+    labels = {-2: "losing by 2+", -1: "losing by 1", 0: "level", 1: "winning by 1", 2: "winning by 2+"}
+    ax.set_xticks(x, [labels[k] for k in t["margin"]])
+    _style(ax, "Trailing teams score more after half-time, leading teams less", "team's situation at half-time",
+           "second-half goals vs expected (%)")
+    _save(fig, path)
+
+
 def chart_moves(mv: pd.DataFrame, path: Path):
     fig, ax = plt.subplots(figsize=(7.0, 4.2))
     for direction, color, dx in (("shortened", ORANGE, -0.08), ("drifted", BLUE, 0.08)):
@@ -306,6 +352,13 @@ def run(raw_dir: Path, out_dir: Path, tune_cutoff: str = "2008-07-01", eval_from
     R["model_tuning"] = {"cutoff": tune_cutoff, "half_life_days": hl, "scores": tune}
     print(f"model vs market (half-life {hl} days)..."); R["model"] = model_vs_market(m, Y, hl, eval_from)
     R["no_crowds"] = no_crowds(m, Y)
+    print("sharp vs soft, by season, by league...")
+    R["sharp"] = sharp.sharp_vs_soft(m, Y, stack_by_season)
+    R["soft_bets"] = sharp.soft_vs_sharp_bets(m, Y)
+    seasons = sharp.by_season(m, Y)
+    R["by_season"] = {"table": seasons, "slope_trend_per_decade": seasons.attrs["trend_per_decade"]}
+    R["by_league"] = sharp.by_league(m, Y)
+    print("half-time (in-play) analysis..."); R["live"] = live.run(m)
 
     chart_calibration(R["calibration"]["table"], out_dir / "calibration.png")
     chart_longshot(R["longshot"], out_dir / "longshot.png")
@@ -313,6 +366,10 @@ def run(raw_dir: Path, out_dir: Path, tune_cutoff: str = "2008-07-01", eval_from
     chart_curve(R["model"]["curve"], out_dir / "value_bets.png")
     if R["closing"]:
         chart_moves(R["closing"]["moves"], out_dir / "line_moves.png")
+    if R["soft_bets"]:
+        chart_soft(R["soft_bets"]["rules"], out_dir / "soft_vs_sharp.png")
+    chart_seasons(seasons, out_dir / "slope_by_season.png")
+    chart_score_effects(R["live"]["score_effects"], out_dir / "score_effects.png")
     curve = R["model"].pop("curve")
     curve.to_csv(out_dir / "value_bet_curve.csv", index=False)
     (out_dir / "results.json").write_text(json.dumps(_clean(R), indent=1))
@@ -358,6 +415,36 @@ def write_report(R: dict) -> str:
           "| Forecast | Odds | Edge | Return | 95% CI | Bets |", "|---|---|---|---|---|---|"]
     L += [f"| {r['forecast']} | {r['odds']} | {r['edge']:.0%} | {pct(r['return'])} | {pct(r['lo'])} to {pct(r['hi'])} | {r['bets']:,} |"
           for r in mm["bets"]]
+    if R.get("sharp"):
+        sh = R["sharp"]
+        d, a = sh["average_minus_pinnacle"], sh["gain_from_adding_average"]
+        L += ["", "## Pinnacle vs the average bookmaker", "",
+              f"{sh['matches']:,} matches. Log loss Pinnacle {sh['log_loss_pinnacle']:.4f}, average {sh['log_loss_average']:.4f} "
+              f"(difference {d[0]:+.5f}, CI {d[1]:+.5f} to {d[2]:+.5f}). Adding the average to Pinnacle: {-a[0]:+.5f} (CI {-a[2]:+.5f} to {-a[1]:+.5f}).", "",
+              "| Retail price beats Pinnacle fair price by | Return | 95% CI | Expected | Bets |", "|---|---|---|---|---|"]
+        L += [f"| {r['edge']:.0%} | {pct(r['return'])} | {pct(r['lo'])} to {pct(r['hi'])} | {pct(r['expected'])} | {r['bets']:,} |"
+              for r in R["soft_bets"]["rules"]]
+    tr = R["by_season"]["slope_trend_per_decade"]
+    L += ["", "## By season", "", f"Trend in calibration slope: {tr[0]:+.3f} per decade (SE {tr[1]:.3f}).", "",
+          "| Season | Slope | 95% CI | Margin | Favourites | Long shots |", "|---|---|---|---|---|---|"]
+    L += [f"| {r['season']} | {r['slope']:.3f} | {r['slope_lo']:.2f}–{r['slope_hi']:.2f} | {pct(r['margin'])} | {pct(r['fav_return'])} | {pct(r['longshot_return'])} |"
+          for r in R["by_season"]["table"]]
+    L += ["", "## By league", "", "| League | Matches | Slope | 95% CI | Margin | Bet everything | Model adds (log loss) |", "|---|---|---|---|---|---|---|"]
+    for r in R["by_league"]:
+        g = R["model"]["by_league"].get(r["league"], {}).get("gain_from_model", [None] * 3)
+        L.append(f"| {r['league']} | {r['matches']:,} | {r['slope']:.3f} | {r['slope_lo']:.2f}–{r['slope_hi']:.2f} | {pct(r['margin'])} | {pct(r['bet_everything'])} | "
+                 f"{-g[0]:+.5f} ({-g[2]:+.5f} to {-g[1]:+.5f}) |")
+    lv = R.get("live")
+    if lv:
+        g = lv["adjusted_gain"]
+        L += ["", "## After half-time", "", f"{lv['matches']:,} matches; {lv['share_second_half']:.1%} of goals come after half-time.", "",
+              "| Half-time situation | Teams | Second-half goals vs expected | 95% CI |", "|---|---|---|---|"]
+        L += [f"| {r['margin']:+d} | {r['teams']:,} | {pct(r['ratio'] - 1)} | {pct(r['lo'] - 1)} to {pct(r['hi'] - 1)} |" for r in lv["score_effects"]]
+        L += ["", "| Favourite | Half-time | Matches | Model win | Actual win | Gap (CI) | Model draw | Actual draw |", "|---|---|---|---|---|---|---|---|"]
+        L += [f"| {r['favourite']} | {r['half_time']} | {r['matches']:,} | {r['model_win']:.3f} | {r['actual_win']:.3f} | {pct(r['win_gap'])} ({pct(r['win_lo'])} to {pct(r['win_hi'])}) | {r['model_draw']:.3f} | {r['actual_draw']:.3f} |"
+              for r in lv["by_state"]]
+        L += ["", f"Log loss on {lv['test_matches']:,} test matches: pre-match {lv['log_loss']['pre_match']:.4f}, half-time naive {lv['log_loss']['half_time_naive']:.4f}, "
+              f"with score effects {lv['log_loss']['half_time_adjusted']:.4f} (gain {g[0]:.4f}, CI {g[1]:.4f} to {g[2]:.4f})."]
     if R.get("no_crowds"):
         L += ["", "## Matches without crowds (June 2020 – May 2021)", "", "| Period | Matches | Home wins | Priced | Gap (CI) | Home goal diff |", "|---|---|---|---|---|---|"]
         for k, v in R["no_crowds"].items():

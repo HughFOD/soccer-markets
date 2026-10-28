@@ -10,7 +10,8 @@ simple rule makes money after the bookmaker's margin.
 **Main result.** The odds are close to calibrated, and a statistical model
 built from past scores could not improve on them. The market has two
 consistent weaknesses: long shots are overpriced, and the opening price lags
-behind news that arrives before kick-off.
+behind news that arrives before kick-off. Neither weakness has faded over
+20 years.
 
 Website: https://hughfod.github.io/soccer-markets/
 
@@ -67,6 +68,41 @@ and 3.6% at Pinnacle.
 | Betting market | 1.0083 | 0.2057 |
 | Market + model combined | 1.0087 | 0.2057 |
 
+**6. Pinnacle's price can find generous retail prices, but the evidence is
+weak.** With the margin removed, Pinnacle (2.5% margin) and the average
+bookmaker (5.6%) are equally accurate. Betting only the retail prices that beat
+Pinnacle's fair price returned +3.8% per bet (95% interval −0.2% to +7.8%,
+4,818 bets); requiring a 2% advantage gave +8.0% (−0.4% to +16.9%). Every
+estimate is positive and close to what Pinnacle's price predicted, but every
+interval touches zero, and most of the profit came in 2012–2014.
+
+![Retail vs Pinnacle](docs/images/soft_vs_sharp.png)
+
+**7. Margins fell, but the long-shot bias did not.** Season by season, the
+calibration slope has no clear trend (−0.04 per decade, standard error 0.04).
+
+![Slope by season](docs/images/slope_by_season.png)
+
+**8. The Championship is not priced less efficiently.** I expected the less-
+watched second division to be easier to beat. Its calibration slope (1.06,
+interval 0.99–1.13) is no further from 1 than the Premier League's (1.12), and
+the model added nothing in either league.
+
+**9. In-play: a half-time lead is less safe than a simple model thinks.** A
+simple half-time price turns the pre-match odds into expected goals and
+assumes the second half continues at the same rate (56% of goals come after
+half-time). But teams losing by 2+ at half-time scored 11% more second-half
+goals than expected, and teams winning by 2+ scored 7% fewer: the trailing
+team attacks and the leading team defends. So the simple model overrates
+leads. A narrow favourite leading by one at half-time was given a 76% chance
+and won 73% of 3,398 matches; from level, draws happened 40% of the time
+against 37% predicted. Adding the score effect, estimated on seasons before
+2010, improved half-time forecasts on the 9,319 later matches (log-loss gain
+0.0015, 95% interval 0.0006–0.0024). The data have no in-play odds, so this
+shows what a naive in-play price gets wrong, not whether bookmakers do.
+
+![Score effects](docs/images/score_effects.png)
+
 Full tables, with intervals for every number: `output/report.md` after a run.
 
 ## Method notes
@@ -102,7 +138,7 @@ In PyCharm, open each file and click the green ▶ next to `if __name__ == "__ma
 | `step1_setup.py` | creates `.venv` and installs everything (once) |
 | `step2_download_more_data.py` | optional: more leagues and seasons from football-data.co.uk |
 | `step3_run_analysis.py` | runs everything (about a minute); results in `output/` |
-| `step4_run_tests.py` | tests: margin maths, calibration, no look-ahead |
+| `step4_run_tests.py` | tests: margin maths, calibration, no look-ahead, the retail-vs-Pinnacle rule |
 | `step5_build_website.py` | rebuilds `docs/index.html` |
 
 From a terminal: `pip install -r requirements.txt && python run.py && python -m pytest`
@@ -114,9 +150,11 @@ markets/data.py        load football-data.co.uk files into one table; downloader
 markets/margin.py      odds to probabilities: proportional, power, Shin
 markets/efficiency.py  scores, calibration, returns, line moves, bootstrap intervals
 markets/model.py       walk-forward Poisson ratings model
+markets/sharp.py       Pinnacle vs retail bookmakers, by season, by league
+markets/live.py        half-time scores: a simple in-play model and score effects
 markets/report.py      runs every analysis; charts, results.json, report.md
 markets/website.py     builds the website from results.json
-tests/                 six checks
+tests/                 nine checks
 data/raw/              match files (football-data.co.uk)
 ```
 

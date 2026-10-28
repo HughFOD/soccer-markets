@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 REPO_URL = "https://github.com/HughFOD/soccer-markets"
-CHARTS = ("calibration", "longshot", "margins", "line_moves", "value_bets")
+CHARTS = ("calibration", "longshot", "margins", "line_moves", "value_bets", "soft_vs_sharp", "slope_by_season", "score_effects")
 
 
 def p(x, d=1, sign=True):
@@ -91,8 +91,65 @@ a{color:var(--accent)}footer{border-top:1px solid var(--line);margin-top:56px;pa
 """
 
 
+def more_findings(R: dict, start: int) -> str:
+    """Findings from markets/sharp.py: Pinnacle vs retail bookmakers, change over time, league comparison."""
+    html, n = [], start
+    sh, sb = R.get("sharp"), R.get("soft_bets")
+    if sh and sb:
+        rules = {r["edge"]: r for r in sb["rules"]}
+        r0, r2 = rules[0.0], rules[0.02]
+        d = sh["average_minus_pinnacle"]
+        html.append(f"""
+<div class=finding><div class=n>FINDING {n}</div>
+<h3>Pinnacle's price can find generous retail prices, but the evidence is weak</h3>
+<p>Pinnacle charges a margin of {p(sh['margin_pinnacle'], 1, False)}; the average bookmaker charges {p(sh['margin_average'], 1, False)}. With the margin removed, the two are equally accurate (log loss {sh['log_loss_pinnacle']:.4f} against {sh['log_loss_average']:.4f}), and the average adds nothing to Pinnacle.</p>
+<p>Retail bookmakers do not all move their prices at once, so sometimes one offers better odds than Pinnacle's fair price. Betting only those prices returned {p(r0['return'])} per bet (95% interval {p(r0['lo'])} to {p(r0['hi'])}, {r0['bets']:,} bets over {sb['matches']:,} matches). When the retail price was at least 2% better, the return was {p(r2['return'])} ({p(r2['lo'])} to {p(r2['hi'])}).</p>
+<img src="images/soft_vs_sharp.png" alt="Return from retail prices that beat Pinnacle's fair price">
+<p>Every estimate is positive and close to what Pinnacle's price predicted, but every interval touches zero, and most of the profit came in 2012–2014. In practice, retail bookmakers limit customers who do this.</p></div>""")
+        n += 1
+    bs = R.get("by_season")
+    if bs:
+        t = bs["table"]
+        tr = bs["slope_trend_per_decade"]
+        html.append(f"""
+<div class=finding><div class=n>FINDING {n}</div>
+<h3>Margins fell, but the long-shot bias did not</h3>
+<p>Measured season by season, the calibration slope shows no clear trend: {tr[0]:+.2f} per decade (standard error {tr[1]:.2f}). Long shots were overpriced in {sum(r['longshot_return'] < r['fav_return'] for r in t)} of {len(t)} seasons. Cheaper betting did not make the prices more accurate.</p>
+<img src="images/slope_by_season.png" alt="Calibration slope by season"></div>""")
+        n += 1
+    bl = {r["league"]: r for r in R.get("by_league", [])}
+    if {"E0", "E1"} <= set(bl):
+        e0, e1 = bl["E0"], bl["E1"]
+        g = R["model"].get("by_league", {})
+        html.append(f"""
+<div class=finding><div class=n>FINDING {n}</div>
+<h3>The Championship is not priced less efficiently</h3>
+<p>I expected the second division, with less attention and smaller bets, to be easier to beat. It was not. Its calibration slope ({e1['slope']:.2f}, interval {e1['slope_lo']:.2f}–{e1['slope_hi']:.2f}) is no further from 1 than the Premier League's ({e0['slope']:.2f}, {e0['slope_lo']:.2f}–{e0['slope_hi']:.2f}), and the model from past scores added nothing in either league.</p>
+<table><tr><th>League</th><th class=num>Matches</th><th class=num>Margin</th><th class=num>Calibration slope</th><th class=num>Bet everything</th></tr>
+<tr><td>Premier League</td><td class=num>{e0['matches']:,}</td><td class=num>{p(e0['margin'], 1, False)}</td><td class=num>{e0['slope']:.2f}</td><td class=num>{p(e0['bet_everything'])}</td></tr>
+<tr><td>Championship</td><td class=num>{e1['matches']:,}</td><td class=num>{p(e1['margin'], 1, False)}</td><td class=num>{e1['slope']:.2f}</td><td class=num>{p(e1['bet_everything'])}</td></tr></table></div>""")
+        n += 1
+    lv = R.get("live")
+    if lv:
+        se = {r["margin"]: r for r in lv["score_effects"]}
+        st = {(r["favourite"], r["half_time"]): r for r in lv["by_state"]}
+        lead = st.get(("narrow favourite", "leading by 1"))
+        lvl = st.get(("narrow favourite", "level"))
+        g = lv["adjusted_gain"]
+        html.append(f"""
+<div class=finding><div class=n>FINDING {n}</div>
+<h3>In-play: a half-time lead is less safe than a simple model thinks</h3>
+<p>The data have half-time scores, so I tested a simple way to price a match at half-time: turn the pre-match odds into each team's expected goals, assume the second half is the rest of the same match ({p(lv['share_second_half'], 0, False)} of goals come after half-time), and add the half-time score.</p>
+<p>Teams do not play the second half the same way whatever the score. A team losing by two or more scored {p(se[-2]['ratio'] - 1, 0)} more second-half goals than expected; a team winning by two or more scored {p(1 - se[2]['ratio'], 0, False)} fewer. The trailing team attacks and the leading team defends.</p>
+<img src="images/score_effects.png" alt="Second-half goals versus expected by half-time situation">
+<p>So the simple model overrates leads. When a narrow pre-match favourite led by one goal at half-time, the model gave it a {p(lead['model_win'], 0, False)} chance of winning; it won {p(lead['actual_win'], 0, False)} of {lead['matches']:,} matches. From level at half-time, draws happened {p(lvl['actual_draw'], 0, False)} of the time against {p(lvl['model_draw'], 0, False)} predicted. Adding the score effect, estimated on seasons before 2010, improved the half-time forecasts on the {lv['test_matches']:,} later matches (log loss gain {g[0]:.4f}, 95% interval {g[1]:.4f} to {g[2]:.4f}).</p>
+<p>The data have no in-play odds, so this shows what a naive in-play price would get wrong, not whether bookmakers make the same mistake.</p></div>""")
+    return "".join(html)
+
+
 def build(R: dict) -> str:
     f = facts(R)
+    extra = more_findings(R, 6 if R["closing"] else 5)
     sc = R["model"]["scores"]
     names = {"uniform": "Equal chances (⅓ each)", "model": "Model from past scores", "market": "Betting market",
              "market_recalibrated": "Market, recalibrated", "market_plus_model": "Market + model combined"}
@@ -116,7 +173,7 @@ def build(R: dict) -> str:
 <div class=kicker>Data science project · Python</div>
 <h1>Testing the Efficiency of Football Betting Odds</h1>
 <p class=lede>Bookmakers set odds on every professional football match. Odds can be read as probabilities, so they are a forecast. This project tests that forecast on {f['matches']} English {f['leagues']} matches from {f['years']}. If the market is efficient, outcomes happen as often as the odds say, and no simple rule makes money.</p>
-<div class=result><b>Main result</b>The odds are close to calibrated, and a statistical model built from past scores could not improve on them. The market has two consistent weaknesses: long shots are overpriced, and the opening price lags behind news that arrives before kick-off.</div>
+<div class=result><b>Main result</b>The odds are close to calibrated, and a statistical model built from past scores could not improve on them. The market has two consistent weaknesses: long shots are overpriced, and the opening price lags behind news that arrives before kick-off. Neither weakness has faded over 20 years.</div>
 <p class=note><code>Odds</code> Decimal odds of 2.50 return £2.50 for every £1 staked, including the stake. They imply a probability of 1 ÷ 2.50 = 40%. The three probabilities for a match (home win, draw, away win) add up to slightly more than 100%. The excess is the bookmaker's <i>margin</i>, its built-in profit.</p>
 </div></header>
 <main class=wrap>
@@ -133,6 +190,9 @@ def build(R: dict) -> str:
 <li><b>Bias.</b> Does betting on some kinds of outcome lose less than others?</li>
 <li><b>Information.</b> Do prices that move before kick-off move the right way?</li>
 <li><b>Forecasting.</b> Can a model built only from past scores beat the market, or add to it?</li>
+<li><b>Sharp vs retail.</b> Can the price of a low-margin bookmaker find mistakes at the others?</li>
+<li><b>In-play.</b> After half-time, do teams keep scoring at the rate the pre-match odds implied?</li>
+<li><b>Change.</b> Has the market become more accurate over 20 years, and is the second division easier to beat?</li>
 </ul>
 
 <h2>What I found</h2>
@@ -158,7 +218,8 @@ def build(R: dict) -> str:
 <table><tr><th>Forecast ({f['eval_matches']} matches from {f['eval_from']})</th><th class=num>Log loss</th><th class=num>RPS</th></tr>{rows}</table>
 <p>Lower is better for both scores. The model is far better than guessing but clearly worse than the market. Combining the two changed log loss by {f['gain']} (95% interval {f['gain_lo']} to {f['gain_hi']}), so the model adds nothing the odds do not already contain.</p>
 <img src="images/value_bets.png" alt="Cumulative profit from the model's value bets">
-<p>Betting whenever the model rated an outcome at least 5% more likely than the odds did lost {f['vb_avg']} per bet at average odds and {f['vb_pin']} at Pinnacle. At the best price across all bookmakers it returned {f['vb_best']}, which is break-even within the uncertainty.</p></div>
+<p>Betting whenever the model rated an outcome at least 5% more likely than the odds did, lost {f['vb_avg'].lstrip('-')} per bet at average odds and {f['vb_pin'].lstrip('-')} at Pinnacle. At the best price across all bookmakers it returned {f['vb_best']}, which is break-even within the uncertainty.</p></div>
+{extra}
 
 <h2>What I learned</h2>
 <div class=cards>
@@ -173,7 +234,7 @@ def build(R: dict) -> str:
 <li><b>Margin removal:</b> three methods compared (proportional, power, Shin 1993).</li>
 <li><b>Model:</b> weekly walk-forward Poisson ratings with time decay, in scikit-learn.</li>
 <li><b>Combination:</b> multinomial logistic regression, refitted each season on earlier seasons only.</li>
-<li><b>Tests:</b> six pytest checks, including that the model never sees a match on or after the one it predicts.</li>
+<li><b>Tests:</b> nine pytest checks, including that the model never sees a match on or after the one it predicts.</li>
 </ul>
 <h2>Limits</h2>
 <ul>

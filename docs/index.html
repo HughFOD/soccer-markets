@@ -37,7 +37,7 @@ a{color:var(--accent)}footer{border-top:1px solid var(--line);margin-top:56px;pa
 <div class=kicker>Data science project · Python</div>
 <h1>Testing the Efficiency of Football Betting Odds</h1>
 <p class=lede>Bookmakers set odds on every professional football match. Odds can be read as probabilities, so they are a forecast. This project tests that forecast on 16,670 English Premier League and Championship matches from 2000 to 2020. If the market is efficient, outcomes happen as often as the odds say, and no simple rule makes money.</p>
-<div class=result><b>Main result</b>The odds are close to calibrated, and a statistical model built from past scores could not improve on them. The market has two consistent weaknesses: long shots are overpriced, and the opening price lags behind news that arrives before kick-off.</div>
+<div class=result><b>Main result</b>The odds are close to calibrated, and a statistical model built from past scores could not improve on them. The market has two consistent weaknesses: long shots are overpriced, and the opening price lags behind news that arrives before kick-off. Neither weakness has faded over 20 years.</div>
 <p class=note><code>Odds</code> Decimal odds of 2.50 return £2.50 for every £1 staked, including the stake. They imply a probability of 1 ÷ 2.50 = 40%. The three probabilities for a match (home win, draw, away win) add up to slightly more than 100%. The excess is the bookmaker's <i>margin</i>, its built-in profit.</p>
 </div></header>
 <main class=wrap>
@@ -54,6 +54,9 @@ a{color:var(--accent)}footer{border-top:1px solid var(--line);margin-top:56px;pa
 <li><b>Bias.</b> Does betting on some kinds of outcome lose less than others?</li>
 <li><b>Information.</b> Do prices that move before kick-off move the right way?</li>
 <li><b>Forecasting.</b> Can a model built only from past scores beat the market, or add to it?</li>
+<li><b>Sharp vs retail.</b> Can the price of a low-margin bookmaker find mistakes at the others?</li>
+<li><b>In-play.</b> After half-time, do teams keep scoring at the rate the pre-match odds implied?</li>
+<li><b>Change.</b> Has the market become more accurate over 20 years, and is the second division easier to beat?</li>
 </ul>
 
 <h2>What I found</h2>
@@ -84,7 +87,31 @@ a{color:var(--accent)}footer{border-top:1px solid var(--line);margin-top:56px;pa
 <table><tr><th>Forecast (9,320 matches from 2010)</th><th class=num>Log loss</th><th class=num>RPS</th></tr><tr><td>Equal chances (⅓ each)</td><td class=num>1.0986</td><td class=num>0.2339</td></tr><tr><td>Model from past scores</td><td class=num>1.0390</td><td class=num>0.2122</td></tr><tr><td>Betting market</td><td class=num>1.0083</td><td class=num>0.2057</td></tr><tr><td>Market, recalibrated</td><td class=num>1.0085</td><td class=num>0.2057</td></tr><tr><td>Market + model combined</td><td class=num>1.0087</td><td class=num>0.2057</td></tr></table>
 <p>Lower is better for both scores. The model is far better than guessing but clearly worse than the market. Combining the two changed log loss by +0.0002 (95% interval -0.0004 to +0.0009), so the model adds nothing the odds do not already contain.</p>
 <img src="images/value_bets.png" alt="Cumulative profit from the model's value bets">
-<p>Betting whenever the model rated an outcome at least 5% more likely than the odds did lost -6.7% per bet at average odds and -3.6% at Pinnacle. At the best price across all bookmakers it returned +0.2%, which is break-even within the uncertainty.</p></div>
+<p>Betting whenever the model rated an outcome at least 5% more likely than the odds did, lost 6.7% per bet at average odds and 3.6% at Pinnacle. At the best price across all bookmakers it returned +0.2%, which is break-even within the uncertainty.</p></div>
+
+<div class=finding><div class=n>FINDING 6</div>
+<h3>Pinnacle's price can find generous retail prices, but the evidence is weak</h3>
+<p>Pinnacle charges a margin of 2.5%; the average bookmaker charges 5.6%. With the margin removed, the two are equally accurate (log loss 1.0028 against 1.0032), and the average adds nothing to Pinnacle.</p>
+<p>Retail bookmakers do not all move their prices at once, so sometimes one offers better odds than Pinnacle's fair price. Betting only those prices returned +3.8% per bet (95% interval -0.2% to +7.8%, 4,818 bets over 7,453 matches). When the retail price was at least 2% better, the return was +8.0% (-0.4% to +16.9%).</p>
+<img src="images/soft_vs_sharp.png" alt="Return from retail prices that beat Pinnacle's fair price">
+<p>Every estimate is positive and close to what Pinnacle's price predicted, but every interval touches zero, and most of the profit came in 2012–2014. In practice, retail bookmakers limit customers who do this.</p></div>
+<div class=finding><div class=n>FINDING 7</div>
+<h3>Margins fell, but the long-shot bias did not</h3>
+<p>Measured season by season, the calibration slope shows no clear trend: -0.04 per decade (standard error 0.04). Long shots were overpriced in 16 of 20 seasons. Cheaper betting did not make the prices more accurate.</p>
+<img src="images/slope_by_season.png" alt="Calibration slope by season"></div>
+<div class=finding><div class=n>FINDING 8</div>
+<h3>The Championship is not priced less efficiently</h3>
+<p>I expected the second division, with less attention and smaller bets, to be easier to beat. It was not. Its calibration slope (1.06, interval 0.99–1.13) is no further from 1 than the Premier League's (1.12, 1.07–1.19), and the model from past scores added nothing in either league.</p>
+<table><tr><th>League</th><th class=num>Matches</th><th class=num>Margin</th><th class=num>Calibration slope</th><th class=num>Bet everything</th></tr>
+<tr><td>Premier League</td><td class=num>7,446</td><td class=num>6.3%</td><td class=num>1.12</td><td class=num>-9.1%</td></tr>
+<tr><td>Championship</td><td class=num>9,224</td><td class=num>7.2%</td><td class=num>1.06</td><td class=num>-7.8%</td></tr></table></div>
+<div class=finding><div class=n>FINDING 9</div>
+<h3>In-play: a half-time lead is less safe than a simple model thinks</h3>
+<p>The data have half-time scores, so I tested a simple way to price a match at half-time: turn the pre-match odds into each team's expected goals, assume the second half is the rest of the same match (56% of goals come after half-time), and add the half-time score.</p>
+<p>Teams do not play the second half the same way whatever the score. A team losing by two or more scored +11% more second-half goals than expected; a team winning by two or more scored 7% fewer. The trailing team attacks and the leading team defends.</p>
+<img src="images/score_effects.png" alt="Second-half goals versus expected by half-time situation">
+<p>So the simple model overrates leads. When a narrow pre-match favourite led by one goal at half-time, the model gave it a 76% chance of winning; it won 73% of 3,398 matches. From level at half-time, draws happened 40% of the time against 37% predicted. Adding the score effect, estimated on seasons before 2010, improved the half-time forecasts on the 9,319 later matches (log loss gain 0.0015, 95% interval 0.0006 to 0.0024).</p>
+<p>The data have no in-play odds, so this shows what a naive in-play price would get wrong, not whether bookmakers make the same mistake.</p></div>
 
 <h2>What I learned</h2>
 <div class=cards>
@@ -99,7 +126,7 @@ a{color:var(--accent)}footer{border-top:1px solid var(--line);margin-top:56px;pa
 <li><b>Margin removal:</b> three methods compared (proportional, power, Shin 1993).</li>
 <li><b>Model:</b> weekly walk-forward Poisson ratings with time decay, in scikit-learn.</li>
 <li><b>Combination:</b> multinomial logistic regression, refitted each season on earlier seasons only.</li>
-<li><b>Tests:</b> six pytest checks, including that the model never sees a match on or after the one it predicts.</li>
+<li><b>Tests:</b> nine pytest checks, including that the model never sees a match on or after the one it predicts.</li>
 </ul>
 <h2>Limits</h2>
 <ul>

@@ -5,12 +5,14 @@ decimal odds offered by several bookmakers. Column sets change over the years,
 so everything is mapped onto a fixed set of columns:
 
     date, season, league, home, away, hg, ag, result   (result is H, D or A)
+    ht_hg, ht_ag   half-time score; h_red, a_red   red cards
     cons_{h,d,a}   consensus probability: each bookmaker's odds turned into
                    probabilities (margin removed), averaged across bookmakers
     best_{h,d,a}   best available decimal odds across bookmakers
     avg_{h,d,a}    average decimal odds across bookmakers
     pin_{h,d,a}    Pinnacle odds (a low-margin bookmaker; from 2012)
     pinc_{h,d,a}   Pinnacle closing odds, just before kick-off (from 2015/16)
+    soft_{h,d,a}   best odds among retail ("soft") bookmakers, i.e. excluding Pinnacle and the Betfair exchange
     n_books        how many bookmakers priced the match
 """
 from __future__ import annotations
@@ -26,6 +28,9 @@ import pandas as pd
 OUTCOMES = ("H", "D", "A")
 # bookmaker prefixes used by football-data.co.uk over the years
 BOOKS = ("B365", "BW", "IW", "LB", "PS", "WH", "SJ", "VC", "GB", "BS", "SB", "SY", "SO", "BF", "1XB", "CL", "BV")
+
+# low-margin bookmakers / exchanges that take large bets; everything else is a "soft" (retail) bookmaker
+SHARP = ("PS", "BF")
 
 LEAGUES = {  # football-data.co.uk code -> readable name
     "E0": "England Premier League", "E1": "England Championship", "SP1": "Spain La Liga",
@@ -101,8 +106,12 @@ def tidy(d: pd.DataFrame, league: str, season: str) -> pd.DataFrame:
         "hg": pd.to_numeric(d["FTHG"], errors="coerce"),
         "ag": pd.to_numeric(d["FTAG"], errors="coerce"),
         "result": d["FTR"],
+        "ht_hg": pd.to_numeric(d["HTHG"], errors="coerce") if "HTHG" in d.columns else np.nan,
+        "ht_ag": pd.to_numeric(d["HTAG"], errors="coerce") if "HTAG" in d.columns else np.nan,
+        "h_red": pd.to_numeric(d["HR"], errors="coerce") if "HR" in d.columns else np.nan,
+        "a_red": pd.to_numeric(d["AR"], errors="coerce") if "AR" in d.columns else np.nan,
     })
-    probs, odds = [], []
+    probs, odds, soft = [], [], []
     for b in BOOKS:
         oh, od, oa = (_num(d, f"{b}{o}") for o in OUTCOMES)
         if oh.isna().all():
@@ -110,6 +119,10 @@ def tidy(d: pd.DataFrame, league: str, season: str) -> pd.DataFrame:
         p = _probs_from_odds(oh, od, oa)
         probs.append(p)
         odds.append(np.column_stack([oh, od, oa]))
+        if b not in SHARP:
+            soft.append(odds[-1])
+    with _quiet():
+        soft_best = np.nanmax(np.stack(soft), axis=0) if soft else np.full((len(d), 3), np.nan)
     if probs:
         P = np.stack(probs)                      # books x matches x 3
         O = np.stack(odds)
@@ -133,6 +146,7 @@ def tidy(d: pd.DataFrame, league: str, season: str) -> pd.DataFrame:
         out[f"avg_{o}"] = avg[:, i]
         out[f"pin_{o}"] = _num(d, f"PS{OUTCOMES[i]}").to_numpy()
         out[f"pinc_{o}"] = _num(d, f"PSC{OUTCOMES[i]}").to_numpy()
+        out[f"soft_{o}"] = soft_best[:, i]
     out["n_books"] = n
     return out
 
