@@ -1,0 +1,39 @@
+name: Daily best bets
+
+# Every morning: download the day's odds, rebuild the website and publish it.
+# Needs the Odds API key saved as a repository secret named ODDS_API_KEY.
+on:
+  schedule:
+    - cron: "17 10 * * *"     # 10:17 UTC = 6:17 AM New York time in summer, 5:17 AM in winter
+  workflow_dispatch:           # also lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-odds
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Download odds and rebuild the pages
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: python -m markets.weekly
+      - name: Publish
+        run: |
+          git config user.name "daily-odds-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/index.html docs/this-week.html
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git commit -m "Daily odds update $(date -u +%Y-%m-%d)"
+          git push
