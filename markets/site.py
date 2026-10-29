@@ -10,51 +10,59 @@ from zoneinfo import ZoneInfo
 import numpy as np
 import pandas as pd
 
+from . import theme
+from .fairprice import MAX_EDGE
 from .usbooks import SITES, THRESHOLD, american
 
 ET = ZoneInfo("America/New_York")
 REPO_URL = "https://github.com/HughFOD/soccer-markets"
 
-CSS = """
-:root{--bg:#f7f6f2;--ink:#121418;--ink2:#454a54;--muted:#7a7f88;--line:#e2e0da;--card:#fff;--accent:#1f6fd1;--good:#0f7b4f;--goodbg:#e6f4ec;--hero:#0e1520;--heroink:#eef1f6}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111317;--ink:#eceef2;--ink2:#b9bdc6;--muted:#8a8f99;--line:#2a2e35;--card:#191c21;--accent:#4b93ea;--good:#4cc38a;--goodbg:#173326;--hero:#0a0e14}}
-*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 'Instrument Sans',system-ui,sans-serif}
-.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
-header{background:var(--hero);color:var(--heroink);padding:44px 0 64px}
-.kicker{font:500 12px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9fb4d4}
-h1{font:700 clamp(1.6rem,3.2vw,2.4rem)/1.15 Archivo,system-ui,sans-serif;margin:12px 0 14px;letter-spacing:-.01em;max-width:820px}
-.lede{font-size:1.06rem;color:#cfd6e2;max-width:760px;margin:0}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:-36px 0 8px;position:relative}
-.stat{background:var(--card);padding:16px 18px}.stat .v{font:700 1.45rem/1.15 Archivo,sans-serif}.stat .l{font-size:.82rem;color:var(--muted);margin-top:4px}
-h2{font:700 1.35rem/1.25 Archivo,sans-serif;margin:44px 0 6px}
-.sub{color:var(--ink2);margin:0 0 14px;max-width:780px}
-.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
-.pick{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--good);border-radius:10px;padding:14px 16px}
-.pick .m{font-weight:600}.pick .meta{font-size:.82rem;color:var(--muted)}
-.pick .bet{margin-top:8px;font:600 1.05rem 'JetBrains Mono',monospace}
-.pick .vs{font-size:.88rem;color:var(--ink2)}
-.edge{display:inline-block;background:var(--goodbg);color:var(--good);font:600 .8rem 'JetBrains Mono',monospace;padding:2px 7px;border-radius:6px;margin-left:6px}
-.empty{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:16px;color:var(--ink2)}
-table{border-collapse:collapse;width:100%;font-size:.92rem}
-th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
-th{color:var(--muted);font-weight:600;font-size:.8rem}
-td.n,th.n{text-align:right;font-family:'JetBrains Mono',monospace}
-.tablewrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
-.bar{display:inline-block;height:8px;border-radius:4px;background:var(--accent);vertical-align:middle;margin-right:6px}
-details{background:var(--card);border:1px solid var(--line);border-radius:10px;margin:10px 0}
-summary{cursor:pointer;padding:12px 16px;font-weight:600}
-summary span{color:var(--muted);font-weight:400}
-.match{padding:6px 16px 14px;border-top:1px solid var(--line)}
-.match h4{margin:8px 0 4px;font:600 .98rem Archivo,sans-serif}.match h4 small{color:var(--muted);font-weight:400}
-.best{background:var(--goodbg);color:var(--good);font-weight:700}
-.cons td{color:var(--ink2);font-style:italic}
-.kind{font-size:.75rem;color:var(--muted)}
-.note{font-size:.88rem;color:var(--ink2)}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}.card h3{margin:0 0 6px;font:650 1rem Archivo,sans-serif}.card p{margin:0;color:var(--ink2);font-size:.92rem}
-a{color:var(--accent)}footer{border-top:1px solid var(--line);margin-top:48px;padding:22px 0 36px;color:var(--muted);font-size:.88rem}
-@media (max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}}
+CSS = theme.CSS + """
+.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.pick{background:var(--bg2);border-radius:18px;padding:22px 22px 20px;display:flex;flex-direction:column;gap:4px}
+.pick .meta{font-size:13px;color:var(--muted)}
+.pick .m{font-size:19px;font-weight:600;line-height:1.25;letter-spacing:-.015em}
+.pick .bet{margin-top:10px;font-size:15px;color:var(--ink2)}
+.pick .bet b{display:block;font:700 30px/1.1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;color:var(--ink);letter-spacing:-.02em;margin:2px 0}
+.pick .vs{font-size:14px;color:var(--muted)}
+.edge{display:inline-block;background:var(--goodbg);color:var(--good);font-size:13px;font-weight:600;padding:3px 10px;border-radius:980px;margin-left:6px;vertical-align:middle}
+.empty{background:var(--bg2);border-radius:18px;padding:22px;color:var(--muted)}
+.daytabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 18px;scrollbar-width:none}.daytabs::-webkit-scrollbar{display:none}
+.daytab{flex:none;font:inherit;font-size:15px;border:0;border-radius:980px;padding:8px 16px;background:var(--bg2);color:var(--ink);cursor:pointer;letter-spacing:-.01em}
+.daytab span{margin-left:7px;color:var(--muted);font-size:13px}
+.daytab[aria-selected=true]{background:var(--ink);color:var(--bg)}.daytab[aria-selected=true] span{color:inherit;opacity:.7}
+html:not(.js) .daytabs{display:none}html:not(.js) .daypane{display:block!important;margin-bottom:28px}
+.dayhead{display:none}html:not(.js) .dayhead{display:block}
+.bets{list-style:none;margin:0;padding:0;background:var(--bg2);border-radius:18px;overflow:hidden}
+.bet-row{display:grid;grid-template-columns:44px 1fr auto auto;gap:18px;align-items:center;padding:16px 22px;border-top:1px solid var(--hair)}
+.bet-row:first-child{border-top:0}
+.rank{font:700 22px -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;color:var(--muted);text-align:center}
+.bet-row:first-child .rank{color:var(--blue)}
+.bet-what{font-size:19px;font-weight:600;letter-spacing:-.015em;line-height:1.25}
+.bet-match{font-size:14px;color:var(--muted);margin-top:2px}
+.bet-where{text-align:right}.bet-odds{font:700 24px/1.1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.bet-site{font-size:14px;color:var(--link);font-weight:500}
+.bet-value{text-align:right;min-width:116px}.bet-value .edge{margin:0}.bet-chance{font-size:13px;color:var(--muted);margin-top:4px}
+.few{font-size:14px;color:var(--muted);margin:12px 4px 0}
+@media (max-width:640px){.bet-row{grid-template-columns:30px 1fr auto;gap:4px 12px;padding:14px 16px}
+  .rank{font-size:18px;grid-row:1/3}.bet-where{grid-column:3;grid-row:1}.bet-value{grid-column:2/4;grid-row:2;text-align:left;min-width:0;display:flex;gap:10px;align-items:center}
+  .bet-main{grid-column:2;grid-row:1}.bet-chance{margin:0}.bet-what{font-size:17px}.bet-odds{font-size:20px}}
+.bar{display:inline-block;height:6px;border-radius:3px;background:var(--blue);vertical-align:middle;margin-right:8px}
+.kind{font-size:12px;color:var(--muted)}
+details.league{background:var(--tile);border-radius:18px;margin:12px 0;overflow:hidden}
+details.league>summary{cursor:pointer;padding:18px 56px 18px 22px;font-size:19px;font-weight:600;list-style:none;position:relative;letter-spacing:-.015em}
+details.league>summary::-webkit-details-marker{display:none}
+details.league>summary:after{content:"+";position:absolute;right:22px;top:50%;transform:translateY(-52%);font-weight:300;font-size:26px;color:var(--muted);line-height:1}
+details.league[open]>summary:after{content:"−"}
+details.league>summary span{color:var(--muted);font-weight:400;font-size:15px;margin-left:8px}
+.match{padding:6px 22px 18px}
+.match h4{margin:10px 0 8px;font-size:16px;font-weight:600}.match h4 small{color:var(--muted);font-weight:400;font-size:13px}
+.match .tablewrap{background:var(--bg2);border-radius:12px}
+.match th,.match td{padding:9px 12px}
+.best{color:var(--good);font-weight:700}
+td.best{background:var(--goodbg)}
+.cons td{color:var(--muted)}
+.note{font-size:14px;color:var(--muted);margin-top:14px}
 """
 
 
@@ -67,27 +75,88 @@ def _pct(x, d=1, sign=True):
     return f"{100 * x:+.{d}f}%" if sign else f"{100 * x:.{d}f}%"
 
 
+TOP_N = 10      # bets listed per day
+MIN_EDGE = 0.001  # a bet is listed only if its best price beats the fair (consensus) price by 0.1%+
+
+
+def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None = None) -> list[tuple[str, list[dict]]]:
+    """[(day label, [bet, ...])] for each day from today on, best value first.
+
+    A bet is one result of one match at its best price across the sites. Value is how much that
+    price pays compared with the consensus fair price. Matches that have already kicked off are left out.
+    """
+    if not len(M) or not len(quotes):
+        return []
+    now = now or pd.Timestamp.now(tz=ET)
+    q = quotes.merge(M[["id", "kickoff", "home", "away", "league", "best_h", "best_d", "best_a",
+                        "cons_h", "cons_d", "cons_a"]], on="id")
+    q["ko"] = pd.to_datetime(q["kickoff"]).dt.tz_convert(ET)
+    q = q[q["ko"] > now]
+    q["best_odds"] = [r[f"best_{r['result']}"] for _, r in q.iterrows()]
+    top = q[np.isclose(q["odds"], q["best_odds"])]           # every site offering the best price
+    order = {k: i for i, k in enumerate(SITES)}
+    rows = []
+    for (mid, res), g in top.groupby(["id", "result"], sort=False):
+        g = g.sort_values("site", key=lambda c: c.map(order))
+        r = g.iloc[0]
+        edge = float(r["edge"])
+        if not (MIN_EDGE < edge <= MAX_EDGE):
+            continue
+        team = r["home"] if res == "h" else r["away"] if res == "a" else None
+        rows.append({"day": r["ko"].date(), "ko": r["ko"], "edge": edge, "odds": american(r["odds"]),
+                     "bet": f"{team} to win" if team else "Draw", "match": f"{r['home']} v {r['away']}",
+                     "league": r["league"], "sites": [SITES[x][0] for x in g["site"]],
+                     "chance": float(r[f"cons_{res}"])})
+    out = []
+    today = now.date()
+    if not any(x["day"] == today for x in rows) and len(M):
+        out.append(("Today", []))
+    for day in sorted({x["day"] for x in rows}):
+        bets = sorted((x for x in rows if x["day"] == day), key=lambda x: -x["edge"])[:TOP_N]
+        label = "Today" if day == today else "Tomorrow" if (day - today).days == 1 else pd.Timestamp(day).strftime("%a %b %-d")
+        out.append((label, bets))
+    return out
+
+
+def days_html(days: list[tuple[str, list[dict]]]) -> str:
+    e = html.escape
+    when = lambda lab: lab.lower() if lab in ("Today", "Tomorrow") else "on " + e(lab)
+    if not days:
+        return ("<div class=empty>No price beats the fair price on any match coming up. "
+                "That happens on quiet days; check back after the next update.</div>")
+    first = next((i for i, (_, b) in enumerate(days) if b), 0)      # open on the first day that has bets
+    tabs = "".join(f'<button class=daytab data-day="{i}"{" aria-selected=true" if i == first else ""}>{e(lab)}'
+                   f'<span>{len(b)}</span></button>' for i, (lab, b) in enumerate(days))
+    panes = []
+    for i, (lab, bets) in enumerate(days):
+        items = "".join(f"""<li class=bet-row><span class=rank>{k}</span>
+<div class=bet-main><div class=bet-what>{e(b['bet'])}</div>
+<div class=bet-match>{e(b['match'])} · {e(b['league'])} · {b['ko'].strftime('%-I:%M %p')} ET</div></div>
+<div class=bet-where><div class=bet-odds>{b['odds'].replace('-', '−')}</div><div class=bet-site>{e(' or '.join(b['sites']))}</div></div>
+<div class=bet-value><span class=edge>{_pct(b['edge'])}</span><div class=bet-chance>{100 * b['chance']:.0f}% fair chance</div></div></li>"""
+                        for k, b in enumerate(bets, 1))
+        note = (f"<div class=empty>No price beats the fair price {when(lab)}. "
+                "Every site is charging its full cut, so there's nothing worth backing.</div>" if not bets else
+                "" if len(bets) >= 5 else
+                f"<p class=few>Only {len(bets)} price{'s' if len(bets) != 1 else ''} beat{'s' if len(bets) == 1 else ''} "
+                f"the fair price {when(lab)}. The rest pay less than fair, so they're left out.</p>")
+        panes.append(f'<div class=daypane data-day="{i}"{" hidden" if i != first else ""}><h3 class=dayhead>{e(lab)}</h3>'
+                     + (f'<ol class=bets>{items}</ol>' if bets else '') + f'{note}</div>')
+    js = ("<script>document.querySelectorAll('.daytab').forEach(t=>t.addEventListener('click',()=>{"
+          "document.querySelectorAll('.daytab').forEach(x=>x.removeAttribute('aria-selected'));t.setAttribute('aria-selected','true');"
+          "document.querySelectorAll('.daypane').forEach(p=>p.hidden=p.dataset.day!==t.dataset.day)}));"
+          "document.documentElement.classList.add('js')</script>")
+    return f'<div class=daytabs role=tablist>{tabs}</div>{"".join(panes)}{js}'
+
+
 def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | None, stamp: str, remaining=None) -> str:
     e = html.escape
     present = [s for s in SITES if len(quotes) and s in set(quotes["site"])]
     n_flags = int(sum(1 for f in M["flag"] if f)) if len(M) else 0
 
-    # ---- best prices right now
-    picks = []
-    for _, r in M.iterrows():
-        for o, lab in zip("hda", ("home win", "draw", "away win")):
-            ed = r[f"edge_{o}"]
-            if THRESHOLD < ed <= 0.25:
-                team = r["home"] if o == "h" else r["away"] if o == "a" else "Draw"
-                what = f"{team} to win" if o != "d" else "Draw"
-                picks.append((ed, f"""<div class=pick><div class=m>{e(r['home'])} v {e(r['away'])}</div>
-<div class=meta>{e(r['league'])} · {_ko(r['kickoff'])}</div>
-<div class=bet>{e(what)} {r[f'best_us_{o}']} <span class=vs>at {e(r[f'best_site_{o}'])}</span><span class=edge>{_pct(ed)}</span></div>
-<div class=vs>Consensus {r[f'cons_us_{o}']} ({100 * r[f'cons_{o}']:.0f}% chance)</div></div>"""))
-    picks = "".join(p for _, p in sorted(picks, key=lambda x: -x[0]))
-    picks_html = f"<div class=picks>{picks}</div>" if picks else (
-        f"<div class=empty>No site is more than {THRESHOLD:.0%} better than the consensus on any result right now. "
-        "Prices are usually close; gaps appear when one site is slow to move.</div>")
+    # ---- today's best bets: per day, up to TOP_N results whose best price beats the fair price
+    days = daily_picks(M, quotes)
+    picks_html = days_html(days)
 
     # ---- which site pays the most
     brows = ""
@@ -122,7 +191,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
             blocks.append(f"""<div class=match><h4>{e(r['home'])} v {e(r['away'])} <small>· {_ko(r['kickoff'])}</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>{e(r['home'])}</th><th class=n>Draw</th><th class=n>{e(r['away'])}</th></tr>{body}</table></div></div>""")
         nflag = int((G["flag"] != "").sum())
-        leagues.append(f"<details{' open' if not leagues else ''}><summary>{e(lg)} <span>· {len(G)} matches"
+        leagues.append(f"<details class=league{' open' if not leagues else ''}><summary>{e(lg)} <span>· {len(G)} matches"
                        f"{f' · {nflag} flagged' if nflag else ''}</span></summary>{''.join(blocks)}</details>")
 
     # ---- does it work (history)
@@ -144,48 +213,55 @@ don't exist, so this test uses the same method on {len(cs['books'])} European bo
 (95% range {_pct(r2['lo'], 1, False)} to {_pct(r2['hi'], 1, False)}). Small gaps (under 1%) are mostly noise. Profit over a few hundred bets
 is too noisy to judge either way, which is why the kick-off price is the better test. This is a study of pricing, not betting advice.</p>"""
 
-    return f"""<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+    return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 <title>Football Odds Compared</title>
 <meta name=description content="This week's football odds at FanDuel, DraftKings, Fanatics, BetMGM, Caesars, Kalshi and Polymarket, compared with the consensus of all of them.">
-<link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel=stylesheet>
 <style>{CSS}</style></head><body>
-<header><div class=wrap>
-<div class=kicker>Updated {stamp} · {len(M)} matches · {len(present)} sites</div>
-<h1>Football Odds Compared Across US Sportsbooks and Prediction Markets</h1>
-<p class=lede>Every match this week in six top leagues, priced by {', '.join(SITES[s][0] for s in present[:-1])}{' and ' + SITES[present[-1]][0] if present else ''}.
-Each site's odds are compared with the consensus of all of them, and any price clearly better than the consensus is flagged.</p>
-</div></header>
-<main class=wrap>
+{theme.nav("week")}
+<section class=hero><div class=wrap>
+<p class=eyebrow>Updated every morning</p>
+<h1>The best bets, every day.</h1>
+<p class=lede>The best-value bets for every day, from every match in six top leagues, priced by {', '.join(SITES[s][0] for s in present[:-1])}{' and ' + SITES[present[-1]][0] if present else ''}.</p>
+<div class=ctas><a class=btn href="#best">See today's best bets</a><a class="btn ghost" href="research.html">How accurate are odds</a></div>
+<p class=updated>Last updated {stamp}</p>
+</div></section>
+
+<section class=band><div class=wrap>
 <div class=stats>
 <div class=stat><div class=v>{len(M)}</div><div class=l>matches this week</div></div>
 <div class=stat><div class=v>{len(present)}</div><div class=l>sportsbooks and prediction markets</div></div>
-<div class=stat><div class=v>{n_flags}</div><div class=l>matches with a price {THRESHOLD:.0%}+ better than consensus</div></div>
-<div class=stat><div class=v>{e(best_site)}</div><div class=l>best prices on average this week</div></div>
-</div>
+<div class=stat><div class=v>{n_flags}</div><div class=l>prices {THRESHOLD:.0%}+ better than consensus</div></div>
+<div class=stat><div class=v>{e(best_site)}</div><div class=l>best prices on average</div></div>
+</div></div></section>
 
-<h2>Best prices right now</h2>
-<p class=sub>Prices more than {THRESHOLD:.0%} better than the consensus. The percentage is how much more the bet pays than the consensus says it should.</p>
+<section class=section id=best><div class=wrap>
+<h2>Ranked, day by day.</h2>
+<p class=sub>Each day's bets where one site pays more than the fair price, ranked by value. Back the result shown, at the site shown, at those odds or better. The green figure is how much more it pays than fair.</p>
 {picks_html}
+</div></section>
 
-<h2>Which site pays the most?</h2>
-<p class=sub>Sites are listed by US market share, largest first. The consensus has every site's cut removed, so it is the fair price, and a site with a cut pays a little less than fair on most results. The margin is that cut (lower is better). "Best price" is how often a site has the top odds on a result. "Vs consensus" is how much its odds pay on average compared with fair.</p>
+<section class=band><div class=wrap>
+<h2>Which site pays the most.</h2>
+<p class=sub>Listed by US market share. The margin is each site's built-in cut (lower is better). "Best price" is how often it has the top odds. "Vs consensus" is how much it pays compared with the fair price.</p>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Matches</th><th class=n>Margin</th><th class=n>Best price</th><th class=n>Vs consensus</th><th class=n>Flags</th></tr>{brows}</table></div>
+</div></section>
 
-<h2>All matches</h2>
-<p class=sub>American odds: +150 means a $100 bet wins $150; −200 means you bet $200 to win $100. The best price for each result is highlighted. The consensus row shows the fair odds and chance.</p>
+<section class=section><div class=wrap>
+<h2>Every match.</h2>
+<p class=sub>+150 means a $100 bet wins $150; −200 means you bet $200 to win $100. The best price for each result is in green, and the consensus row shows the fair odds and chance.</p>
 {''.join(leagues)}
+</div></section>
 
-{hist}
+{('<section class=band><div class=wrap>' + hist + '</div></section>') if hist else ''}
 
-<h2>How it works</h2>
+<section class=section><div class=wrap>
+<h2>How it works.</h2>
+<p class=sub>Three steps, rerun every week.</p>
 <div class=cards>
-<div class=card><h3>1. Collect the odds</h3><p>Odds for every match come from The Odds API, limited to FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus Kalshi and Polymarket, listed by market share. Caesars and Fanatics appear only on a paid data plan.</p></div>
-<div class=card><h3>2. Build the consensus</h3><p>Each site's odds are turned into chances with its cut removed, then averaged with equal weight. No site counts more than another.</p></div>
-<div class=card><h3>3. Flag the gaps</h3><p>A price more than {THRESHOLD:.0%} better than the consensus is flagged. Gaps over 25% are ignored as stale or mistyped prices.</p></div>
+<div class=card><h3>Collect the odds.</h3><p>From FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus Kalshi and Polymarket, through The Odds API. Caesars and Fanatics appear only on a paid data plan.</p></div>
+<div class=card><h3>Build the consensus.</h3><p>Each site's odds become chances with its cut removed, then are averaged with equal weight. No site counts more than another.</p></div>
+<div class=card><h3>Flag the gaps.</h3><p>A price more than {THRESHOLD:.0%} better than the consensus is flagged. Gaps over 25% are ignored as stale or mistyped prices.</p></div>
 </div>
-<p class=note style="margin-top:14px">Prices move constantly, so check the site before acting. Odds from The Odds API; history from football-data.co.uk.
-<a href="research.html">Background research on 50,000 matches</a> · <a href="{REPO_URL}">Code on GitHub</a></p>
-</main>
-<footer><div class=wrap>A data science project in Python by Hugh. This is a study of pricing, not betting advice.</div></footer>
+</div></section>
+{theme.footer()}
 </body></html>"""

@@ -182,4 +182,26 @@ def test_consensus_comparison_flags_the_generous_site():
     r = M.iloc[0]
     assert r["best_site_h"] == "Polymarket" and "Home" in r["flag"]
     board = usbooks.scoreboard(quotes, t)
-    assert set(board["name"][:2]) == {"Kalshi", "Polymarket"}   # lower cuts, so they pay more on average
+    assert set(board.nlargest(2, "avg_edge")["name"]) == {"Kalshi", "Polymarket"}   # lower cuts, so they pay more
+    assert list(board["site"]) == [k for k in usbooks.SITES if k in set(board["site"])]    # listed in market-share order
+
+
+def test_daily_picks_rank_only_bets_that_beat_the_fair_price():
+    import pandas as pd
+    from markets import site, usbooks
+    ko = "2026-10-31T15:00:00Z"
+    ev = lambda mid, books: {"id": mid, "commence_time": ko, "home_team": "A" + mid, "away_team": "B" + mid,
+                             "bookmakers": [{"key": k, "title": k, "markets": [{"key": "h2h", "outcomes": [
+                                 {"name": "A" + mid, "price": h}, {"name": "B" + mid, "price": a}, {"name": "Draw", "price": d}]}]}
+                                 for k, (h, d, a) in books.items()]}
+    fair = {"fanduel": (2.40, 3.30, 3.00), "draftkings": (2.40, 3.30, 3.00), "betmgm": (2.40, 3.30, 3.00)}
+    raw = {"soccer_epl|us": [ev("1", {**fair, "kalshi": (2.70, 3.30, 3.00)}),     # big edge on the home win
+                             ev("2", {**fair, "kalshi": (2.60, 3.30, 3.00)}),     # smaller edge
+                             ev("3", fair)]}                                       # nothing beats fair
+    M, q = usbooks.price(usbooks.to_table(raw))
+    days = site.daily_picks(M, q, now=pd.Timestamp("2026-10-31T08:00", tz=site.ET))
+    assert [lab for lab, _ in days] == ["Today"]
+    bets = days[0][1]
+    assert [b["bet"] for b in bets[:2]] == ["A1 to win", "A2 to win"]           # ranked by value
+    assert all(b["edge"] > site.MIN_EDGE for b in bets) and bets[0]["sites"] == ["Kalshi"]
+    assert site.daily_picks(M, q, now=pd.Timestamp("2026-10-31T12:00", tz=site.ET)) == [("Today", [])]  # kicked off

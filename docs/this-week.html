@@ -1,86 +1,288 @@
 <!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=color-scheme content="light dark">
 <title>Football Odds Compared</title>
 <meta name=description content="This week's football odds at FanDuel, DraftKings, Fanatics, BetMGM, Caesars, Kalshi and Polymarket, compared with the consensus of all of them.">
-<link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel=stylesheet>
 <style>
-:root{--bg:#f7f6f2;--ink:#121418;--ink2:#454a54;--muted:#7a7f88;--line:#e2e0da;--card:#fff;--accent:#1f6fd1;--good:#0f7b4f;--goodbg:#e6f4ec;--hero:#0e1520;--heroink:#eef1f6}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111317;--ink:#eceef2;--ink2:#b9bdc6;--muted:#8a8f99;--line:#2a2e35;--card:#191c21;--accent:#4b93ea;--good:#4cc38a;--goodbg:#173326;--hero:#0a0e14}}
-*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 'Instrument Sans',system-ui,sans-serif}
-.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
-header{background:var(--hero);color:var(--heroink);padding:44px 0 64px}
-.kicker{font:500 12px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9fb4d4}
-h1{font:700 clamp(1.6rem,3.2vw,2.4rem)/1.15 Archivo,system-ui,sans-serif;margin:12px 0 14px;letter-spacing:-.01em;max-width:820px}
-.lede{font-size:1.06rem;color:#cfd6e2;max-width:760px;margin:0}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:-36px 0 8px;position:relative}
-.stat{background:var(--card);padding:16px 18px}.stat .v{font:700 1.45rem/1.15 Archivo,sans-serif}.stat .l{font-size:.82rem;color:var(--muted);margin-top:4px}
-h2{font:700 1.35rem/1.25 Archivo,sans-serif;margin:44px 0 6px}
-.sub{color:var(--ink2);margin:0 0 14px;max-width:780px}
-.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
-.pick{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--good);border-radius:10px;padding:14px 16px}
-.pick .m{font-weight:600}.pick .meta{font-size:.82rem;color:var(--muted)}
-.pick .bet{margin-top:8px;font:600 1.05rem 'JetBrains Mono',monospace}
-.pick .vs{font-size:.88rem;color:var(--ink2)}
-.edge{display:inline-block;background:var(--goodbg);color:var(--good);font:600 .8rem 'JetBrains Mono',monospace;padding:2px 7px;border-radius:6px;margin-left:6px}
-.empty{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:16px;color:var(--ink2)}
-table{border-collapse:collapse;width:100%;font-size:.92rem}
-th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
-th{color:var(--muted);font-weight:600;font-size:.8rem}
-td.n,th.n{text-align:right;font-family:'JetBrains Mono',monospace}
-.tablewrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
-.bar{display:inline-block;height:8px;border-radius:4px;background:var(--accent);vertical-align:middle;margin-right:6px}
-details{background:var(--card);border:1px solid var(--line);border-radius:10px;margin:10px 0}
-summary{cursor:pointer;padding:12px 16px;font-weight:600}
-summary span{color:var(--muted);font-weight:400}
-.match{padding:6px 16px 14px;border-top:1px solid var(--line)}
-.match h4{margin:8px 0 4px;font:600 .98rem Archivo,sans-serif}.match h4 small{color:var(--muted);font-weight:400}
-.best{background:var(--goodbg);color:var(--good);font-weight:700}
-.cons td{color:var(--ink2);font-style:italic}
-.kind{font-size:.75rem;color:var(--muted)}
-.note{font-size:.88rem;color:var(--ink2)}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}.card h3{margin:0 0 6px;font:650 1rem Archivo,sans-serif}.card p{margin:0;color:var(--ink2);font-size:.92rem}
-a{color:var(--accent)}footer{border-top:1px solid var(--line);margin-top:48px;padding:22px 0 36px;color:var(--muted);font-size:.88rem}
-@media (max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}}
+:root{--bg:#fff;--bg2:#f5f5f7;--tile:#fff;--ink:#1d1d1f;--ink2:#424245;--muted:#6e6e73;--line:#d2d2d7;--hair:#e8e8ed;
+  --link:#0066cc;--blue:#0071e3;--good:#1d7c3a;--goodbg:#e9f6ec;--card:#fff;--nav:rgba(255,255,255,.72);
+  --c1:#0071e3;--c2:#eb6834;--grid:#e8e8ed;--axis:#86868b;--accent:#0071e3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--bg2:#161617;--tile:#1d1d1f;--ink:#f5f5f7;--ink2:#d2d2d7;
+  --muted:#a1a1a6;--line:#424245;--hair:#2c2c2e;--link:#2997ff;--blue:#0071e3;--good:#4cd964;--goodbg:#13281a;--card:#1d1d1f;
+  --nav:rgba(22,22,23,.72);--c1:#2997ff;--c2:#e8590c;--grid:#2c2c2e;--axis:#86868b;--accent:#2997ff}}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.47 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  letter-spacing:-.022em;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:0 22px}
+a{color:var(--link);text-decoration:none}a:hover{text-decoration:underline}
+h1,h2,h3,h4,.display{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Helvetica,Arial,sans-serif}
+
+/* top bar */
+.gnav{position:sticky;top:0;z-index:10;background:var(--nav);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--hair)}
+.gnav .wrap{display:flex;align-items:center;justify-content:space-between;height:48px}
+.gnav .brand{font-weight:600;font-size:17px;color:var(--ink);letter-spacing:-.02em}
+.gnav nav{display:flex;gap:22px;font-size:14px}.gnav nav a{color:var(--ink2)}.gnav nav a.on{color:var(--ink);font-weight:600}
+.gnav nav a:hover{color:var(--ink);text-decoration:none}
+
+/* hero */
+.hero{text-align:center;padding:72px 0 48px}
+.eyebrow{font-size:17px;font-weight:600;color:#bf4800;margin:0 0 6px;letter-spacing:-.01em}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .eyebrow{color:#ff9f0a}}
+.hero h1{font-size:clamp(40px,7vw,64px);line-height:1.06;font-weight:700;letter-spacing:-.015em;margin:0 auto 14px;max-width:860px}
+.hero .lede{font-size:clamp(19px,2.4vw,24px);line-height:1.35;color:var(--muted);font-weight:500;max-width:760px;margin:0 auto;letter-spacing:.005em}
+.ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+.btn{display:inline-block;background:var(--blue);color:#fff;font-size:17px;padding:11px 22px;border-radius:980px}
+.btn:hover{text-decoration:none;filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--link);padding:11px 6px}.btn.ghost:after{content:" ›"}
+.updated{margin-top:18px;font-size:14px;color:var(--muted)}
+
+/* sections */
+.band{background:var(--bg2);padding:64px 0}
+.section{padding:64px 0}
+h2{font-size:clamp(32px,4.6vw,48px);line-height:1.08;font-weight:700;letter-spacing:-.01em;margin:0 0 10px}
+.sub{font-size:19px;line-height:1.42;color:var(--muted);margin:0 0 30px;max-width:720px}
+h3{font-size:21px;line-height:1.2;font-weight:600;margin:0 0 6px;letter-spacing:-.015em}
+
+/* big numbers */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:0}
+.stat{background:var(--tile);border-radius:18px;padding:24px 22px}
+.band .stat{background:var(--tile)}
+.stat .v{font:700 clamp(28px,3.6vw,40px)/1.05 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;letter-spacing:-.02em}
+.stat .l{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.35}
+
+/* tiles */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:var(--tile);border-radius:18px;padding:28px 24px}
+.card p{margin:0;color:var(--muted);font-size:16px;line-height:1.45}
+.section .card,.section .stat{background:var(--bg2)}
+
+/* tables */
+.tablewrap,.tw{overflow-x:auto;background:var(--tile);border-radius:18px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{padding:12px 16px;border-bottom:1px solid var(--hair);text-align:left;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+th{color:var(--muted);font-weight:600;font-size:13px}
+td.n,th.n,td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+
+footer{background:var(--bg2);color:var(--muted);font-size:12px;line-height:1.5;padding:22px 0 34px}
+footer .wrap{border-top:1px solid var(--line);padding-top:18px}
+footer p{margin:0 0 6px}
+
+@media (max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}}
+@media (max-width:520px){.hero{padding:48px 0 34px}.band,.section{padding:44px 0}.stat{padding:18px 16px}.gnav nav{gap:14px}
+  th,td{padding:10px 10px}.card{padding:22px 18px}}
+
+.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.pick{background:var(--bg2);border-radius:18px;padding:22px 22px 20px;display:flex;flex-direction:column;gap:4px}
+.pick .meta{font-size:13px;color:var(--muted)}
+.pick .m{font-size:19px;font-weight:600;line-height:1.25;letter-spacing:-.015em}
+.pick .bet{margin-top:10px;font-size:15px;color:var(--ink2)}
+.pick .bet b{display:block;font:700 30px/1.1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;color:var(--ink);letter-spacing:-.02em;margin:2px 0}
+.pick .vs{font-size:14px;color:var(--muted)}
+.edge{display:inline-block;background:var(--goodbg);color:var(--good);font-size:13px;font-weight:600;padding:3px 10px;border-radius:980px;margin-left:6px;vertical-align:middle}
+.empty{background:var(--bg2);border-radius:18px;padding:22px;color:var(--muted)}
+.daytabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 18px;scrollbar-width:none}.daytabs::-webkit-scrollbar{display:none}
+.daytab{flex:none;font:inherit;font-size:15px;border:0;border-radius:980px;padding:8px 16px;background:var(--bg2);color:var(--ink);cursor:pointer;letter-spacing:-.01em}
+.daytab span{margin-left:7px;color:var(--muted);font-size:13px}
+.daytab[aria-selected=true]{background:var(--ink);color:var(--bg)}.daytab[aria-selected=true] span{color:inherit;opacity:.7}
+html:not(.js) .daytabs{display:none}html:not(.js) .daypane{display:block!important;margin-bottom:28px}
+.dayhead{display:none}html:not(.js) .dayhead{display:block}
+.bets{list-style:none;margin:0;padding:0;background:var(--bg2);border-radius:18px;overflow:hidden}
+.bet-row{display:grid;grid-template-columns:44px 1fr auto auto;gap:18px;align-items:center;padding:16px 22px;border-top:1px solid var(--hair)}
+.bet-row:first-child{border-top:0}
+.rank{font:700 22px -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;color:var(--muted);text-align:center}
+.bet-row:first-child .rank{color:var(--blue)}
+.bet-what{font-size:19px;font-weight:600;letter-spacing:-.015em;line-height:1.25}
+.bet-match{font-size:14px;color:var(--muted);margin-top:2px}
+.bet-where{text-align:right}.bet-odds{font:700 24px/1.1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.bet-site{font-size:14px;color:var(--link);font-weight:500}
+.bet-value{text-align:right;min-width:116px}.bet-value .edge{margin:0}.bet-chance{font-size:13px;color:var(--muted);margin-top:4px}
+.few{font-size:14px;color:var(--muted);margin:12px 4px 0}
+@media (max-width:640px){.bet-row{grid-template-columns:30px 1fr auto;gap:4px 12px;padding:14px 16px}
+  .rank{font-size:18px;grid-row:1/3}.bet-where{grid-column:3;grid-row:1}.bet-value{grid-column:2/4;grid-row:2;text-align:left;min-width:0;display:flex;gap:10px;align-items:center}
+  .bet-main{grid-column:2;grid-row:1}.bet-chance{margin:0}.bet-what{font-size:17px}.bet-odds{font-size:20px}}
+.bar{display:inline-block;height:6px;border-radius:3px;background:var(--blue);vertical-align:middle;margin-right:8px}
+.kind{font-size:12px;color:var(--muted)}
+details.league{background:var(--tile);border-radius:18px;margin:12px 0;overflow:hidden}
+details.league>summary{cursor:pointer;padding:18px 56px 18px 22px;font-size:19px;font-weight:600;list-style:none;position:relative;letter-spacing:-.015em}
+details.league>summary::-webkit-details-marker{display:none}
+details.league>summary:after{content:"+";position:absolute;right:22px;top:50%;transform:translateY(-52%);font-weight:300;font-size:26px;color:var(--muted);line-height:1}
+details.league[open]>summary:after{content:"−"}
+details.league>summary span{color:var(--muted);font-weight:400;font-size:15px;margin-left:8px}
+.match{padding:6px 22px 18px}
+.match h4{margin:10px 0 8px;font-size:16px;font-weight:600}.match h4 small{color:var(--muted);font-weight:400;font-size:13px}
+.match .tablewrap{background:var(--bg2);border-radius:12px}
+.match th,.match td{padding:9px 12px}
+.best{color:var(--good);font-weight:700}
+td.best{background:var(--goodbg)}
+.cons td{color:var(--muted)}
+.note{font-size:14px;color:var(--muted);margin-top:14px}
 </style></head><body>
-<header><div class=wrap>
-<div class=kicker>Updated 29 Oct 2026 · 110 matches · 5 sites</div>
-<h1>Football Odds Compared Across US Sportsbooks and Prediction Markets</h1>
-<p class=lede>Every match this week in six top leagues, priced by FanDuel, DraftKings, BetMGM, Kalshi and Polymarket.
-Each site's odds are compared with the consensus of all of them, and any price clearly better than the consensus is flagged.</p>
-</div></header>
-<main class=wrap>
+<header class=gnav><div class=wrap><a class=brand href="index.html">Football Odds</a><nav><a href="index.html" class=on>Best bets</a><a href="research.html">Research</a><a href="https://github.com/HughFOD/soccer-markets">Code</a></nav></div></header>
+<section class=hero><div class=wrap>
+<p class=eyebrow>Updated every morning</p>
+<h1>The best bets, every day.</h1>
+<p class=lede>The best-value bets for every day, from every match in six top leagues, priced by FanDuel, DraftKings, BetMGM, Kalshi and Polymarket.</p>
+<div class=ctas><a class=btn href="#best">See today's best bets</a><a class="btn ghost" href="research.html">How accurate are odds</a></div>
+<p class=updated>Last updated Thu 29 Oct 2026, 3:09 AM ET</p>
+</div></section>
+
+<section class=band><div class=wrap>
 <div class=stats>
 <div class=stat><div class=v>110</div><div class=l>matches this week</div></div>
 <div class=stat><div class=v>5</div><div class=l>sportsbooks and prediction markets</div></div>
-<div class=stat><div class=v>4</div><div class=l>matches with a price 2%+ better than consensus</div></div>
-<div class=stat><div class=v>Kalshi</div><div class=l>best prices on average this week</div></div>
-</div>
+<div class=stat><div class=v>4</div><div class=l>prices 2%+ better than consensus</div></div>
+<div class=stat><div class=v>Kalshi</div><div class=l>best prices on average</div></div>
+</div></div></section>
 
-<h2>Best prices right now</h2>
-<p class=sub>Prices more than 2% better than the consensus. The percentage is how much more the bet pays than the consensus says it should.</p>
-<div class=picks><div class=pick><div class=m>FC Schalke 04 v RB Leipzig</div>
-<div class=meta>Bundesliga · Sat Oct 31, 10:30 AM ET</div>
-<div class=bet>FC Schalke 04 to win +335 <span class=vs>at Kalshi</span><span class=edge>+4.2%</span></div>
-<div class=vs>Consensus +317 (24% chance)</div></div><div class=pick><div class=m>Lecce v Genoa</div>
-<div class=meta>Serie A · Sun Nov 1, 12:00 PM ET</div>
-<div class=bet>Lecce to win +233 <span class=vs>at Kalshi</span><span class=edge>+3.9%</span></div>
-<div class=vs>Consensus +221 (31% chance)</div></div><div class=pick><div class=m>Hamburger SV v Borussia Monchengladbach</div>
-<div class=meta>Bundesliga · Fri Nov 6, 2:30 PM ET</div>
-<div class=bet>Hamburger SV to win +156 <span class=vs>at Kalshi</span><span class=edge>+2.7%</span></div>
-<div class=vs>Consensus +149 (40% chance)</div></div><div class=pick><div class=m>Norwich City v Watford</div>
-<div class=meta>Championship · Sat Oct 31, 8:30 AM ET</div>
-<div class=bet>Norwich City to win -156 <span class=vs>at Kalshi</span><span class=edge>+2.5%</span></div>
-<div class=vs>Consensus -167 (63% chance)</div></div></div>
+<section class=section id=best><div class=wrap>
+<h2>Ranked, day by day.</h2>
+<p class=sub>Each day's bets where one site pays more than the fair price, ranked by value. Back the result shown, at the site shown, at those odds or better. The green figure is how much more it pays than fair.</p>
+<div class=daytabs role=tablist><button class=daytab data-day="0">Today<span>0</span></button><button class=daytab data-day="1" aria-selected=true>Tomorrow<span>4</span></button><button class=daytab data-day="2">Sat Oct 31<span>10</span></button><button class=daytab data-day="3">Sun Nov 1<span>8</span></button><button class=daytab data-day="4">Mon Nov 2<span>2</span></button><button class=daytab data-day="5">Fri Nov 6<span>1</span></button><button class=daytab data-day="6">Sat Nov 7<span>6</span></button><button class=daytab data-day="7">Sun Nov 8<span>2</span></button></div><div class=daypane data-day="0" hidden><h3 class=dayhead>Today</h3><div class=empty>No price beats the fair price today. Every site is charging its full cut, so there's nothing worth backing.</div></div><div class=daypane data-day="1"><h3 class=dayhead>Tomorrow</h3><ol class=bets><li class=bet-row><span class=rank>1</span>
+<div class=bet-main><div class=bet-what>Le Havre to win</div>
+<div class=bet-match>Le Havre v Paris Saint Germain · Ligue 1 · 2:00 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>+1150</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+1.9%</span><div class=bet-chance>8% fair chance</div></div></li><li class=bet-row><span class=rank>2</span>
+<div class=bet-main><div class=bet-what>Paris Saint Germain to win</div>
+<div class=bet-match>Le Havre v Paris Saint Germain · Ligue 1 · 2:00 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>−370</div><div class=bet-site>BetMGM</div></div>
+<div class=bet-value><span class=edge>+1.1%</span><div class=bet-chance>80% fair chance</div></div></li><li class=bet-row><span class=rank>3</span>
+<div class=bet-main><div class=bet-what>Lille to win</div>
+<div class=bet-match>Lille v RC Lens · Ligue 1 · 4:05 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>+163</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.9%</span><div class=bet-chance>38% fair chance</div></div></li><li class=bet-row><span class=rank>4</span>
+<div class=bet-main><div class=bet-what>Wrexham AFC to win</div>
+<div class=bet-match>Sheffield United v Wrexham AFC · Championship · 4:00 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>+194</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.1%</span><div class=bet-chance>34% fair chance</div></div></li></ol><p class=few>Only 4 prices beat the fair price tomorrow. The rest pay less than fair, so they're left out.</p></div><div class=daypane data-day="2" hidden><h3 class=dayhead>Sat Oct 31</h3><ol class=bets><li class=bet-row><span class=rank>1</span>
+<div class=bet-main><div class=bet-what>FC Schalke 04 to win</div>
+<div class=bet-match>FC Schalke 04 v RB Leipzig · Bundesliga · 10:30 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>+335</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+4.2%</span><div class=bet-chance>24% fair chance</div></div></li><li class=bet-row><span class=rank>2</span>
+<div class=bet-main><div class=bet-what>Norwich City to win</div>
+<div class=bet-match>Norwich City v Watford · Championship · 8:30 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>−156</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+2.5%</span><div class=bet-chance>63% fair chance</div></div></li><li class=bet-row><span class=rank>3</span>
+<div class=bet-main><div class=bet-what>Stoke City to win</div>
+<div class=bet-match>Stoke City v Preston North End · Championship · 8:30 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>−122</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+1.8%</span><div class=bet-chance>56% fair chance</div></div></li><li class=bet-row><span class=rank>4</span>
+<div class=bet-main><div class=bet-what>AC Milan to win</div>
+<div class=bet-match>AC Milan v Inter Milan · Serie A · 3:45 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>+285</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+1.4%</span><div class=bet-chance>26% fair chance</div></div></li><li class=bet-row><span class=rank>5</span>
+<div class=bet-main><div class=bet-what>Lyon to win</div>
+<div class=bet-match>Lyon v Angers · Ligue 1 · 3:45 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>−233</div><div class=bet-site>BetMGM</div></div>
+<div class=bet-value><span class=edge>+1.1%</span><div class=bet-chance>71% fair chance</div></div></li><li class=bet-row><span class=rank>6</span>
+<div class=bet-main><div class=bet-what>Augsburg to win</div>
+<div class=bet-match>Augsburg v SC Freiburg · Bundesliga · 10:30 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>+223</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+1.0%</span><div class=bet-chance>31% fair chance</div></div></li><li class=bet-row><span class=rank>7</span>
+<div class=bet-main><div class=bet-what>Blackburn Rovers to win</div>
+<div class=bet-match>Swansea City v Blackburn Rovers · Championship · 11:00 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>+400</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.9%</span><div class=bet-chance>20% fair chance</div></div></li><li class=bet-row><span class=rank>8</span>
+<div class=bet-main><div class=bet-what>Borussia Monchengladbach to win</div>
+<div class=bet-match>Borussia Monchengladbach v SC Paderborn · Bundesliga · 10:30 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>+104</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.9%</span><div class=bet-chance>49% fair chance</div></div></li><li class=bet-row><span class=rank>9</span>
+<div class=bet-main><div class=bet-what>Real Betis to win</div>
+<div class=bet-match>Real Betis v Málaga · La Liga · 1:30 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>−250</div><div class=bet-site>BetMGM</div></div>
+<div class=bet-value><span class=edge>+0.9%</span><div class=bet-chance>72% fair chance</div></div></li><li class=bet-row><span class=rank>10</span>
+<div class=bet-main><div class=bet-what>Bayer Leverkusen to win</div>
+<div class=bet-match>Bayer Leverkusen v VfB Stuttgart · Bundesliga · 10:30 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>−118</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.9%</span><div class=bet-chance>55% fair chance</div></div></li></ol></div><div class=daypane data-day="3" hidden><h3 class=dayhead>Sun Nov 1</h3><ol class=bets><li class=bet-row><span class=rank>1</span>
+<div class=bet-main><div class=bet-what>Lecce to win</div>
+<div class=bet-match>Lecce v Genoa · Serie A · 12:00 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>+233</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+3.9%</span><div class=bet-chance>31% fair chance</div></div></li><li class=bet-row><span class=rank>2</span>
+<div class=bet-main><div class=bet-what>Eintracht Frankfurt to win</div>
+<div class=bet-match>Eintracht Frankfurt v Hamburger SV · Bundesliga · 11:30 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>−149</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+1.7%</span><div class=bet-chance>61% fair chance</div></div></li><li class=bet-row><span class=rank>3</span>
+<div class=bet-main><div class=bet-what>Paris FC to win</div>
+<div class=bet-match>Paris FC v AS Monaco · Ligue 1 · 11:15 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>+144</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+1.5%</span><div class=bet-chance>42% fair chance</div></div></li><li class=bet-row><span class=rank>4</span>
+<div class=bet-main><div class=bet-what>Strasbourg to win</div>
+<div class=bet-match>Strasbourg v Auxerre · Ligue 1 · 9:00 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>−112</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.9%</span><div class=bet-chance>53% fair chance</div></div></li><li class=bet-row><span class=rank>5</span>
+<div class=bet-main><div class=bet-what>Real Madrid to win</div>
+<div class=bet-match>Real Racing Club de Santander v Real Madrid · La Liga · 10:15 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>−417</div><div class=bet-site>BetMGM</div></div>
+<div class=bet-value><span class=edge>+0.9%</span><div class=bet-chance>81% fair chance</div></div></li><li class=bet-row><span class=rank>6</span>
+<div class=bet-main><div class=bet-what>Como to win</div>
+<div class=bet-match>Como v Venezia · Serie A · 6:30 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>−303</div><div class=bet-site>BetMGM or Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.7%</span><div class=bet-chance>76% fair chance</div></div></li><li class=bet-row><span class=rank>7</span>
+<div class=bet-main><div class=bet-what>Frosinone to win</div>
+<div class=bet-match>Frosinone v Torino · Serie A · 9:00 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>+127</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.4%</span><div class=bet-chance>44% fair chance</div></div></li><li class=bet-row><span class=rank>8</span>
+<div class=bet-main><div class=bet-what>Getafe to win</div>
+<div class=bet-match>Getafe v Sevilla · La Liga · 8:00 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>+245</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.2%</span><div class=bet-chance>29% fair chance</div></div></li></ol></div><div class=daypane data-day="4" hidden><h3 class=dayhead>Mon Nov 2</h3><ol class=bets><li class=bet-row><span class=rank>1</span>
+<div class=bet-main><div class=bet-what>Atalanta BC to win</div>
+<div class=bet-match>Atalanta BC v Parma · Serie A · 2:45 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>−192</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+1.4%</span><div class=bet-chance>67% fair chance</div></div></li><li class=bet-row><span class=rank>2</span>
+<div class=bet-main><div class=bet-what>Deportivo La Coruña to win</div>
+<div class=bet-match>Deportivo La Coruña v CA Osasuna · La Liga · 3:00 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>+127</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.2%</span><div class=bet-chance>44% fair chance</div></div></li></ol><p class=few>Only 2 prices beat the fair price on Mon Nov 2. The rest pay less than fair, so they're left out.</p></div><div class=daypane data-day="5" hidden><h3 class=dayhead>Fri Nov 6</h3><ol class=bets><li class=bet-row><span class=rank>1</span>
+<div class=bet-main><div class=bet-what>Hamburger SV to win</div>
+<div class=bet-match>Hamburger SV v Borussia Monchengladbach · Bundesliga · 2:30 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>+156</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+2.7%</span><div class=bet-chance>40% fair chance</div></div></li></ol><p class=few>Only 1 price beats the fair price on Fri Nov 6. The rest pay less than fair, so they're left out.</p></div><div class=daypane data-day="6" hidden><h3 class=dayhead>Sat Nov 7</h3><ol class=bets><li class=bet-row><span class=rank>1</span>
+<div class=bet-main><div class=bet-what>Draw</div>
+<div class=bet-match>FSV Mainz 05 v Bayern Munich · Bundesliga · 9:30 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>+525</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+1.7%</span><div class=bet-chance>16% fair chance</div></div></li><li class=bet-row><span class=rank>2</span>
+<div class=bet-main><div class=bet-what>Borussia Dortmund to win</div>
+<div class=bet-match>Borussia Dortmund v Elversberg · Bundesliga · 9:30 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>−303</div><div class=bet-site>BetMGM</div></div>
+<div class=bet-value><span class=edge>+1.5%</span><div class=bet-chance>76% fair chance</div></div></li><li class=bet-row><span class=rank>3</span>
+<div class=bet-main><div class=bet-what>Arsenal to win</div>
+<div class=bet-match>Arsenal v Hull City · Premier League · 10:00 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>−556</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.9%</span><div class=bet-chance>85% fair chance</div></div></li><li class=bet-row><span class=rank>4</span>
+<div class=bet-main><div class=bet-what>Paris Saint Germain to win</div>
+<div class=bet-match>Paris Saint Germain v Troyes · Ligue 1 · 2:45 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>−667</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.8%</span><div class=bet-chance>88% fair chance</div></div></li><li class=bet-row><span class=rank>5</span>
+<div class=bet-main><div class=bet-what>Real Madrid to win</div>
+<div class=bet-match>Valencia v Real Madrid · La Liga · 3:00 PM ET</div></div>
+<div class=bet-where><div class=bet-odds>−233</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+0.5%</span><div class=bet-chance>70% fair chance</div></div></li><li class=bet-row><span class=rank>6</span>
+<div class=bet-main><div class=bet-what>RB Leipzig to win</div>
+<div class=bet-match>RB Leipzig v Augsburg · Bundesliga · 9:30 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>−208</div><div class=bet-site>BetMGM</div></div>
+<div class=bet-value><span class=edge>+0.2%</span><div class=bet-chance>68% fair chance</div></div></li></ol></div><div class=daypane data-day="7" hidden><h3 class=dayhead>Sun Nov 8</h3><ol class=bets><li class=bet-row><span class=rank>1</span>
+<div class=bet-main><div class=bet-what>Lille to win</div>
+<div class=bet-match>Rennes v Lille · Ligue 1 · 9:00 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>+270</div><div class=bet-site>Kalshi</div></div>
+<div class=bet-value><span class=edge>+1.5%</span><div class=bet-chance>27% fair chance</div></div></li><li class=bet-row><span class=rank>2</span>
+<div class=bet-main><div class=bet-what>SC Freiburg to win</div>
+<div class=bet-match>SC Freiburg v Union Berlin · Bundesliga · 11:30 AM ET</div></div>
+<div class=bet-where><div class=bet-odds>−189</div><div class=bet-site>BetMGM</div></div>
+<div class=bet-value><span class=edge>+0.6%</span><div class=bet-chance>66% fair chance</div></div></li></ol><p class=few>Only 2 prices beat the fair price on Sun Nov 8. The rest pay less than fair, so they're left out.</p></div><script>document.querySelectorAll('.daytab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.daytab').forEach(x=>x.removeAttribute('aria-selected'));t.setAttribute('aria-selected','true');document.querySelectorAll('.daypane').forEach(p=>p.hidden=p.dataset.day!==t.dataset.day)}));document.documentElement.classList.add('js')</script>
+</div></section>
 
-<h2>Which site pays the most?</h2>
-<p class=sub>Sites are listed by US market share, largest first. The consensus has every site's cut removed, so it is the fair price, and a site with a cut pays a little less than fair on most results. The margin is that cut (lower is better). "Best price" is how often a site has the top odds on a result. "Vs consensus" is how much its odds pay on average compared with fair.</p>
+<section class=band><div class=wrap>
+<h2>Which site pays the most.</h2>
+<p class=sub>Listed by US market share. The margin is each site's built-in cut (lower is better). "Best price" is how often it has the top odds. "Vs consensus" is how much it pays compared with the fair price.</p>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Matches</th><th class=n>Margin</th><th class=n>Best price</th><th class=n>Vs consensus</th><th class=n>Flags</th></tr><tr><td><b>FanDuel</b><br><span class=kind>Sportsbook</span></td><td class=n>110</td><td class=n>7.1%</td><td class=n><span class=bar style='width:10px'></span>15%</td><td class=n>-7.7%</td><td class=n>0</td></tr><tr><td><b>DraftKings</b><br><span class=kind>Sportsbook</span></td><td class=n>100</td><td class=n>6.9%</td><td class=n><span class=bar style='width:2px'></span>2%</td><td class=n>-8.3%</td><td class=n>0</td></tr><tr><td><b>BetMGM</b><br><span class=kind>Sportsbook</span></td><td class=n>80</td><td class=n>5.7%</td><td class=n><span class=bar style='width:14px'></span>20%</td><td class=n>-7.2%</td><td class=n>0</td></tr><tr><td><b>Kalshi</b><br><span class=kind>Prediction market</span></td><td class=n>110</td><td class=n>2.0%</td><td class=n><span class=bar style='width:56px'></span>78%</td><td class=n>-3.9%</td><td class=n>4</td></tr><tr><td><b>Polymarket</b><br><span class=kind>Prediction market</span></td><td class=n>10</td><td class=n>1.9%</td><td class=n><span class=bar style='width:60px'></span>83%</td><td class=n>-2.0%</td><td class=n>0</td></tr></table></div>
+</div></section>
 
-<h2>All matches</h2>
-<p class=sub>American odds: +150 means a $100 bet wins $150; −200 means you bet $200 to win $100. The best price for each result is highlighted. The consensus row shows the fair odds and chance.</p>
-<details open><summary>Serie A <span>· 12 matches · 1 flagged</span></summary><div class=match><h4>Frosinone v Lecce <small>· Thu Oct 29, 1:30 PM ET</small></h4>
+<section class=section><div class=wrap>
+<h2>Every match.</h2>
+<p class=sub>+150 means a $100 bet wins $150; −200 means you bet $200 to win $100. The best price for each result is in green, and the consensus row shows the fair odds and chance.</p>
+<details class=league open><summary>Serie A <span>· 12 matches · 1 flagged</span></summary><div class=match><h4>Frosinone v Lecce <small>· Thu Oct 29, 1:30 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Frosinone</th><th class=n>Draw</th><th class=n>Lecce</th></tr><tr><td>FanDuel</td><td class=n>-145</td><td class=n>+300</td><td class=n>+340</td></tr><tr><td>DraftKings</td><td class=n>-145</td><td class=n>+300</td><td class=n>+310</td></tr><tr><td>BetMGM</td><td class=n>-145</td><td class='n best'>+320</td><td class=n>+350</td></tr><tr><td>Kalshi</td><td class='n best'>-133</td><td class=n>+317</td><td class='n best'>+376</td></tr><tr class=cons><td>Consensus</td><td class=n>-132 <small>(57%)</small></td><td class=n>+345 <small>(22%)</small></td><td class=n>+384 <small>(21%)</small></td></tr></table></div></div><div class=match><h4>Fiorentina v Atalanta BC <small>· Thu Oct 29, 3:45 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Fiorentina</th><th class=n>Draw</th><th class=n>Atalanta BC</th></tr><tr><td>FanDuel</td><td class=n>+125</td><td class=n>+250</td><td class=n>+200</td></tr><tr><td>DraftKings</td><td class=n>+125</td><td class=n>+250</td><td class=n>+185</td></tr><tr><td>BetMGM</td><td class=n>+125</td><td class='n best'>+270</td><td class=n>+195</td></tr><tr><td>Kalshi</td><td class='n best'>+138</td><td class='n best'>+270</td><td class='n best'>+203</td></tr><tr class=cons><td>Consensus</td><td class=n>+138 <small>(42%)</small></td><td class=n>+284 <small>(26%)</small></td><td class=n>+213 <small>(32%)</small></td></tr></table></div></div><div class=match><h4>Bologna v Monza <small>· Sat Oct 31, 10:00 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Bologna</th><th class=n>Draw</th><th class=n>Monza</th></tr><tr><td>FanDuel</td><td class=n>-145</td><td class=n>+290</td><td class=n>+350</td></tr><tr><td>DraftKings</td><td class=n>-149</td><td class=n>+280</td><td class=n>+360</td></tr><tr><td>BetMGM</td><td class=n>-141</td><td class=n>+290</td><td class=n>+360</td></tr><tr><td>Kalshi</td><td class='n best'>-139</td><td class='n best'>+317</td><td class='n best'>+400</td></tr><tr class=cons><td>Consensus</td><td class=n>-133 <small>(57%)</small></td><td class=n>+328 <small>(23%)</small></td><td class=n>+412 <small>(20%)</small></td></tr></table></div></div><div class=match><h4>Udinese v AS Roma <small>· Sat Oct 31, 1:00 PM ET</small></h4>
@@ -92,7 +294,7 @@ Each site's odds are compared with the consensus of all of them, and any price c
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Lecce</th><th class=n>Draw</th><th class=n>Genoa</th></tr><tr><td>FanDuel</td><td class=n>+195</td><td class='n best'>+220</td><td class=n>+145</td></tr><tr><td>DraftKings</td><td class=n>+195</td><td class=n>+195</td><td class=n>+140</td></tr><tr><td>BetMGM</td><td class=n>+190</td><td class=n>+210</td><td class=n>+155</td></tr><tr><td>Kalshi</td><td class='n best'>+233</td><td class=n>+212</td><td class='n best'>+156</td></tr><tr class=cons><td>Consensus</td><td class=n>+221 <small>(31%)</small></td><td class=n>+228 <small>(30%)</small></td><td class=n>+161 <small>(38%)</small></td></tr></table></div></div><div class=match><h4>Juventus v Napoli <small>· Sun Nov 1, 2:45 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Juventus</th><th class=n>Draw</th><th class=n>Napoli</th></tr><tr><td>FanDuel</td><td class=n>+115</td><td class=n>+220</td><td class=n>+240</td></tr><tr><td>DraftKings</td><td class=n>+110</td><td class=n>+225</td><td class=n>+220</td></tr><tr><td>BetMGM</td><td class=n>+115</td><td class=n>+240</td><td class=n>+225</td></tr><tr><td>Kalshi</td><td class='n best'>+127</td><td class='n best'>+245</td><td class='n best'>+245</td></tr><tr class=cons><td>Consensus</td><td class=n>+127 <small>(44%)</small></td><td class=n>+258 <small>(28%)</small></td><td class=n>+257 <small>(28%)</small></td></tr></table></div></div><div class=match><h4>Sassuolo v Fiorentina <small>· Mon Nov 2, 12:30 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Sassuolo</th><th class=n>Draw</th><th class=n>Fiorentina</th></tr><tr><td>FanDuel</td><td class=n>+175</td><td class='n best'>+270</td><td class=n>+130</td></tr><tr><td>DraftKings</td><td class=n>+170</td><td class=n>+250</td><td class=n>+125</td></tr><tr><td>BetMGM</td><td class=n>+180</td><td class='n best'>+270</td><td class=n>+130</td></tr><tr><td>Kalshi</td><td class='n best'>+194</td><td class='n best'>+270</td><td class='n best'>+144</td></tr><tr class=cons><td>Consensus</td><td class=n>+197 <small>(34%)</small></td><td class=n>+294 <small>(25%)</small></td><td class=n>+144 <small>(41%)</small></td></tr></table></div></div><div class=match><h4>Atalanta BC v Parma <small>· Mon Nov 2, 2:45 PM ET</small></h4>
-<div class=tablewrap><table><tr><th>Site</th><th class=n>Atalanta BC</th><th class=n>Draw</th><th class=n>Parma</th></tr><tr><td>FanDuel</td><td class=n>-238</td><td class=n>+340</td><td class=n>+600</td></tr><tr><td>DraftKings</td><td class=n>-233</td><td class=n>+330</td><td class=n>+500</td></tr><tr><td>BetMGM</td><td class=n>-208</td><td class=n>+350</td><td class=n>+575</td></tr><tr><td>Kalshi</td><td class='n best'>-192</td><td class='n best'>+376</td><td class='n best'>+614</td></tr><tr class=cons><td>Consensus</td><td class=n>-201 <small>(67%)</small></td><td class=n>+396 <small>(20%)</small></td><td class=n>+662 <small>(13%)</small></td></tr></table></div></div></details><details><summary>Ligue 1 <span>· 18 matches</span></summary><div class=match><h4>Nice v Rennes <small>· Fri Oct 30, 2:00 PM ET</small></h4>
+<div class=tablewrap><table><tr><th>Site</th><th class=n>Atalanta BC</th><th class=n>Draw</th><th class=n>Parma</th></tr><tr><td>FanDuel</td><td class=n>-238</td><td class=n>+340</td><td class=n>+600</td></tr><tr><td>DraftKings</td><td class=n>-233</td><td class=n>+330</td><td class=n>+500</td></tr><tr><td>BetMGM</td><td class=n>-208</td><td class=n>+350</td><td class=n>+575</td></tr><tr><td>Kalshi</td><td class='n best'>-192</td><td class='n best'>+376</td><td class='n best'>+614</td></tr><tr class=cons><td>Consensus</td><td class=n>-201 <small>(67%)</small></td><td class=n>+396 <small>(20%)</small></td><td class=n>+662 <small>(13%)</small></td></tr></table></div></div></details><details class=league><summary>Ligue 1 <span>· 18 matches</span></summary><div class=match><h4>Nice v Rennes <small>· Fri Oct 30, 2:00 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Nice</th><th class=n>Draw</th><th class=n>Rennes</th></tr><tr><td>FanDuel</td><td class=n>+160</td><td class=n>+280</td><td class=n>+140</td></tr><tr><td>DraftKings</td><td class=n>+180</td><td class=n>+275</td><td class=n>+135</td></tr><tr><td>BetMGM</td><td class=n>+170</td><td class=n>+275</td><td class=n>+138</td></tr><tr><td>Kalshi</td><td class='n best'>+186</td><td class='n best'>+285</td><td class='n best'>+144</td></tr><tr class=cons><td>Consensus</td><td class=n>+186 <small>(35%)</small></td><td class=n>+302 <small>(25%)</small></td><td class=n>+149 <small>(40%)</small></td></tr></table></div></div><div class=match><h4>Le Havre v Paris Saint Germain <small>· Fri Oct 30, 2:00 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Le Havre</th><th class=n>Draw</th><th class=n>Paris Saint Germain</th></tr><tr><td>FanDuel</td><td class=n>+900</td><td class=n>+600</td><td class=n>-500</td></tr><tr><td>DraftKings</td><td class=n>+950</td><td class=n>+600</td><td class=n>-417</td></tr><tr><td>BetMGM</td><td class=n>+825</td><td class=n>+600</td><td class='n best'>-370</td></tr><tr><td>Kalshi</td><td class='n best'>+1150</td><td class='n best'>+669</td><td class=n>-400</td></tr><tr class=cons><td>Consensus</td><td class=n>+1126 <small>(8%)</small></td><td class=n>+717 <small>(12%)</small></td><td class=n>-390 <small>(80%)</small></td></tr></table></div></div><div class=match><h4>Lille v RC Lens <small>· Fri Oct 30, 4:05 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Lille</th><th class=n>Draw</th><th class=n>RC Lens</th></tr><tr><td>FanDuel</td><td class=n>+150</td><td class=n>+250</td><td class=n>+160</td></tr><tr><td>DraftKings</td><td class=n>+150</td><td class=n>+255</td><td class=n>+175</td></tr><tr><td>BetMGM</td><td class=n>+140</td><td class='n best'>+270</td><td class=n>+170</td></tr><tr><td>Kalshi</td><td class='n best'>+163</td><td class='n best'>+270</td><td class='n best'>+178</td></tr><tr class=cons><td>Consensus</td><td class=n>+161 <small>(38%)</small></td><td class=n>+282 <small>(26%)</small></td><td class=n>+182 <small>(35%)</small></td></tr></table></div></div><div class=match><h4>Troyes v Le Mans FC <small>· Sat Oct 31, 3:45 PM ET</small></h4>
@@ -110,7 +312,7 @@ Each site's odds are compared with the consensus of all of them, and any price c
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Brest</th><th class=n>Draw</th><th class=n>Lyon</th></tr><tr><td>FanDuel</td><td class=n>+180</td><td class=n>+260</td><td class=n>+130</td></tr><tr><td>DraftKings</td><td class=n>+180</td><td class=n>+260</td><td class=n>+130</td></tr><tr><td>Kalshi</td><td class='n best'>+194</td><td class='n best'>+270</td><td class='n best'>+138</td></tr><tr class=cons><td>Consensus</td><td class=n>+201 <small>(33%)</small></td><td class=n>+289 <small>(26%)</small></td><td class=n>+143 <small>(41%)</small></td></tr></table></div></div><div class=match><h4>Le Havre v Lorient <small>· Sun Nov 8, 11:15 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Le Havre</th><th class=n>Draw</th><th class=n>Lorient</th></tr><tr><td>FanDuel</td><td class='n best'>+175</td><td class='n best'>+240</td><td class=n>+145</td></tr><tr><td>DraftKings</td><td class=n>+165</td><td class=n>+225</td><td class='n best'>+160</td></tr><tr><td>Kalshi</td><td class=n>+170</td><td class=n>+223</td><td class=n>+156</td></tr><tr class=cons><td>Consensus</td><td class=n>+188 <small>(35%)</small></td><td class=n>+256 <small>(28%)</small></td><td class=n>+169 <small>(37%)</small></td></tr></table></div></div><div class=match><h4>Le Mans FC v AS Monaco <small>· Sun Nov 8, 11:15 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Le Mans FC</th><th class=n>Draw</th><th class=n>AS Monaco</th></tr><tr><td>FanDuel</td><td class='n best'>+330</td><td class=n>+300</td><td class=n>-145</td></tr><tr><td>DraftKings</td><td class=n>+300</td><td class=n>+310</td><td class=n>-135</td></tr><tr><td>Kalshi</td><td class=n>+317</td><td class='n best'>+317</td><td class='n best'>-127</td></tr><tr class=cons><td>Consensus</td><td class=n>+354 <small>(22%)</small></td><td class=n>+346 <small>(22%)</small></td><td class=n>-125 <small>(56%)</small></td></tr></table></div></div><div class=match><h4>RC Lens v Marseille <small>· Sun Nov 8, 2:45 PM ET</small></h4>
-<div class=tablewrap><table><tr><th>Site</th><th class=n>RC Lens</th><th class=n>Draw</th><th class=n>Marseille</th></tr><tr><td>FanDuel</td><td class=n>+100</td><td class='n best'>+300</td><td class=n>+220</td></tr><tr><td>DraftKings</td><td class=n>+105</td><td class=n>+295</td><td class=n>+210</td></tr><tr><td>Kalshi</td><td class='n best'>+108</td><td class='n best'>+300</td><td class='n best'>+223</td></tr><tr class=cons><td>Consensus</td><td class=n>+112 <small>(47%)</small></td><td class=n>+329 <small>(23%)</small></td><td class=n>+238 <small>(30%)</small></td></tr></table></div></div></details><details><summary>Bundesliga <span>· 18 matches · 2 flagged</span></summary><div class=match><h4>Elversberg v FSV Mainz 05 <small>· Fri Oct 30, 3:30 PM ET</small></h4>
+<div class=tablewrap><table><tr><th>Site</th><th class=n>RC Lens</th><th class=n>Draw</th><th class=n>Marseille</th></tr><tr><td>FanDuel</td><td class=n>+100</td><td class='n best'>+300</td><td class=n>+220</td></tr><tr><td>DraftKings</td><td class=n>+105</td><td class=n>+295</td><td class=n>+210</td></tr><tr><td>Kalshi</td><td class='n best'>+108</td><td class='n best'>+300</td><td class='n best'>+223</td></tr><tr class=cons><td>Consensus</td><td class=n>+112 <small>(47%)</small></td><td class=n>+329 <small>(23%)</small></td><td class=n>+238 <small>(30%)</small></td></tr></table></div></div></details><details class=league><summary>Bundesliga <span>· 18 matches · 2 flagged</span></summary><div class=match><h4>Elversberg v FSV Mainz 05 <small>· Fri Oct 30, 3:30 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Elversberg</th><th class=n>Draw</th><th class=n>FSV Mainz 05</th></tr><tr><td>FanDuel</td><td class=n>+210</td><td class=n>+280</td><td class=n>+110</td></tr><tr><td>DraftKings</td><td class=n>+195</td><td class=n>+275</td><td class=n>+110</td></tr><tr><td>BetMGM</td><td class=n>+220</td><td class=n>+280</td><td class=n>+110</td></tr><tr><td>Kalshi</td><td class='n best'>+223</td><td class='n best'>+300</td><td class='n best'>+117</td></tr><tr class=cons><td>Consensus</td><td class=n>+231 <small>(30%)</small></td><td class=n>+311 <small>(24%)</small></td><td class=n>+120 <small>(45%)</small></td></tr></table></div></div><div class=match><h4>Bayer Leverkusen v VfB Stuttgart <small>· Sat Oct 31, 10:30 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Bayer Leverkusen</th><th class=n>Draw</th><th class=n>VfB Stuttgart</th></tr><tr><td>FanDuel</td><td class=n>-145</td><td class=n>+340</td><td class=n>+290</td></tr><tr><td>DraftKings</td><td class=n>-130</td><td class=n>+320</td><td class=n>+260</td></tr><tr><td>BetMGM</td><td class=n>-125</td><td class=n>+333</td><td class=n>+270</td></tr><tr><td>Kalshi</td><td class='n best'>-118</td><td class='n best'>+355</td><td class='n best'>+300</td></tr><tr class=cons><td>Consensus</td><td class=n>-120 <small>(55%)</small></td><td class=n>+375 <small>(21%)</small></td><td class=n>+309 <small>(24%)</small></td></tr></table></div></div><div class=match><h4>Augsburg v SC Freiburg <small>· Sat Oct 31, 10:30 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Augsburg</th><th class=n>Draw</th><th class=n>SC Freiburg</th></tr><tr><td>FanDuel</td><td class=n>+195</td><td class='n best'>+290</td><td class=n>+110</td></tr><tr><td>DraftKings</td><td class=n>+195</td><td class=n>+270</td><td class=n>+110</td></tr><tr><td>BetMGM</td><td class=n>+195</td><td class=n>+280</td><td class=n>+120</td></tr><tr><td>Kalshi</td><td class='n best'>+223</td><td class=n>+285</td><td class='n best'>+127</td></tr><tr class=cons><td>Consensus</td><td class=n>+220 <small>(31%)</small></td><td class=n>+310 <small>(24%)</small></td><td class=n>+126 <small>(44%)</small></td></tr></table></div></div><div class=match><h4>FC Schalke 04 v RB Leipzig <small>· Sat Oct 31, 10:30 AM ET</small></h4>
@@ -128,7 +330,7 @@ Each site's odds are compared with the consensus of all of them, and any price c
 <div class=tablewrap><table><tr><th>Site</th><th class=n>VfB Stuttgart</th><th class=n>Draw</th><th class=n>Werder Bremen</th></tr><tr><td>FanDuel</td><td class=n>-238</td><td class=n>+410</td><td class=n>+470</td></tr><tr><td>DraftKings</td><td class=n>-227</td><td class=n>+370</td><td class=n>+400</td></tr><tr><td>BetMGM</td><td class=n>-208</td><td class=n>+400</td><td class=n>+425</td></tr><tr><td>Kalshi</td><td class='n best'>-204</td><td class='n best'>+456</td><td class='n best'>+488</td></tr><tr class=cons><td>Consensus</td><td class=n>-200 <small>(67%)</small></td><td class=n>+478 <small>(17%)</small></td><td class=n>+523 <small>(16%)</small></td></tr></table></div></div><div class=match><h4>1. FC Köln v Bayer Leverkusen <small>· Sun Nov 8, 9:30 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>1. FC Köln</th><th class=n>Draw</th><th class=n>Bayer Leverkusen</th></tr><tr><td>FanDuel</td><td class='n best'>+340</td><td class='n best'>+350</td><td class=n>-164</td></tr><tr><td>DraftKings</td><td class=n>+320</td><td class=n>+310</td><td class=n>-164</td></tr><tr><td>BetMGM</td><td class=n>+320</td><td class=n>+340</td><td class='n best'>-145</td></tr><tr><td>Kalshi</td><td class=n>+335</td><td class=n>+317</td><td class=n>-149</td></tr><tr class=cons><td>Consensus</td><td class=n>+381 <small>(21%)</small></td><td class=n>+382 <small>(21%)</small></td><td class=n>-141 <small>(58%)</small></td></tr></table></div></div><div class=match><h4>SC Freiburg v Union Berlin <small>· Sun Nov 8, 11:30 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>SC Freiburg</th><th class=n>Draw</th><th class=n>Union Berlin</th></tr><tr><td>FanDuel</td><td class=n>-238</td><td class=n>+360</td><td class=n>+500</td></tr><tr><td>DraftKings</td><td class=n>-222</td><td class=n>+330</td><td class=n>+425</td></tr><tr><td>BetMGM</td><td class='n best'>-189</td><td class=n>+360</td><td class=n>+450</td></tr><tr><td>Kalshi</td><td class=n>-204</td><td class='n best'>+376</td><td class='n best'>+525</td></tr><tr class=cons><td>Consensus</td><td class=n>-192 <small>(66%)</small></td><td class=n>+420 <small>(19%)</small></td><td class=n>+567 <small>(15%)</small></td></tr></table></div></div><div class=match><h4>TSG Hoffenheim v FC Schalke 04 <small>· Sun Nov 8, 1:30 PM ET</small></h4>
-<div class=tablewrap><table><tr><th>Site</th><th class=n>TSG Hoffenheim</th><th class=n>Draw</th><th class=n>FC Schalke 04</th></tr><tr><td>FanDuel</td><td class=n>-189</td><td class='n best'>+340</td><td class='n best'>+380</td></tr><tr><td>DraftKings</td><td class=n>-169</td><td class=n>+320</td><td class=n>+330</td></tr><tr><td>BetMGM</td><td class='n best'>-164</td><td class=n>+333</td><td class='n best'>+380</td></tr><tr><td>Kalshi</td><td class='n best'>-164</td><td class=n>+335</td><td class=n>+376</td></tr><tr class=cons><td>Consensus</td><td class=n>-155 <small>(61%)</small></td><td class=n>+389 <small>(20%)</small></td><td class=n>+431 <small>(19%)</small></td></tr></table></div></div></details><details><summary>Championship <span>· 22 matches · 1 flagged</span></summary><div class=match><h4>Sheffield United v Wrexham AFC <small>· Fri Oct 30, 4:00 PM ET</small></h4>
+<div class=tablewrap><table><tr><th>Site</th><th class=n>TSG Hoffenheim</th><th class=n>Draw</th><th class=n>FC Schalke 04</th></tr><tr><td>FanDuel</td><td class=n>-189</td><td class='n best'>+340</td><td class='n best'>+380</td></tr><tr><td>DraftKings</td><td class=n>-169</td><td class=n>+320</td><td class=n>+330</td></tr><tr><td>BetMGM</td><td class='n best'>-164</td><td class=n>+333</td><td class='n best'>+380</td></tr><tr><td>Kalshi</td><td class='n best'>-164</td><td class=n>+335</td><td class=n>+376</td></tr><tr class=cons><td>Consensus</td><td class=n>-155 <small>(61%)</small></td><td class=n>+389 <small>(20%)</small></td><td class=n>+431 <small>(19%)</small></td></tr></table></div></div></details><details class=league><summary>Championship <span>· 22 matches · 1 flagged</span></summary><div class=match><h4>Sheffield United v Wrexham AFC <small>· Fri Oct 30, 4:00 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Sheffield United</th><th class=n>Draw</th><th class=n>Wrexham AFC</th></tr><tr><td>FanDuel</td><td class=n>+145</td><td class=n>+240</td><td class=n>+175</td></tr><tr><td>DraftKings</td><td class=n>+145</td><td class=n>+240</td><td class=n>+190</td></tr><tr><td>BetMGM</td><td class=n>+155</td><td class='n best'>+250</td><td class=n>+165</td></tr><tr><td>Kalshi</td><td class='n best'>+156</td><td class=n>+245</td><td class='n best'>+194</td></tr><tr class=cons><td>Consensus</td><td class=n>+160 <small>(38%)</small></td><td class=n>+263 <small>(28%)</small></td><td class=n>+194 <small>(34%)</small></td></tr></table></div></div><div class=match><h4>Stoke City v Preston North End <small>· Sat Oct 31, 8:30 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Stoke City</th><th class=n>Draw</th><th class=n>Preston North End</th></tr><tr><td>FanDuel</td><td class=n>-145</td><td class=n>+270</td><td class=n>+360</td></tr><tr><td>DraftKings</td><td class=n>-135</td><td class=n>+285</td><td class=n>+360</td></tr><tr><td>BetMGM</td><td class=n>-141</td><td class=n>+280</td><td class=n>+360</td></tr><tr><td>Kalshi</td><td class='n best'>-122</td><td class='n best'>+300</td><td class='n best'>+400</td></tr><tr class=cons><td>Consensus</td><td class=n>-127 <small>(56%)</small></td><td class=n>+311 <small>(24%)</small></td><td class=n>+408 <small>(20%)</small></td></tr></table></div></div><div class=match><h4>Norwich City v Watford <small>· Sat Oct 31, 8:30 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Norwich City</th><th class=n>Draw</th><th class=n>Watford</th></tr><tr><td>FanDuel</td><td class=n>-200</td><td class=n>+340</td><td class=n>+430</td></tr><tr><td>DraftKings</td><td class=n>-179</td><td class='n best'>+350</td><td class=n>+450</td></tr><tr><td>Kalshi</td><td class='n best'>-156</td><td class=n>+335</td><td class='n best'>+488</td></tr><tr class=cons><td>Consensus</td><td class=n>-167 <small>(63%)</small></td><td class=n>+377 <small>(21%)</small></td><td class=n>+506 <small>(17%)</small></td></tr></table></div></div><div class=match><h4>Lincoln City v Birmingham City <small>· Sat Oct 31, 8:30 AM ET</small></h4>
@@ -150,7 +352,7 @@ Each site's odds are compared with the consensus of all of them, and any price c
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Birmingham City</th><th class=n>Draw</th><th class=n>Millwall</th></tr><tr><td>FanDuel</td><td class=n>-105</td><td class='n best'>+270</td><td class='n best'>+250</td></tr><tr><td>BetMGM</td><td class='n best'>+100</td><td class='n best'>+270</td><td class='n best'>+250</td></tr><tr><td>Kalshi</td><td class=n>-112</td><td class=n>+223</td><td class=n>+245</td></tr><tr class=cons><td>Consensus</td><td class=n>+106 <small>(49%)</small></td><td class=n>+292 <small>(25%)</small></td><td class=n>+287 <small>(26%)</small></td></tr></table></div></div><div class=match><h4>West Bromwich Albion v Southampton <small>· Tue Nov 3, 3:00 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>West Bromwich Albion</th><th class=n>Draw</th><th class=n>Southampton</th></tr><tr><td>FanDuel</td><td class='n best'>+155</td><td class='n best'>+270</td><td class=n>+150</td></tr><tr><td>BetMGM</td><td class=n>+150</td><td class='n best'>+270</td><td class='n best'>+155</td></tr><tr><td>Kalshi</td><td class=n>+150</td><td class=n>+257</td><td class=n>+133</td></tr><tr class=cons><td>Consensus</td><td class=n>+170 <small>(37%)</small></td><td class=n>+303 <small>(25%)</small></td><td class=n>+163 <small>(38%)</small></td></tr></table></div></div><div class=match><h4>Wrexham AFC v Middlesbrough <small>· Wed Nov 4, 2:45 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Wrexham AFC</th><th class=n>Draw</th><th class=n>Middlesbrough</th></tr><tr><td>FanDuel</td><td class=n>+200</td><td class='n best'>+270</td><td class=n>+110</td></tr><tr><td>BetMGM</td><td class='n best'>+210</td><td class=n>+260</td><td class='n best'>+120</td></tr><tr><td>Kalshi</td><td class=n>+186</td><td class=n>+233</td><td class=n>+108</td></tr><tr class=cons><td>Consensus</td><td class=n>+228 <small>(31%)</small></td><td class=n>+294 <small>(25%)</small></td><td class=n>+127 <small>(44%)</small></td></tr></table></div></div><div class=match><h4>Bristol City v Wolverhampton Wanderers <small>· Wed Nov 4, 3:00 PM ET</small></h4>
-<div class=tablewrap><table><tr><th>Site</th><th class=n>Bristol City</th><th class=n>Draw</th><th class=n>Wolverhampton Wanderers</th></tr><tr><td>FanDuel</td><td class='n best'>+210</td><td class='n best'>+260</td><td class=n>+110</td></tr><tr><td>BetMGM</td><td class='n best'>+210</td><td class='n best'>+260</td><td class='n best'>+120</td></tr><tr><td>Kalshi</td><td class=n>+194</td><td class=n>+223</td><td class=n>+108</td></tr><tr class=cons><td>Consensus</td><td class=n>+235 <small>(30%)</small></td><td class=n>+285 <small>(26%)</small></td><td class=n>+126 <small>(44%)</small></td></tr></table></div></div></details><details><summary>La Liga <span>· 20 matches</span></summary><div class=match><h4>Villarreal v Espanyol <small>· Fri Oct 30, 4:00 PM ET</small></h4>
+<div class=tablewrap><table><tr><th>Site</th><th class=n>Bristol City</th><th class=n>Draw</th><th class=n>Wolverhampton Wanderers</th></tr><tr><td>FanDuel</td><td class='n best'>+210</td><td class='n best'>+260</td><td class=n>+110</td></tr><tr><td>BetMGM</td><td class='n best'>+210</td><td class='n best'>+260</td><td class='n best'>+120</td></tr><tr><td>Kalshi</td><td class=n>+194</td><td class=n>+223</td><td class=n>+108</td></tr><tr class=cons><td>Consensus</td><td class=n>+235 <small>(30%)</small></td><td class=n>+285 <small>(26%)</small></td><td class=n>+126 <small>(44%)</small></td></tr></table></div></div></details><details class=league><summary>La Liga <span>· 20 matches</span></summary><div class=match><h4>Villarreal v Espanyol <small>· Fri Oct 30, 4:00 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Villarreal</th><th class=n>Draw</th><th class=n>Espanyol</th></tr><tr><td>FanDuel</td><td class=n>-238</td><td class=n>+400</td><td class=n>+550</td></tr><tr><td>DraftKings</td><td class=n>-238</td><td class=n>+400</td><td class=n>+600</td></tr><tr><td>BetMGM</td><td class='n best'>-222</td><td class=n>+380</td><td class=n>+525</td></tr><tr><td>Kalshi</td><td class='n best'>-222</td><td class='n best'>+426</td><td class='n best'>+614</td></tr><tr class=cons><td>Consensus</td><td class=n>-216 <small>(68%)</small></td><td class=n>+448 <small>(18%)</small></td><td class=n>+645 <small>(13%)</small></td></tr></table></div></div><div class=match><h4>Levante v Atlético Madrid <small>· Sat Oct 31, 9:00 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Levante</th><th class=n>Draw</th><th class=n>Atlético Madrid</th></tr><tr><td>FanDuel</td><td class=n>+420</td><td class=n>+340</td><td class=n>-189</td></tr><tr><td>DraftKings</td><td class=n>+390</td><td class=n>+360</td><td class=n>-169</td></tr><tr><td>BetMGM</td><td class=n>+400</td><td class=n>+350</td><td class=n>-175</td></tr><tr><td>Kalshi</td><td class='n best'>+426</td><td class='n best'>+376</td><td class='n best'>-164</td></tr><tr class=cons><td>Consensus</td><td class=n>+458 <small>(18%)</small></td><td class=n>+397 <small>(20%)</small></td><td class=n>-163 <small>(62%)</small></td></tr></table></div></div><div class=match><h4>Rayo Vallecano v Celta Vigo <small>· Sat Oct 31, 11:15 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Rayo Vallecano</th><th class=n>Draw</th><th class=n>Celta Vigo</th></tr><tr><td>FanDuel</td><td class=n>+140</td><td class=n>+220</td><td class=n>+195</td></tr><tr><td>DraftKings</td><td class=n>+140</td><td class=n>+230</td><td class=n>+205</td></tr><tr><td>BetMGM</td><td class=n>+135</td><td class=n>+230</td><td class=n>+200</td></tr><tr><td>Kalshi</td><td class='n best'>+150</td><td class='n best'>+245</td><td class='n best'>+212</td></tr><tr class=cons><td>Consensus</td><td class=n>+151 <small>(40%)</small></td><td class=n>+249 <small>(29%)</small></td><td class=n>+218 <small>(31%)</small></td></tr></table></div></div><div class=match><h4>Real Betis v Málaga <small>· Sat Oct 31, 1:30 PM ET</small></h4>
@@ -170,7 +372,7 @@ Each site's odds are compared with the consensus of all of them, and any price c
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Real Sociedad</th><th class=n>Draw</th><th class=n>Rayo Vallecano</th></tr><tr><td>FanDuel</td><td class='n best'>-120</td><td class=n>+280</td><td class=n>+290</td></tr><tr><td>DraftKings</td><td class=n>-130</td><td class=n>+285</td><td class=n>+300</td></tr><tr><td>Kalshi</td><td class=n>-122</td><td class='n best'>+300</td><td class='n best'>+335</td></tr><tr class=cons><td>Consensus</td><td class=n>-115 <small>(54%)</small></td><td class=n>+319 <small>(24%)</small></td><td class=n>+342 <small>(23%)</small></td></tr></table></div></div><div class=match><h4>Celta Vigo v Levante <small>· Sun Nov 8, 12:30 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Celta Vigo</th><th class=n>Draw</th><th class=n>Levante</th></tr><tr><td>FanDuel</td><td class=n>-130</td><td class=n>+270</td><td class=n>+320</td></tr><tr><td>DraftKings</td><td class=n>-125</td><td class=n>+280</td><td class=n>+300</td></tr><tr><td>Kalshi</td><td class='n best'>-118</td><td class='n best'>+300</td><td class='n best'>+335</td></tr><tr class=cons><td>Consensus</td><td class=n>-116 <small>(54%)</small></td><td class=n>+312 <small>(24%)</small></td><td class=n>+352 <small>(22%)</small></td></tr></table></div></div><div class=match><h4>Villarreal v Getafe <small>· Sun Nov 8, 12:30 PM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Villarreal</th><th class=n>Draw</th><th class=n>Getafe</th></tr><tr><td>FanDuel</td><td class=n>-238</td><td class=n>+330</td><td class=n>+600</td></tr><tr><td>DraftKings</td><td class=n>-208</td><td class=n>+320</td><td class=n>+550</td></tr><tr><td>Kalshi</td><td class='n best'>-204</td><td class='n best'>+355</td><td class='n best'>+614</td></tr><tr class=cons><td>Consensus</td><td class=n>-199 <small>(67%)</small></td><td class=n>+382 <small>(21%)</small></td><td class=n>+688 <small>(13%)</small></td></tr></table></div></div><div class=match><h4>Atlético Madrid v Barcelona <small>· Sun Nov 8, 3:00 PM ET</small></h4>
-<div class=tablewrap><table><tr><th>Site</th><th class=n>Atlético Madrid</th><th class=n>Draw</th><th class=n>Barcelona</th></tr><tr><td>FanDuel</td><td class=n>+240</td><td class=n>+330</td><td class=n>-120</td></tr><tr><td>DraftKings</td><td class=n>+255</td><td class=n>+310</td><td class=n>-120</td></tr><tr><td>Kalshi</td><td class='n best'>+285</td><td class='n best'>+335</td><td class='n best'>-112</td></tr><tr class=cons><td>Consensus</td><td class=n>+285 <small>(26%)</small></td><td class=n>+360 <small>(22%)</small></td><td class=n>-110 <small>(52%)</small></td></tr></table></div></div></details><details><summary>Premier League <span>· 20 matches</span></summary><div class=match><h4>Chelsea v Manchester United <small>· Sat Oct 31, 8:30 AM ET</small></h4>
+<div class=tablewrap><table><tr><th>Site</th><th class=n>Atlético Madrid</th><th class=n>Draw</th><th class=n>Barcelona</th></tr><tr><td>FanDuel</td><td class=n>+240</td><td class=n>+330</td><td class=n>-120</td></tr><tr><td>DraftKings</td><td class=n>+255</td><td class=n>+310</td><td class=n>-120</td></tr><tr><td>Kalshi</td><td class='n best'>+285</td><td class='n best'>+335</td><td class='n best'>-112</td></tr><tr class=cons><td>Consensus</td><td class=n>+285 <small>(26%)</small></td><td class=n>+360 <small>(22%)</small></td><td class=n>-110 <small>(52%)</small></td></tr></table></div></div></details><details class=league><summary>Premier League <span>· 20 matches</span></summary><div class=match><h4>Chelsea v Manchester United <small>· Sat Oct 31, 8:30 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Chelsea</th><th class=n>Draw</th><th class=n>Manchester United</th></tr><tr><td>FanDuel</td><td class=n>-130</td><td class=n>+290</td><td class=n>+290</td></tr><tr><td>DraftKings</td><td class=n>-120</td><td class=n>+295</td><td class=n>+300</td></tr><tr><td>BetMGM</td><td class=n>-120</td><td class=n>+290</td><td class=n>+300</td></tr><tr><td>Kalshi</td><td class='n best'>-112</td><td class='n best'>+300</td><td class='n best'>+317</td></tr><tr><td>Polymarket</td><td class='n best'>-112</td><td class='n best'>+300</td><td class='n best'>+317</td></tr><tr class=cons><td>Consensus</td><td class=n>-112 <small>(53%)</small></td><td class=n>+319 <small>(24%)</small></td><td class=n>+330 <small>(23%)</small></td></tr></table></div></div><div class=match><h4>Bournemouth v Leeds United <small>· Sat Oct 31, 11:00 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Bournemouth</th><th class=n>Draw</th><th class=n>Leeds United</th></tr><tr><td>FanDuel</td><td class=n>+105</td><td class=n>+240</td><td class=n>+250</td></tr><tr><td>DraftKings</td><td class=n>+115</td><td class=n>+245</td><td class=n>+250</td></tr><tr><td>BetMGM</td><td class=n>+110</td><td class=n>+240</td><td class=n>+240</td></tr><tr><td>Kalshi</td><td class='n best'>+117</td><td class='n best'>+257</td><td class=n>+257</td></tr><tr><td>Polymarket</td><td class='n best'>+117</td><td class='n best'>+257</td><td class='n best'>+270</td></tr><tr class=cons><td>Consensus</td><td class=n>+119 <small>(46%)</small></td><td class=n>+265 <small>(27%)</small></td><td class=n>+271 <small>(27%)</small></td></tr></table></div></div><div class=match><h4>Manchester City v Brighton and Hove Albion <small>· Sat Oct 31, 11:00 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Manchester City</th><th class=n>Draw</th><th class=n>Brighton and Hove Albion</th></tr><tr><td>FanDuel</td><td class=n>-161</td><td class=n>+320</td><td class=n>+350</td></tr><tr><td>DraftKings</td><td class=n>-149</td><td class=n>+350</td><td class=n>+360</td></tr><tr><td>BetMGM</td><td class=n>-154</td><td class=n>+340</td><td class=n>+350</td></tr><tr><td>Kalshi</td><td class='n best'>-139</td><td class='n best'>+355</td><td class='n best'>+376</td></tr><tr><td>Polymarket</td><td class=n>-145</td><td class='n best'>+355</td><td class='n best'>+376</td></tr><tr class=cons><td>Consensus</td><td class=n>-142 <small>(59%)</small></td><td class=n>+373 <small>(21%)</small></td><td class=n>+394 <small>(20%)</small></td></tr></table></div></div><div class=match><h4>Coventry City v Sunderland <small>· Sat Oct 31, 11:00 AM ET</small></h4>
@@ -191,8 +393,9 @@ Each site's odds are compared with the consensus of all of them, and any price c
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Ipswich Town</th><th class=n>Draw</th><th class=n>Bournemouth</th></tr><tr><td>FanDuel</td><td class=n>+240</td><td class=n>+280</td><td class=n>-105</td></tr><tr><td>DraftKings</td><td class=n>+265</td><td class=n>+265</td><td class=n>-110</td></tr><tr><td>Kalshi</td><td class='n best'>+270</td><td class='n best'>+285</td><td class='n best'>+100</td></tr><tr class=cons><td>Consensus</td><td class=n>+285 <small>(26%)</small></td><td class=n>+306 <small>(25%)</small></td><td class=n>+103 <small>(49%)</small></td></tr></table></div></div><div class=match><h4>Crystal Palace v Liverpool <small>· Sun Nov 8, 9:00 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Crystal Palace</th><th class=n>Draw</th><th class=n>Liverpool</th></tr><tr><td>FanDuel</td><td class=n>+330</td><td class=n>+310</td><td class=n>-145</td></tr><tr><td>DraftKings</td><td class=n>+340</td><td class=n>+300</td><td class=n>-145</td></tr><tr><td>Kalshi</td><td class='n best'>+376</td><td class='n best'>+317</td><td class='n best'>-139</td></tr><tr class=cons><td>Consensus</td><td class=n>+389 <small>(20%)</small></td><td class=n>+344 <small>(23%)</small></td><td class=n>-133 <small>(57%)</small></td></tr></table></div></div><div class=match><h4>Manchester United v Aston Villa <small>· Sun Nov 8, 11:30 AM ET</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Manchester United</th><th class=n>Draw</th><th class=n>Aston Villa</th></tr><tr><td>FanDuel</td><td class=n>+120</td><td class=n>+270</td><td class=n>+185</td></tr><tr><td>DraftKings</td><td class=n>+120</td><td class=n>+260</td><td class=n>+190</td></tr><tr><td>Kalshi</td><td class='n best'>+122</td><td class='n best'>+300</td><td class='n best'>+203</td></tr><tr class=cons><td>Consensus</td><td class=n>+131 <small>(43%)</small></td><td class=n>+306 <small>(25%)</small></td><td class=n>+211 <small>(32%)</small></td></tr></table></div></div></details>
+</div></section>
 
-<h2>Does beating the consensus mean anything?</h2>
+<section class=band><div class=wrap><h2>Does beating the consensus mean anything?</h2>
 <p class=sub>A price that beats the consensus could just be noise. The test is whether it still looks good at kick-off,
 when every site has caught up with the news. Free historical odds from American sportsbooks and prediction markets
 don't exist, so this test uses the same method on 13 European bookmakers, 2019 to 2027
@@ -200,16 +403,16 @@ don't exist, so this test uses the same method on 13 European bookmakers, 2019 t
 <div class=tablewrap><table><tr><th>When a price beat the consensus by</th><th class=n>Prices</th><th class=n>Gap when flagged</th><th class=n>Gap at kick-off</th><th class=n>Still better at kick-off</th></tr><tr><td>More than 0% better</td><td class=n>2,058</td><td class=n>+0.9%</td><td class=n>+0.8%</td><td class=n>57%</td></tr><tr><td>More than 1% better</td><td class=n>611</td><td class=n>+2.2%</td><td class=n>+1.6%</td><td class=n>61%</td></tr><tr><td>More than 2% better</td><td class=n>205</td><td class=n>+3.7%</td><td class=n>+4.0%</td><td class=n>73%</td></tr><tr><td>More than 3% better</td><td class=n>92</td><td class=n>+5.2%</td><td class=n>+5.4%</td><td class=n>77%</td></tr><tr><td>More than 5% better</td><td class=n>26</td><td class=n>+8.7%</td><td class=n>+7.3%</td><td class=n>77%</td></tr></table></div>
 <p class=note>Prices more than 2% better than the consensus were still better at kick-off 73% of the time, by 4.0% on average
 (95% range 2.8% to 5.2%). Small gaps (under 1%) are mostly noise. Profit over a few hundred bets
-is too noisy to judge either way, which is why the kick-off price is the better test. This is a study of pricing, not betting advice.</p>
+is too noisy to judge either way, which is why the kick-off price is the better test. This is a study of pricing, not betting advice.</p></div></section>
 
-<h2>How it works</h2>
+<section class=section><div class=wrap>
+<h2>How it works.</h2>
+<p class=sub>Three steps, rerun every week.</p>
 <div class=cards>
-<div class=card><h3>1. Collect the odds</h3><p>Odds for every match come from The Odds API, limited to FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus Kalshi and Polymarket, listed by market share. Caesars and Fanatics appear only on a paid data plan.</p></div>
-<div class=card><h3>2. Build the consensus</h3><p>Each site's odds are turned into chances with its cut removed, then averaged with equal weight. No site counts more than another.</p></div>
-<div class=card><h3>3. Flag the gaps</h3><p>A price more than 2% better than the consensus is flagged. Gaps over 25% are ignored as stale or mistyped prices.</p></div>
+<div class=card><h3>Collect the odds.</h3><p>From FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus Kalshi and Polymarket, through The Odds API. Caesars and Fanatics appear only on a paid data plan.</p></div>
+<div class=card><h3>Build the consensus.</h3><p>Each site's odds become chances with its cut removed, then are averaged with equal weight. No site counts more than another.</p></div>
+<div class=card><h3>Flag the gaps.</h3><p>A price more than 2% better than the consensus is flagged. Gaps over 25% are ignored as stale or mistyped prices.</p></div>
 </div>
-<p class=note style="margin-top:14px">Prices move constantly, so check the site before acting. Odds from The Odds API; history from football-data.co.uk.
-<a href="research.html">Background research on 50,000 matches</a> · <a href="https://github.com/HughFOD/soccer-markets">Code on GitHub</a></p>
-</main>
-<footer><div class=wrap>A data science project in Python by Hugh. This is a study of pricing, not betting advice.</div></footer>
+</div></section>
+<footer><div class=wrap><p>Odds from The Odds API. Match history from football-data.co.uk. Prices move constantly, so check the site before acting.</p><p>A data science project in Python by Hugh. This is a study of pricing, not betting advice. <a href="https://github.com/HughFOD/soccer-markets">Code on GitHub</a></p></div></footer>
 </body></html>

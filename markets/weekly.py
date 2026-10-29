@@ -97,12 +97,18 @@ def run(raw_dir: Path = ROOT / "data" / "raw", fixtures: Path | None = None, out
         docs: Path = ROOT / "docs", threshold: float = 0.02, download: bool = True) -> pd.DataFrame:
     from . import usbooks
     key = usbooks.api_key()
-    stamp = datetime.now().strftime("%d %b %Y")
+    from zoneinfo import ZoneInfo
+    stamp = datetime.now(ZoneInfo("America/New_York")).strftime("%a %-d %b %Y, %-I:%M %p ET")
     if key or (ROOT / "data" / "us_odds.json").exists():
         from . import site
         path = ROOT / "data" / "us_odds.json"
         if key and download:
-            usbooks.download(key, path)
+            fresh = usbooks.download(key, path.with_suffix(".new.json"))
+            if not sum(len(v) for v in fresh.values()):
+                # nothing came back (network or key problem): keep the last good odds and pages
+                path.with_suffix(".new.json").unlink(missing_ok=True)
+                raise SystemExit("No odds downloaded, so the pages were left as they were.")
+            path.with_suffix(".new.json").replace(path)
         saved = json.loads(path.read_text())
         t = usbooks.to_table(saved["data"])
         M, quotes = usbooks.price(t, threshold)

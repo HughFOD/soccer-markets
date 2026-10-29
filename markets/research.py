@@ -11,18 +11,27 @@ from pathlib import Path
 import pandas as pd
 
 from . import viz
-from .website import CSS, LG, REPO_URL, facts, p
+from . import theme
+from .website import LG, facts, p
 
 ROOT = Path(__file__).resolve().parent.parent
 
 EXTRA_CSS = """
-.cta{display:inline-block;margin-top:22px;background:#eb6834;color:#fff;font-weight:600;padding:10px 18px;border-radius:8px;text-decoration:none}
-.toc{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 18px;padding:0;list-style:none;margin:8px 0 0}
-.toc a{text-decoration:none;color:var(--ink)}.toc a b{color:var(--accent);font:600 12px 'JetBrains Mono',monospace;margin-right:8px}
-.finding h3{font-size:1.25rem}
-.finding .take{font-size:1.02rem;color:var(--ink);margin:4px 0 10px}
-.tw{overflow-x:auto}.finding table{min-width:0}
-@media (max-width:720px){.toc{grid-template-columns:1fr}.finding{padding:18px 14px 10px}td,th{padding:7px 4px;font-size:.86rem}}
+.toc{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 28px;padding:0;list-style:none;margin:0}
+.toc a{color:var(--ink);font-size:17px;display:flex;gap:12px;align-items:baseline}.toc a:hover{color:var(--link);text-decoration:none}
+.toc a b{color:var(--muted);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.finding{background:var(--bg2);border-radius:28px;padding:40px 40px 30px;margin:0 0 22px}
+.finding .n{font-size:14px;font-weight:600;color:#bf4800;margin-bottom:6px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .finding .n{color:#ff9f0a}}
+.finding h3{font-size:clamp(26px,3.4vw,34px);line-height:1.12;font-weight:700;letter-spacing:-.012em;margin:0 0 12px}
+.finding .take{font-size:19px;line-height:1.42;color:var(--ink2);margin:0 0 22px;max-width:740px}
+.finding p{color:var(--muted);font-size:17px;line-height:1.5;max-width:740px}
+.finding .chart{background:var(--tile);border-radius:18px;padding:22px 22px 14px;margin:0 0 18px}
+.finding table{min-width:0}.finding .tw{margin:12px 0}
+.section ul.plain{color:var(--muted);padding-left:20px;max-width:760px}.section ul.plain li{margin:8px 0}
+.section ul.plain b{color:var(--ink)}
+.callout{max-width:760px;margin:26px auto 0;font-size:19px;line-height:1.45;color:var(--ink2)}
+@media (max-width:720px){.toc{grid-template-columns:1fr}.finding{padding:26px 18px 18px;border-radius:22px}.finding .chart{padding:16px 12px 10px}}
 """
 
 
@@ -149,59 +158,60 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
         toc.append(a)
         body.append(b)
 
-    return f"""<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+    return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 <title>How Accurate Are Betting Odds?</title>
 <meta name=description content="A test of football betting odds on {f['matches']} matches: how accurate they are, where they go wrong, and whether a model can beat them.">
-<link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel=stylesheet>
-<style>{CSS}{EXTRA_CSS}{viz.CSS}</style></head><body>
-<header class=hero><div class=wrap>
-<div class=kicker>Background research · Python</div>
-<h1>How Accurate Are Football Betting Odds?</h1>
-<p class=lede>Odds are forecasts: +150 says a result has about a 40% chance. I tested those forecasts on {f['matches']} matches
+<style>{theme.CSS}{EXTRA_CSS}{viz.CSS}</style></head><body>
+{theme.nav("research")}
+<section class=hero><div class=wrap>
+<p class=eyebrow>Research</p>
+<h1>How accurate are betting odds?</h1>
+<p class=lede>Odds are forecasts: +150 says a result has about a 40% chance. I tested them on {f['matches']} matches
 from the {f['leagues']}, every season since {R['seasons'][0][:4]}.</p>
-<div class=result><b>In short</b>The odds are very accurate and a model built from past results couldn't beat them.
-But they have blind spots: long shots are overpriced, the opening price is slow to react to news, and the simple
-way to price a game at half-time overrates the team that's ahead.</div>
-<a class=cta href="index.html">← Back to this week's odds comparison</a>
-<p class=note><code>Odds</code> +150 means a $100 bet wins $150; −200 means you bet $200 to win $100. The data is from
-European bookmakers, because free historical odds from American sites don't exist.</p>
-</div></header>
-<main class=wrap>
+<p class=callout>The odds are very accurate, and a model built from past results couldn't beat them.
+But they have blind spots: long shots are overpriced, the opening price is slow to react to news, and the
+simple way to price a game at half-time overrates the team that's ahead.</p>
+<div class=ctas><a class=btn href="#found">See the findings</a><a class="btn ghost" href="index.html">This week's best bets</a></div>
+</div></section>
+
+<section class=band><div class=wrap>
 <div class=stats>
 <div class=stat><div class=v>{f['matches']}</div><div class=l>matches tested</div></div>
 <div class=stat><div class=v>{f['n_seasons']}</div><div class=l>seasons</div></div>
 <div class=stat><div class=v>{dollars(avg[-1]['return'])}</div><div class=l>lost per $100 on long shots</div></div>
 <div class=stat><div class=v>{f['margin_last']}</div><div class=l>bookmaker's cut today, down from {f['margin_first']}</div></div>
-</div>
+</div></div></section>
 
-<h2>What I found</h2>
+<section class=section id=found><div class=wrap>
+<h2>What I found.</h2>
+<p class=sub>Eight findings. +150 means a $100 bet wins $150; −200 means you bet $200 to win $100.
+The data is from European bookmakers, because free historical odds from American sites don't exist.</p>
 <ul class=toc>{''.join(toc)}</ul>
-{''.join(body)}
+</div></section>
+<div class=wrap>{''.join(body)}</div>
 
-<h2>What I learned</h2>
+<section class=section><div class=wrap>
+<h2>What I learned.</h2>
+<p class=sub>Three habits that made the results trustworthy.</p>
 <div class=cards>
-<div class=card><h3>Judge the chances, not the picks</h3><p>Counting how often a forecast picks the winner throws away most of the information. An error score rewards a forecast for being confident only when it should be.</p></div>
-<div class=card><h3>Never let the model see the future</h3><p>The model only uses matches already played, and its setting was chosen on separate early seasons. Without that, a backtest can look profitable by accident.</p></div>
-<div class=card><h3>Always show the uncertainty</h3><p>Betting results are noisy. Several strategies that looked promising here turned out to be luck once the uncertainty was measured.</p></div>
+<div class=card><h3>Judge the chances, not the picks.</h3><p>Counting how often a forecast picks the winner throws away most of the information. An error score rewards a forecast for being confident only when it should be.</p></div>
+<div class=card><h3>Never let the model see the future.</h3><p>The model only uses matches already played, and its setting was chosen on separate early seasons. Without that, a backtest can look profitable by accident.</p></div>
+<div class=card><h3>Always show the uncertainty.</h3><p>Betting results are noisy. Several strategies that looked promising here turned out to be luck once the uncertainty was measured.</p></div>
 </div>
+</div></section>
 
-<h2>How it's built</h2>
-<ul>
-<li><b>Data:</b> results and odds from up to ten bookmakers per match, from <a href="https://www.football-data.co.uk">football-data.co.uk</a>.</li>
-<li><b>Removing the margin:</b> three methods compared (proportional, power and Shin's 1993 model).</li>
-<li><b>Model:</b> team ratings refitted every week on past matches only, in scikit-learn.</li>
-<li><b>Uncertainty:</b> 95% ranges from resampling whole matches (the bootstrap).</li>
-<li><b>Tests:</b> automated checks, including one that the model never sees a match before predicting it.</li>
+<section class=band><div class=wrap>
+<h2>How it's built.</h2>
+<ul class=plain>
+<li><b>Data.</b> Results and odds from up to ten bookmakers per match, from <a href="https://www.football-data.co.uk">football-data.co.uk</a>.</li>
+<li><b>Removing the margin.</b> Three methods compared: proportional, power and Shin's 1993 model.</li>
+<li><b>Model.</b> Team ratings refitted every week on past matches only, in scikit-learn.</li>
+<li><b>Uncertainty.</b> 95% ranges from resampling whole matches (the bootstrap).</li>
+<li><b>Tests.</b> Automated checks, including one that the model never sees a match before predicting it.</li>
+<li><b>Limits.</b> The odds are snapshots, not every price on offer, and from European bookmakers; American sites may price differently.</li>
 </ul>
-<h2>Limits</h2>
-<ul>
-<li>The odds are snapshots collected by football-data.co.uk, not every price on offer.</li>
-<li>The history is European bookmakers; American sites may price differently.</li>
-<li>This is a study of forecasting, not betting advice. Mostly, it shows how hard the market is to beat.</li>
-</ul>
-</main>
-<footer><div class=wrap>Code and data: <a href="{REPO_URL}">{REPO_URL.replace('https://', '')}</a></div></footer>
+</div></section>
+{theme.footer()}
 <script>{viz.JS}</script>
 </body></html>"""
 

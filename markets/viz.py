@@ -16,18 +16,16 @@ import json
 import pandas as pd
 
 CSS = """
-:root{--c1:#2a78d6;--c2:#eb6834;--grid:#e8e6e0;--axis:#9a9ea6}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--c1:#3987e5;--c2:#d95926;--grid:#2b2f36;--axis:#6f7580}}
 .chart{margin:14px 0 8px}
-.chart h4{font:700 1.08rem/1.3 Archivo,system-ui,sans-serif;margin:0 0 2px;color:var(--ink)}
-.chart .csub{font-size:.88rem;color:var(--muted);margin:0 0 8px;line-height:1.45}
+.chart h4{font-size:19px;line-height:1.25;font-weight:600;margin:0 0 4px;color:var(--ink);letter-spacing:-.015em}
+.chart .csub{font-size:14px;color:var(--muted);margin:0 0 12px;line-height:1.4}
 .chart .plot{position:relative;width:100%;touch-action:pan-y}
 .chart svg{display:block;overflow:visible}
-.chart svg text{font-family:'Instrument Sans',system-ui,sans-serif}
-.chart .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--card);font-size:.84rem;line-height:1.35;
-  padding:6px 9px;border-radius:6px;white-space:nowrap;opacity:0;transition:opacity .1s;z-index:2}
+.chart svg text{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif}
+.chart .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:13px;line-height:1.35;
+  padding:7px 11px;border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.18);white-space:nowrap;opacity:0;transition:opacity .1s;z-index:2}
 .chart .tip b{font-weight:700}
-.chart details{margin-top:6px}.chart summary{font-size:.84rem;color:var(--muted);cursor:pointer}
+.chart details{margin-top:8px}.chart summary{font-size:14px;color:var(--link);cursor:pointer}
 .chart details table{font-size:.86rem}
 """
 
@@ -37,7 +35,7 @@ const NS='http://www.w3.org/2000/svg';
 function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
 function txt(p,x,y,s,a){const t=el('text',Object.assign({x:x,y:y},a||{}),p);t.textContent=s;return t}
 const ctx=document.createElement('canvas').getContext('2d');
-function tw(s,size,bold){ctx.font=(bold?'700 ':'400 ')+size+'px "Instrument Sans",system-ui,sans-serif';return ctx.measureText(s).width}
+function tw(s,size,bold){ctx.font=(bold?'700 ':'400 ')+size+'px -apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif';return ctx.measureText(s).width}
 function F(v,f){const r=Math.round(v),a=Math.abs(r);
   if(f==='usd')return r<0?'−$'+a:r>0?'+$'+a:'$0';
   if(f==='usdk')return r<0?'−$'+a.toLocaleString()+'k':r>0?'+$'+a.toLocaleString()+'k':'$0';
