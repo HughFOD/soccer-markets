@@ -1,4 +1,4 @@
-"""The homepage: this week's football odds across US sportsbooks and prediction markets.
+"""The homepage: this week's soccer odds across US sportsbooks and prediction markets.
 
 Built by markets.weekly from the saved Odds API responses and output/results.json.
 """
@@ -214,14 +214,14 @@ don't exist, so this test uses the same method on {len(cs['books'])} European bo
 is too noisy to judge either way, which is why the kick-off price is the better test. This is a study of pricing, not betting advice.</p>"""
 
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
-<title>Football Odds Compared</title>
-<meta name=description content="This week's football odds at FanDuel, DraftKings, Fanatics, BetMGM, Caesars, Kalshi and Polymarket, compared with the consensus of all of them.">
+<title>Soccer Odds Compared</title>
+<meta name=description content="This week's soccer odds at FanDuel, DraftKings, Fanatics, BetMGM, Caesars, Kalshi and Polymarket, compared with the consensus of all of them.">
 <style>{CSS}</style></head><body>
 {theme.nav("week")}
 <section class=hero><div class=wrap>
 <p class=eyebrow>Updated every morning</p>
 <h1>The best bets, every day.</h1>
-<p class=lede>The best-value bets for every day, from every match in six top leagues, priced by {', '.join(SITES[s][0] for s in present[:-1])}{' and ' + SITES[present[-1]][0] if present else ''}.</p>
+<p class=lede>The best-value soccer bets for every day, from the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and the Championship.</p>
 <div class=ctas><a class=btn href="#best">See today's best bets</a><a class="btn ghost" href="research.html">How accurate are odds</a></div>
 <p class=updated>Last updated {stamp}</p>
 </div></section>

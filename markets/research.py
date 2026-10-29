@@ -1,4 +1,4 @@
-"""The research page (docs/research.html): how accurate are football betting odds?
+"""The research page (docs/research.html): how accurate are soccer betting odds?
 
 Built from output/results.json. The charts are interactive SVG drawn in the page (markets/viz.py).
 Run: python -m markets.research
@@ -160,13 +160,13 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
 
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 <title>How Accurate Are Betting Odds?</title>
-<meta name=description content="A test of football betting odds on {f['matches']} matches: how accurate they are, where they go wrong, and whether a model can beat them.">
+<meta name=description content="A test of soccer betting odds on {f['matches']} matches: how accurate they are, where they go wrong, and whether a model can beat them.">
 <style>{theme.CSS}{EXTRA_CSS}{viz.CSS}</style></head><body>
 {theme.nav("research")}
 <section class=hero><div class=wrap>
 <p class=eyebrow>Research</p>
 <h1>How accurate are betting odds?</h1>
-<p class=lede>Odds are forecasts: +150 says a result has about a 40% chance. I tested them on {f['matches']} matches
+<p class=lede>Odds are forecasts: +150 implies a 40% chance, because a $100 bet returns $250 in total and 100 ÷ 250 = 40%. I tested them on {f['matches']} matches
 from the {f['leagues']}, every season since {R['seasons'][0][:4]}.</p>
 <p class=callout>The odds are very accurate, and a model built from past results couldn't beat them.
 But they have blind spots: long shots are overpriced, the opening price is slow to react to news, and the

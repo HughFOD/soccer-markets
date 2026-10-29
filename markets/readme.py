@@ -41,7 +41,7 @@ Prices more than 2% better than the consensus were still better at kick-off
 {100 * r2['beat_close']:.0f}% of the time, by {p(r2['edge_vs_close'], 1, False)} on average (95% range {p(r2['lo'], 1, False)} to {p(r2['hi'], 1, False)}).
 Small gaps (under 1%) are mostly noise.
 """
-    return f"""# Football Odds Compared Across US Sportsbooks and Prediction Markets
+    return f"""# Soccer Odds Compared Across US Sportsbooks and Prediction Markets
 
 Every match this week in six top leagues (Premier League, Championship, La
 Liga, Bundesliga, Serie A, Ligue 1), priced by FanDuel, DraftKings, Fanatics,

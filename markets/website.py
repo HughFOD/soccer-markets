@@ -273,14 +273,14 @@ def build(R: dict) -> str:
 <img src="images/line_moves.png" alt="Return at the opening price after the price moved">
 <p>This isn't a strategy, because you can't know the move in advance. What it shows is that real information, such as team news and injuries, arrives before kick-off and the opening price hasn't caught up. I tried several cut-offs, not just 3 points, and they all point the same way.</p></div>"""
     return f"""<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
-<title>A Fair-Price Engine for Football Odds</title>
-<meta name=description content="Combines about ten bookmakers into one fair price for every upcoming football match, and flags prices that are better than fair.">
+<title>A Fair-Price Engine for Soccer Odds</title>
+<meta name=description content="Combines about ten bookmakers into one fair price for every upcoming soccer match, and flags prices that are better than fair.">
 <link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel=stylesheet>
 <style>{CSS}.cta{{display:inline-block;margin-top:22px;background:#eb6834;color:#fff;font-weight:600;padding:10px 18px;border-radius:8px;text-decoration:none}}</style></head><body>
 <header class=hero><div class=wrap>
 <div class=kicker>Background research · Python</div>
-<h1>A Fair-Price Engine for Football Odds</h1>
+<h1>A Fair-Price Engine for Soccer Odds</h1>
 <p class=lede>Bookmakers often disagree about the same match. This tool combines them into one fair price for every upcoming game, then flags any American sportsbook (DraftKings, FanDuel, BetMGM, Caesars and others) whose odds are better than fair. It is built the way a market maker thinks: work out what something is really worth, then look for prices that are out of line.</p>
 <div class=result><b>Main result</b>When the engine flagged a price as more than 2% better than fair, that price beat the market's closing price {k.get('beat', '')} of the time, by {k.get('clv', '').lstrip('+')} on average. That is almost exactly the {k.get('exp', '').lstrip('+')} the engine predicted, tested on {k.get('n', 0):,} matches it had never seen.</div>
 <a class=cta href="index.html">← Back to this week's odds comparison</a>
@@ -344,7 +344,7 @@ def build(R: dict) -> str:
 <h2>Limits</h2>
 <ul>
 <li>The track record needs closing prices, which the included files have from 2015. Running <code>step2_download_more_data.py</code> extends it to the current season and four more leagues.</li>
-{"<li>The included data covers English football only. <code>update_everything.py</code> adds Spain, Germany, Italy, France and the seasons since 2020.</li>" if set(R["leagues"]) <= {"E0", "E1"} else ""}
+{"<li>The included data covers English soccer only. <code>update_everything.py</code> adds Spain, Germany, Italy, France and the seasons since 2020.</li>" if set(R["leagues"]) <= {"E0", "E1"} else ""}
 <li>The odds are snapshots collected by football-data.co.uk, not every price on offer.</li>
 <li>This is a study of forecasting, not betting advice. Mostly, it shows how hard the market is to beat.</li>
 </ul>

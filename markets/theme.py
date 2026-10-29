@@ -83,7 +83,7 @@ footer p{margin:0 0 6px}
 def nav(active: str) -> str:
     def a(href, label, key):
         return f'<a href="{href}"{" class=on" if key == active else ""}>{label}</a>'
-    return (f'<header class=gnav><div class=wrap><a class=brand href="index.html">Football Odds</a><nav>'
+    return (f'<header class=gnav><div class=wrap><a class=brand href="index.html">Soccer Odds</a><nav>'
             f'{a("index.html", "Best bets", "week")}{a("research.html", "Research", "research")}'
             f'{a(REPO_URL, "Code", "code")}</nav></div></header>')
 

@@ -1,4 +1,4 @@
-"""This week's football odds at American sportsbooks and prediction markets, from The Odds API.
+"""This week's soccer odds at American sportsbooks and prediction markets, from The Odds API.
 
 Needs a free API key saved in odds_api_key.txt in the project folder (or the
 ODDS_API_KEY environment variable). One refresh of six leagues uses 12 of the
