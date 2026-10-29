@@ -1,4 +1,4 @@
-# Football Odds Compared Across US Sportsbooks and Prediction Markets
+# Soccer Odds Compared Across US Sportsbooks and Prediction Markets
 
 Every match this week in six top leagues (Premier League, Championship, La
 Liga, Bundesliga, Serie A, Ligue 1), priced by the major US sites only:
