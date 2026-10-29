@@ -81,7 +81,7 @@ def us_page(tab: pd.DataFrame, stamp: str, threshold: float, remaining) -> str:
 <div class=kicker>Fair-price engine · American sportsbooks · updated {stamp}</div>
 <h1>This Week's Fair Prices</h1>
 <p class=lede>Fair odds for {len(tab)} upcoming matches, compared with DraftKings, FanDuel, BetMGM, BetRivers and the other US-licensed sportsbooks. {(f"{len(flagged)} {'match has' if len(flagged) == 1 else 'matches have'} a sportsbook price at least {threshold:.0%} better than fair (highlighted).") if len(flagged) else f"No American sportsbook price is {threshold:.0%} or more better than fair right now."}</p>
-<p class=note>Each cell shows the fair odds in American format, the fair chance, and the best American sportsbook price. The fair price is mostly Pinnacle's, with the margin removed, blended with the other bookmakers (including offshore sites such as Bovada, which are never flagged); betting exchanges are left out. Odds from The Odds API. <a href="index.html" style="color:#9fb4d4">How it works and its track record</a>.</p>
+<p class=note>Each cell shows the fair odds in American format, the fair chance, and the best American sportsbook price. The fair price blends the bookmakers' odds with their margins removed; betting exchanges are left out. Odds from The Odds API. <a href="index.html" style="color:#9fb4d4">How it works and its track record</a>.</p>
 </div></header>
 <main class=wrap>
 {f"<h2>Flagged prices</h2><ul>{flag_list}</ul>" if flag_list else ""}
@@ -99,16 +99,24 @@ def run(raw_dir: Path = ROOT / "data" / "raw", fixtures: Path | None = None, out
     key = usbooks.api_key()
     stamp = datetime.now().strftime("%d %b %Y")
     if key or (ROOT / "data" / "us_odds.json").exists():
+        from . import site
         path = ROOT / "data" / "us_odds.json"
         if key and download:
             usbooks.download(key, path)
         saved = json.loads(path.read_text())
-        tab = usbooks.price(usbooks.to_table(saved["data"]), threshold)
+        t = usbooks.to_table(saved["data"])
+        M, quotes = usbooks.price(t, threshold)
+        board = usbooks.scoreboard(quotes, t)
+        res = out_dir / "results.json"
+        R = json.loads(res.read_text()) if res.exists() else None
         out_dir.mkdir(parents=True, exist_ok=True)
-        tab.to_csv(out_dir / "this_week_us.csv", index=False)
-        (docs / "this-week.html").write_text(us_page(tab, stamp, threshold, saved.get("remaining")))
-        print(f"{len(tab)} matches priced at American sportsbooks, {int((tab['flag'] != '').sum()) if len(tab) else 0} flagged -> docs/this-week.html")
-        return tab
+        M.to_csv(out_dir / "this_week_us.csv", index=False)
+        board.to_csv(out_dir / "site_scoreboard.csv", index=False)
+        page_html = site.build(M, quotes, board, R, stamp, saved.get("remaining"))
+        for name in ("index.html", "this-week.html"):
+            (docs / name).write_text(page_html)
+        print(f"{len(M)} matches across {board.shape[0]} sites, {int((M['flag'] != '').sum()) if len(M) else 0} flagged -> docs/index.html")
+        return M
     print("No Odds API key (odds_api_key.txt), so pricing against European bookmakers from football-data.co.uk instead.")
     fixtures = fixtures or ROOT / "data" / "fixtures.csv"
     if download:

@@ -1,22 +1,16 @@
-"""This week's prices at American sportsbooks, from The Odds API (the-odds-api.com).
+"""This week's football odds at American sportsbooks and prediction markets, from The Odds API.
 
 Needs a free API key saved in odds_api_key.txt in the project folder (or the
 ODDS_API_KEY environment variable). One refresh of six leagues uses 12 of the
-free plan's 500 monthly credits.
+free plan's 500 monthly credits (two regions per league).
 
-How a match is priced
----------------------
-- Fair price: a blend that mirrors the backtested engine, which gives
-  Pinnacle about 70% of the weight and spreads the rest over the other
-  bookmakers. Pinnacle and the European bookmakers come from the Odds API's
-  "eu" region. Betting exchanges (Betfair, Matchbook, Smarkets) are left out.
-- Flags: an American sportsbook whose odds are more than 2% better than fair
+- Sites: FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus the prediction
+  markets Kalshi and Polymarket (largest first). Every other site is ignored.
+  On the free plan only FanDuel, DraftKings, BetMGM, Kalshi and Polymarket come through.
+- Consensus: every site's odds turned into chances with its margin removed,
+  then averaged with equal weight. No site counts more than another.
+- Flags: a site whose odds are more than 2% better than the consensus
   (and no more than 25%, which is almost always a stale or mistyped price).
-- Odds are shown in American format (+150 / -200) as well as the chance.
-
-The backtest behind the engine uses European bookmakers (2013 to 2026),
-because free historical odds from American sportsbooks do not exist. The
-weekly page says so.
 """
 from __future__ import annotations
 
@@ -29,21 +23,23 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from . import margin
+from .consensus import _probs
 from .fairprice import MAX_EDGE, pool
 
 ROOT = Path(__file__).resolve().parent.parent
 SPORTS = {"soccer_epl": "Premier League", "soccer_efl_champ": "Championship", "soccer_spain_la_liga": "La Liga",
           "soccer_germany_bundesliga": "Bundesliga", "soccer_italy_serie_a": "Serie A",
           "soccer_france_ligue_one": "Ligue 1"}
-EXCHANGES = {"betfair_ex_eu", "betfair_ex_uk", "betfair_ex_au", "matchbook", "smarkets", "betfair"}
-PINNACLE_SHARE = 0.7
-# American companies licensed in US states. Other bookmakers the Odds API lists in its "us" region
-# (Bovada, BetOnline, BetUS, MyBookie, LowVig) are offshore sites: they count toward the fair price
-# but are not flagged.
-US_LICENSED = {"draftkings", "fanduel", "betmgm", "betrivers", "williamhill_us", "espnbet", "fanatics", "hardrockbet",
-               "ballybet", "betparx", "fliff", "windcreek", "superbook", "unibet_us", "pointsbetus", "wynnbet",
-               "twinspires", "betfred_us", "circasports"}
+REGIONS = ("us", "us_ex")
+SITES = {  # key -> (display name, kind). Only these sites are used, listed by US market share
+    # (sportsbooks: Q3 2026 revenue share; prediction markets: trading volume).
+    "fanduel": ("FanDuel", "Sportsbook"), "draftkings": ("DraftKings", "Sportsbook"),
+    "fanatics": ("Fanatics", "Sportsbook"),  # paid Odds API plans only
+    "betmgm": ("BetMGM", "Sportsbook"),
+    "williamhill_us": ("Caesars", "Sportsbook"),  # paid Odds API plans only
+    "kalshi": ("Kalshi", "Prediction market"), "polymarket": ("Polymarket", "Prediction market"),
+}
+THRESHOLD = 0.02
 
 
 def api_key() -> str | None:
@@ -61,10 +57,10 @@ def fetch(key: str, sport: str, region: str) -> tuple[list, str | None]:
 
 
 def download(key: str, dest: Path) -> dict:
-    """Save the raw responses (so a run can be repeated without spending credits)."""
+    """Save the raw responses (so pages can be rebuilt without spending credits)."""
     out, remaining = {}, None
     for sport in SPORTS:
-        for region in ("us", "eu"):
+        for region in REGIONS:
             try:
                 out[f"{sport}|{region}"], remaining = fetch(key, sport, region)
             except Exception as e:  # league out of season, or a temporary error
@@ -77,12 +73,14 @@ def download(key: str, dest: Path) -> dict:
 
 
 def to_table(raw: dict) -> pd.DataFrame:
-    """One row per match and bookmaker: decimal odds for home, draw and away, and the bookmaker's region."""
+    """One row per match and site: decimal odds for home, draw and away. Only the sites in SITES."""
     rows = []
     for k, events in raw.items():
-        sport, region = k.split("|")
+        sport = k.split("|")[0]
         for ev in events:
             for bk in ev.get("bookmakers", []):
+                if bk["key"] not in SITES:
+                    continue
                 h2h = next((mk for mk in bk.get("markets", []) if mk.get("key") == "h2h"), None)
                 if not h2h:
                     continue
@@ -91,59 +89,66 @@ def to_table(raw: dict) -> pd.DataFrame:
                 if None in (oh, od, oa):
                     continue
                 rows.append({"id": ev["id"], "league": SPORTS.get(sport, sport), "kickoff": ev["commence_time"],
-                             "home": ev["home_team"], "away": ev["away_team"], "book": bk["key"], "book_name": bk["title"],
-                             "region": region, "h": oh, "d": od, "a": oa})
+                             "home": ev["home_team"], "away": ev["away_team"], "site": bk["key"], "h": oh, "d": od, "a": oa})
     t = pd.DataFrame(rows)
-    if t.empty:
-        return t
-    # a bookmaker listed in both regions counts once, as American if it appears in the US region
-    t = t.sort_values("region", key=lambda s: s.map({"us": 0, "eu": 1})).drop_duplicates(["id", "book"])
-    t.loc[(t["region"] == "us") & ~t["book"].isin(US_LICENSED), "region"] = "offshore"
-    return t[~t["book"].isin(EXCHANGES)].reset_index(drop=True)
+    return t.drop_duplicates(["id", "site"]).reset_index(drop=True) if len(t) else t
 
 
 def american(dec: float) -> str:
-    if not np.isfinite(dec) or dec <= 1:
+    if dec is None or not np.isfinite(dec) or dec <= 1:
         return ""
     return f"+{100 * (dec - 1):.0f}" if dec >= 2 else f"{-100 / (dec - 1):.0f}"
 
 
-def price(t: pd.DataFrame, threshold: float = 0.02) -> pd.DataFrame:
-    """Fair price per match and the best American sportsbook price for each result."""
-    out = []
+def price(t: pd.DataFrame, threshold: float = THRESHOLD, min_sites: int = 3) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Returns (matches, quotes).
+
+    matches: one row per match with the consensus chance and odds for each result,
+      the best price and site, and any flags.
+    quotes: one row per match, site and result, with the site's odds and its edge
+      over the consensus (positive = better than the consensus).
+    """
+    matches, quotes = [], []
     for mid, g in t.groupby("id", sort=False):
         O = g[["h", "d", "a"]].to_numpy(float)
-        with np.errstate(divide="ignore", invalid="ignore"):
-            over = (1 / O).sum(1) - 1
-        ok = np.isfinite(O).all(1) & (over > -0.01) & (over < 0.20)
-        g, O = g[ok], O[ok]
-        if len(g) < 2:
+        P = _probs(O)
+        ok = np.isfinite(P).all(1)
+        g, O, P = g[ok], O[ok], P[ok]
+        if len(g) < min_sites:
             continue
-        Pb = margin.power(O)
-        is_pin = (g["book"] == "pinnacle").to_numpy()
-        if is_pin.any() and len(g) > 1:
-            w = np.where(is_pin, PINNACLE_SHARE, (1 - PINNACLE_SHARE) / max((~is_pin).sum(), 1))
-        else:
-            w = np.full(len(g), 1 / len(g))
-        P = pool(np.log(Pb)[:, None, :], w, 1.0)[0]
-        us = (g["region"] == "us").to_numpy()
+        C = pool(np.log(P)[:, None, :], np.ones(len(g)) / len(g), 1.0)[0]
         r0 = g.iloc[0]
-        row = {"league": r0["league"], "kickoff": r0["kickoff"], "home": r0["home"], "away": r0["away"],
-               "n_books": len(g), "n_us": int(us.sum()), "has_pinnacle": bool(is_pin.any())}
+        row = {"id": mid, "league": r0["league"], "kickoff": r0["kickoff"], "home": r0["home"], "away": r0["away"],
+               "n_sites": len(g), "sites": ",".join(g["site"])}
         flags = []
         for k, (o, lab) in enumerate(zip("hda", ("Home", "Draw", "Away"))):
-            row[f"fair_{o}"] = P[k]
-            row[f"fair_us_{o}"] = american(1 / P[k])
-            if us.any():
-                j = int(np.argmax(np.where(us, O[:, k], -np.inf)))
-                best = O[j, k]
-                edge = P[k] * best - 1
-                row.update({f"best_{o}": best, f"best_us_{o}": american(best), f"best_book_{o}": g["book_name"].iloc[j],
-                            f"edge_{o}": edge})
-                if threshold < edge <= MAX_EDGE:
-                    flags.append(f"{lab} {american(best)} at {g['book_name'].iloc[j]} ({edge:+.1%})")
-            else:
-                row.update({f"best_{o}": np.nan, f"best_us_{o}": "", f"best_book_{o}": "", f"edge_{o}": np.nan})
+            E = C[k] * O[:, k] - 1
+            j = int(np.argmax(O[:, k]))
+            row.update({f"cons_{o}": C[k], f"cons_us_{o}": american(1 / C[k]), f"best_{o}": O[j, k],
+                        f"best_us_{o}": american(O[j, k]), f"best_site_{o}": SITES[g["site"].iloc[j]][0], f"edge_{o}": E[j]})
+            if threshold < E[j] <= MAX_EDGE:
+                flags.append(f"{lab} {american(O[j, k])} at {SITES[g['site'].iloc[j]][0]} ({E[j]:+.1%} vs consensus)")
+            for i in range(len(g)):
+                quotes.append({"id": mid, "site": g["site"].iloc[i], "result": o, "odds": O[i, k], "edge": E[i],
+                               "best": i == j or O[i, k] == O[j, k]})
         row["flag"] = "; ".join(flags)
-        out.append(row)
-    return pd.DataFrame(out).sort_values("kickoff").reset_index(drop=True) if out else pd.DataFrame()
+        matches.append(row)
+    M = pd.DataFrame(matches)
+    if len(M):
+        M = M.sort_values("kickoff").reset_index(drop=True)
+    return M, pd.DataFrame(quotes)
+
+
+def scoreboard(quotes: pd.DataFrame, t: pd.DataFrame) -> pd.DataFrame:
+    """Which site has the best prices this week."""
+    if quotes.empty:
+        return pd.DataFrame()
+    with np.errstate(divide="ignore"):
+        margins = t.assign(margin=(1 / t[["h", "d", "a"]]).sum(1) - 1).groupby("site")["margin"].median()
+    q = quotes.groupby("site").agg(matches=("id", "nunique"), avg_edge=("edge", "mean"), best_share=("best", "mean"),
+                                   flagged=("edge", lambda e: int(((e > THRESHOLD) & (e <= MAX_EDGE)).sum())))
+    q["margin"] = margins.reindex(q.index)
+    q["name"] = [SITES[s][0] for s in q.index]
+    q["kind"] = [SITES[s][1] for s in q.index]
+    order = {k: i for i, k in enumerate(SITES)}  # market-share order
+    return q.sort_index(key=lambda ix: ix.map(order)).reset_index()

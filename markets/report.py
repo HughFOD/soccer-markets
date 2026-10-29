@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
-from . import data, efficiency as ef, fairprice, live, margin, model, sharp
+from . import consensus, data, efficiency as ef, fairprice, live, margin, model, sharp
 
 BLUE, ORANGE, AQUA, INK, MUTED, GRID = "#2a78d6", "#eb6834", "#1baf7a", "#0b0b0b", "#52514e", "#e4e3df"
 HDA = ["h", "d", "a"]
@@ -220,8 +220,7 @@ def chart_calibration(table: pd.DataFrame, path: Path):
 
 def chart_longshot(flb: dict, path: Path):
     fig, ax = plt.subplots(figsize=(7.4, 4.6))
-    for key, color, label, dx in (("average", BLUE, "average odds", -0.13), ("best", ORANGE, "best odds", 0.0),
-                                  ("pinnacle", AQUA, "Pinnacle", 0.13)):
+    for key, color, label, dx in (("average", BLUE, "average odds", -0.08), ("best", ORANGE, "best odds", 0.08)):
         t = flb[key]
         x = np.arange(len(t)) + dx
         ax.errorbar(x, 100 * t["return"], yerr=[100 * (t["return"] - t["lo"]), 100 * (t["hi"] - t["return"])],
@@ -239,8 +238,6 @@ def chart_margins(mg: pd.DataFrame, path: Path):
     fig, ax = plt.subplots(figsize=(7.4, 4.2))
     x = np.arange(len(mg))
     ax.plot(x, 100 * mg["avg_margin"], color=BLUE, lw=2, marker="o", ms=5, label="average bookmaker")
-    p = mg["pin_margin"].notna()
-    ax.plot(x[p], 100 * mg.loc[p, "pin_margin"], color=AQUA, lw=2, marker="o", ms=5, label="Pinnacle")
     ax.set_xticks(x[::2], [s[2:4] + "/" + s[-2:] for s in mg["season"]][::2])
     ax.set_ylim(0, None)
     _style(ax, "The bookmaker's margin has shrunk", "season", "margin (%)")
@@ -250,8 +247,7 @@ def chart_margins(mg: pd.DataFrame, path: Path):
 
 def chart_curve(curve: pd.DataFrame, path: Path):
     fig, ax = plt.subplots(figsize=(7.4, 4.2))
-    for key, color, label in (("best", ORANGE, "best odds across bookmakers"), ("pin", AQUA, "Pinnacle odds"),
-                              ("avg", BLUE, "average odds")):
+    for key, color, label in (("best", ORANGE, "best odds across bookmakers"), ("avg", BLUE, "average odds")):
         ax.plot(curve["date"], curve[key], color=color, lw=2, label=label)
     ax.axhline(0, color=INK, lw=1)
     _style(ax, "Betting the model's 'value' picks", "", "cumulative profit (1 unit per bet)")
@@ -436,6 +432,8 @@ def run(raw_dir: Path, out_dir: Path, tune_cutoff: str = "2008-07-01", eval_from
     R["by_season"] = {"table": seasons, "slope_trend_per_decade": seasons.attrs["trend_per_decade"]}
     R["by_league"] = sharp.by_league(m, Y)
     print("half-time (in-play) analysis..."); R["live"] = live.run(m)
+    print("consensus test...")
+    R["consensus"] = consensus.backtest(m, Y)
     print("fair-price engine...")
     books = fairprice.books_in(m)
     P_fair, W = fairprice.walk_forward(m, books)

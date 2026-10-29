@@ -17,185 +17,87 @@ def pence(x):
 
 
 def build(R: dict) -> str:
-    fr = R["fair"]
-    bt = fr["backtest"]
-    rules = {r["threshold"]: r for r in bt["rules"]}
-    r2 = rules[0.02]
-    seasons = [r["season"] for r in bt["by_season"]]
-    yrs = f"{seasons[0][:4]}–{seasons[-1][-4:]}" if seasons else ""
-    acc = {r["source"]: r for r in fr["accuracy"]}
-    w = fr["latest_weights"]
-    tot = sum(w.values())
-    from .report import BOOK_NAMES as names
-    blend = ", ".join(f"{names.get(b, b)} {100 * v / tot:.0f}%" for b, v in sorted(w.items(), key=lambda kv: -kv[1])[:4])
-    leagues = _join([LG.get(x, x) for x in R["leagues"]])
-    avg = R["longshot"]["average"]
-    cl = R.get("closing")
-    lv = R.get("live")
-    mm = R["model"]
-    from .website import engine_section
-    recent = "**The edge has shrunk.** " + engine_section(R)[1].get("recent", "")
-    tt = fr.get("bet_types", [])
-    types_md = "| Type | Flags | Edge vs close | Beat close | Return per bet (95% range) |\n|---|---|---|---|---|\n" + "\n".join(
-        f"| {r['type']} | {r['bets']:,} | {p(r['clv'])} | {100 * r['beat_close']:.0f}% | {p(r['return'])} ({p(r['lo'])} to {p(r['hi'])}) |"
-        for r in tt if r["group"] in ("Price", "Size of gap", "League"))
-    rule_rows = "\n".join(
-        f"| More than {100 * r['threshold']:.0f}% better | {r['bets']:,} | {p(r['expected'])} | "
-        f"{p(r['clv'])} ({p(r['clv_lo'])} to {p(r['clv_hi'])}) | {100 * r['beat_close']:.0f}% |" for r in bt["rules"])
-    acc_rows = "\n".join(f"| {r['source']} | {r['distance_to_close']:.5f} | {p(r['vs_fair'], 0)} |" for r in fr["accuracy"])
+    cs = R.get("consensus")
+    rr = {x["threshold"]: x for x in cs["rules"]} if cs else {}
+    r2 = rr.get(0.02)
+    hist = ""
+    if cs:
+        rows = "\n".join(f"| More than {100 * x['threshold']:.0f}% better | {x['bets']:,} | {p(x['expected'])} | {p(x['edge_vs_close'])} | {100 * x['beat_close']:.0f}% |"
+                         for x in cs["rules"])
+        hist = f"""## Does beating the consensus mean anything?
 
-    L = [f"""# A Fair-Price Engine for Football Odds
+A price that beats the consensus could be noise. The test is whether it still
+looks good at kick-off, when every site has caught up with the news. Free
+historical odds from American sportsbooks and prediction markets don't exist,
+so the test uses the same method on {len(cs['books'])} European bookmakers, {cs['seasons'][0][:4]} to
+{cs['seasons'][-1][-4:]} ({cs['matches']:,} matches), comparing each flagged price with the consensus
+closing price.
 
-Bookmakers often disagree about the same match. This tool combines them into
-one fair price for every upcoming game, then flags any American sportsbook
-(DraftKings, FanDuel, BetMGM, Caesars and others) whose odds are better than
-fair. It is built the way a market maker thinks:
-work out what something is really worth, then look for prices that are out of
-line.
+| When a price beat the consensus by | Prices | Gap when flagged | Gap at kick-off | Still better at kick-off |
+|---|---|---|---|---|
+{rows}
 
-**Main result.** When the engine flagged a price as more than 2% better than
-fair, that price beat the market's closing price {100 * r2['beat_close']:.0f}% of the time, by
-{p(r2['clv'], 1, False)} on average (95% range {p(r2['clv_lo'], 1, False)} to {p(r2['clv_hi'], 1, False)}). That is almost exactly the
-{p(r2['expected'], 1, False)} the engine predicted, tested on {bt['matches']:,} matches ({yrs}) it had never seen.
+Prices more than 2% better than the consensus were still better at kick-off
+{100 * r2['beat_close']:.0f}% of the time, by {p(r2['edge_vs_close'], 1, False)} on average (95% range {p(r2['lo'], 1, False)} to {p(r2['hi'], 1, False)}).
+Small gaps (under 1%) are mostly noise.
+"""
+    return f"""# Football Odds Compared Across US Sportsbooks and Prediction Markets
 
-- Website: https://hughfod.github.io/soccer-markets/
-- This week's prices at American sportsbooks: https://hughfod.github.io/soccer-markets/this-week.html
+Every match this week in six top leagues (Premier League, Championship, La
+Liga, Bundesliga, Serie A, Ligue 1), priced by FanDuel, DraftKings, Fanatics,
+BetMGM and Caesars, and by the prediction markets Kalshi and Polymarket.
+(Caesars and Fanatics appear only on a paid Odds API plan.) Each site's odds are compared with the
+consensus of all of them, and any price clearly better than the consensus is
+flagged.
 
-> **How odds work.** American odds of +150 mean a $100 bet wins $150; −200
-> means you bet $200 to win $100. +150 implies a 40% chance. The chances for a home win, a
-> draw and an away win add up to a little over 100%. The extra is the
-> bookmaker's cut, called the margin.
+**Website:** https://hughfod.github.io/soccer-markets/
 
 ## How it works
 
-1. **Remove each bookmaker's cut.** Every bookmaker's odds are turned into
-   fair chances, taking more of the margin off long shots, where bookmakers
-   put most of it.
-2. **Blend the bookmakers.** The chances are combined into one fair price (a
-   weighted logarithmic pool). Each bookmaker's weight is learned from how well
-   its prices predicted the sharpest closing price in the previous two seasons.
-   Today the blend is {blend}.
-3. **Flag out-of-line prices.** Any regular bookmaker offering odds more than
-   2% better than the fair price is flagged.
+1. **Collect the odds.** The Odds API supplies current odds from the major US
+   sportsbooks and prediction markets.
+2. **Build the consensus.** Each site's odds are turned into chances with its
+   cut removed, then averaged with equal weight. No site counts more than
+   another. With the cuts removed, the consensus is the fair price.
+3. **Flag the gaps.** A price more than 2% better than the consensus is
+   flagged. Gaps over 25% are ignored as stale or mistyped prices.
+4. **Rank the sites.** For each site: its cut, how often it has the best
+   price, and how much it pays on average compared with the consensus.
 
-Betting exchanges such as Betfair are left out: in thin markets their prices
-swing a lot, and with them in, one exchange took most of the weight. Leaving
-them out changed the results by less than a tenth of a point. The track record
-uses European bookmakers (2013/14 to 2025/26), because free historical odds
-from American sportsbooks don't exist; the weekly page applies the same method
-to American sportsbooks.
+American odds: +150 means a $100 bet wins $150; −200 means you bet $200 to win $100.
 
-Why learn from closing prices and not results? Results are mostly luck, so
-weights learned from them are noisy and unstable. The closing price, set just before kick-off, is the
-market's final and best-informed view, so it is a much cleaner target.
+{hist}
+## Background research
 
-![Weights](docs/images/fair_weights.png)
-
-## Track record
-
-Profit is a poor test of a price because it depends on who won. The standard
-test is the closing price: if you regularly get better odds than the market's
-final price, your prices were genuinely good, whoever won.
-
-![Closing-line value](docs/images/fair_clv.png)
-
-| Flag when the price is | Prices | Predicted edge | Edge vs closing price (95% range) | Beat close |
-|---|---|---|---|---|
-{rule_rows}
-
-The fair price is also closer to the closing price than any single bookmaker:
-
-| Price | Distance to closing price | vs this engine |
-|---|---|---|
-{acc_rows}
-
-{recent}
-
-![By season](docs/images/fair_by_season.png)
-
-The profit on the 2% flags was {p(r2['return'])} per bet, but its 95% range
-({p(r2['lo'])} to {p(r2['hi'])}) is wide, which is why the closing price is the better test.
-In practice, bookmakers limit customers who consistently beat their prices.
-
-## The best types of bets
-
-{types_md}
-
-![Bet types](docs/images/bet_types.png)
-
-## What {len(R['margins'])} seasons of odds show
-
-Before building the engine, I studied how accurate the odds are, using
-{R['matches']:,} matches from the {leagues}. These findings explain the design.
-
-1. **The odds are accurate, but slightly too cautious.** Calibration slope
-   {R['calibration']['pooled']['slope']:.2f} (1.00 is perfect): favourites win a little more often than
-   the odds say. ![Calibration](docs/images/calibration.png)
-2. **Long shots are a bad bet.** £1 on every heavy favourite lost
-   {pence(avg[0]['return'])}; £1 on every long shot (odds of 10 or more) lost {pence(avg[-1]['return'])}. Bookmakers put more
-   of their margin on long shots, which is why the engine removes it that way.
-   ![Long shots](docs/images/longshot.png)
-3. **Bookmakers take a smaller cut than they used to,** from
-   {p(R['margins'][0]['avg_margin'], 1, False)} to {p(R['margins'][-1]['avg_margin'], 1, False)}. ![Margins](docs/images/margins.png)"""]
-    if cl:
-        mv = {(r["threshold"], r["direction"]): r for r in cl["moves"]}
-        s3 = mv[(0.03, "shortened")]
-        L.append(f"""4. **Prices that move before kick-off move the right way,** so the closing
-   price knows more than the opening one. When a chance rose 3+ points before
-   kick-off, a bet at the opening price made {p(s3['return'])}. This is why the engine is
-   judged against the closing price. ![Line moves](docs/images/line_moves.png)""")
-    L.append(f"""5. **A model built from past results can't beat the odds.** Team ratings
-   refitted every week scored log loss {mm['scores']['model']['log_loss']:.3f} against the odds' {mm['scores']['market']['log_loss']:.3f}, and adding the
-   model to the odds didn't help. The engine therefore starts from the odds,
-   not from a model. ![Model](docs/images/value_bets.png)""")
-    if lv:
-        rb = {r["check"]: r for r in lv["robustness"]}
-        a = rb["All matches with a lead at half-time"]
-        L.append(f"""6. **After half-time, the team that's behind scores more than expected.**
-   Within the same match, the trailing team scored {p(a['actual_share'], 1, False)} of second-half goals
-   against {p(a['expected_share'], 1, False)} expected, and the pattern holds in all {len(rb)} checks. A
-   simple live price that ignores this overrates the team in front.
-   ![Score effects](docs/images/score_effect_checks.png)""")
-    L.append("""
-Full tables with 95% ranges for every number are in `output/report.md` after a run.
+Before building the comparison, I studied {R['matches']:,} matches from 2000 to 2026 to
+see how accurate betting odds are: long shots are overpriced, prices that
+move before kick-off move the right way, a model from past results can't beat
+the odds, and teams behind at half-time score more than expected. The
+details are on the [research page](https://hughfod.github.io/soccer-markets/research.html).
 
 ## Running it
 
-In PyCharm, open `update_everything.py` and click the green ▶ next to
-`if __name__ == "__main__":`. It sets up the first time, downloads the latest
-odds, reruns everything, prices this week's matches and rebuilds the website
-and this README. Run `step6_this_week.py` on its own to refresh just this
-week's prices.
-
-From a terminal: `pip install -r requirements.txt && python update_everything.py && python -m pytest`
+1. Get a free key at the-odds-api.com and save it as `odds_api_key.txt` in
+   this folder (it is never uploaded).
+2. Run `python3 update_everything.py`. It downloads the latest data, reruns
+   the analysis and rebuilds the website. A refresh uses 12 of the free
+   plan's 500 monthly credits.
 
 ## Layout
 
 ```
-markets/fairprice.py   the engine: margin removal, weighted pool, weights from closing prices, flags, backtest
-markets/weekly.py      prices this week's matches -> docs/this-week.html
-markets/usbooks.py     American sportsbook odds from The Odds API (needs a free key in odds_api_key.txt)
-markets/data.py        loads and downloads football-data.co.uk files
-markets/margin.py      odds to fair chances: proportional, power, Shin
-markets/efficiency.py  scores, calibration, returns, bootstrap ranges
-markets/model.py       team-ratings model (the baseline the odds beat)
-markets/sharp.py       Pinnacle vs other bookmakers, by season, by league
-markets/live.py        half-time scores and score effects
-markets/report.py      runs every analysis; charts, results.json, report.md
-markets/website.py     builds the website; markets/readme.py builds this README
-tests/                 sixteen checks, including that nothing is fitted on the matches it is tested on
+markets/usbooks.py     odds from The Odds API; consensus, flags, site rankings
+markets/site.py        the homepage
+markets/consensus.py   the consensus method and its historical test
+markets/weekly.py      runs the weekly update
+markets/report.py      the background research (charts, results.json)
+markets/website.py     the research page; markets/readme.py writes this README
+tests/                 automated checks
 ```
 
-## Limits
-
-- The track record needs closing prices, which the data has from 2015/16.
-- Odds are snapshots collected twice a week by football-data.co.uk, so a
-  flagged price may already have moved.
-- This is a study of pricing, not betting advice.
-
-Data: [football-data.co.uk](https://www.football-data.co.uk).
-""")
-    return "\n".join(L)
+This is a study of pricing, not betting advice. Data: The Odds API and
+[football-data.co.uk](https://www.football-data.co.uk).
+"""
 
 
 def main(out_dir: Path = ROOT / "output"):

@@ -279,11 +279,11 @@ def build(R: dict) -> str:
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel=stylesheet>
 <style>{CSS}.cta{{display:inline-block;margin-top:22px;background:#eb6834;color:#fff;font-weight:600;padding:10px 18px;border-radius:8px;text-decoration:none}}</style></head><body>
 <header class=hero><div class=wrap>
-<div class=kicker>Data science project · Python</div>
+<div class=kicker>Background research · Python</div>
 <h1>A Fair-Price Engine for Football Odds</h1>
 <p class=lede>Bookmakers often disagree about the same match. This tool combines them into one fair price for every upcoming game, then flags any American sportsbook (DraftKings, FanDuel, BetMGM, Caesars and others) whose odds are better than fair. It is built the way a market maker thinks: work out what something is really worth, then look for prices that are out of line.</p>
 <div class=result><b>Main result</b>When the engine flagged a price as more than 2% better than fair, that price beat the market's closing price {k.get('beat', '')} of the time, by {k.get('clv', '').lstrip('+')} on average. That is almost exactly the {k.get('exp', '').lstrip('+')} the engine predicted, tested on {k.get('n', 0):,} matches it had never seen.</div>
-<a class=cta href="this-week.html">See this week's prices at American sportsbooks →</a>
+<a class=cta href="index.html">← Back to this week's odds comparison</a>
 <p class=note><code>How odds work</code> American odds of +150 mean a $100 bet wins $150; −200 means you bet $200 to win $100. +150 implies a 40% chance. Add up the chances for a home win, a draw and an away win and you get a little over 100%. The extra is the bookmaker's cut, called the <i>margin</i>. The track record below is from European bookmakers, because free historical odds from American sportsbooks don't exist.</p>
 </div></header>
 <main class=wrap>
@@ -354,13 +354,9 @@ def build(R: dict) -> str:
 
 
 def main(out_dir: Path = ROOT / "output", docs: Path = ROOT / "docs"):
-    R = json.loads((out_dir / "results.json").read_text())
-    (docs / "images").mkdir(parents=True, exist_ok=True)
-    for c in CHARTS:
-        if (out_dir / f"{c}.png").exists():
-            shutil.copy(out_dir / f"{c}.png", docs / "images" / f"{c}.png")
-    (docs / "index.html").write_text(build(R))
-    print(f"wrote {docs / 'index.html'}")
+    """Builds docs/research.html. The page now lives in markets/research.py (charts in markets/charts.py)."""
+    from .research import main as research_main
+    research_main(out_dir, docs)
 
 
 if __name__ == "__main__":

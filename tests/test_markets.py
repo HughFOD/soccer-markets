@@ -168,15 +168,18 @@ def test_american_odds():
     assert american(2.5) == "+150" and american(1.5) == "-200" and american(2.0) == "+100"
 
 
-def test_us_page_ignores_exchanges_and_flags_only_us_books():
+def test_consensus_comparison_flags_the_generous_site():
     from markets import usbooks
     ev = lambda books: {"id": "e1", "commence_time": "2026-10-31T15:00:00Z", "home_team": "A", "away_team": "B",
                         "bookmakers": [{"key": k, "title": k, "markets": [{"key": "h2h", "outcomes": [
                             {"name": "A", "price": h}, {"name": "B", "price": a}, {"name": "Draw", "price": d}]}]}
                                        for k, h, d, a in books]}
-    raw = {"soccer_epl|us": [ev([("draftkings", 2.2, 3.4, 3.4)])],
-           "soccer_epl|eu": [ev([("pinnacle", 2.0, 3.6, 4.0), ("betfair_ex_eu", 3.0, 3.0, 3.0), ("unibet", 2.3, 3.4, 3.4)])]}
+    raw = {"soccer_epl|us": [ev([("draftkings", 2.0, 3.4, 3.6), ("fanduel", 2.0, 3.4, 3.6), ("bovada", 9.0, 9.0, 9.0)])],
+           "soccer_epl|us_ex": [ev([("kalshi", 2.08, 3.5, 3.8), ("polymarket", 2.2, 3.4, 3.6)])]}
     t = usbooks.to_table(raw)
-    assert "betfair_ex_eu" not in set(t["book"])
-    r = usbooks.price(t).iloc[0]
-    assert r["best_book_h"] == "draftkings" and "Home" in r["flag"]   # unibet's better price is not American, so not flagged
+    assert "bovada" not in set(t["site"])                     # only the listed US sites count
+    M, quotes = usbooks.price(t)
+    r = M.iloc[0]
+    assert r["best_site_h"] == "Polymarket" and "Home" in r["flag"]
+    board = usbooks.scoreboard(quotes, t)
+    assert set(board["name"][:2]) == {"Kalshi", "Polymarket"}   # lower cuts, so they pay more on average

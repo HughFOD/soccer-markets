@@ -1,0 +1,249 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">
+<title>How Accurate Are Betting Odds?</title>
+<meta name=description content="A test of football betting odds on 52,841 matches: how accurate they are, where they go wrong, and whether a model can beat them.">
+<link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel=stylesheet>
+<style>
+:root{--bg:#fbfaf7;--ink:#14161a;--ink2:#4a4d55;--muted:#767a83;--line:#e3e1db;--card:#ffffff;--accent:#2a78d6;--accent2:#eb6834;--hero:#101722;--heroink:#eef1f6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121417;--ink:#eceef2;--ink2:#b7bbc4;--muted:#8a8f99;--line:#2a2e35;--card:#1a1d22;--accent:#3987e5;--accent2:#d95926;--hero:#0b0f16}}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 'Instrument Sans',system-ui,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px}
+header.hero{background:var(--hero);color:var(--heroink);padding:56px 0 44px}
+.kicker{font:500 12px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:#9fb4d4}
+h1{font:700 clamp(1.6rem,2.9vw,2.3rem)/1.2 Archivo,system-ui,sans-serif;margin:14px 0 18px;letter-spacing:-.01em}
+.lede{font-size:1.08rem;color:#d3d9e3;max-width:760px}
+.result{margin-top:26px;border-left:3px solid var(--accent2);padding:10px 0 10px 18px;max-width:760px}
+.result b{display:block;font:600 12px/1.4 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#f3a37f;margin-bottom:4px}
+.note{margin-top:22px;font-size:.92rem;color:#aab4c3;max-width:760px}
+.note code{font-family:'JetBrains Mono',monospace;background:#1d2633;padding:1px 6px;border-radius:4px;color:#e6ebf2}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:-22px 0 40px;position:relative}
+.stat{background:var(--card);padding:16px 18px}.stat .v{font:700 1.5rem/1.1 Archivo,sans-serif}.stat .l{font-size:.82rem;color:var(--muted);margin-top:4px}
+h2{font:700 1.45rem/1.25 Archivo,sans-serif;margin:52px 0 12px}
+h3{font:650 1.1rem/1.35 Archivo,sans-serif;margin:0 0 6px}
+.finding{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 22px 14px;margin:18px 0}
+.finding .n{font:600 12px 'JetBrains Mono',monospace;color:var(--accent);letter-spacing:.1em}
+.finding img{width:100%;height:auto;border-radius:6px;margin:10px 0 6px;background:#fff}
+.finding p{margin:6px 0 10px;color:var(--ink2)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}.card p{margin:0;color:var(--ink2);font-size:.95rem}
+table{border-collapse:collapse;width:100%;font-size:.93rem;margin:10px 0}td,th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left}th{color:var(--muted);font-weight:600}
+td.num,th.num{text-align:right;font-family:'JetBrains Mono',monospace}
+ul{padding-left:20px;color:var(--ink2)}li{margin:4px 0}
+a{color:var(--accent)}footer{border-top:1px solid var(--line);margin-top:56px;padding:26px 0 40px;color:var(--muted);font-size:.9rem}
+@media (max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}}
+
+.cta{display:inline-block;margin-top:22px;background:#eb6834;color:#fff;font-weight:600;padding:10px 18px;border-radius:8px;text-decoration:none}
+.toc{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 18px;padding:0;list-style:none;margin:8px 0 0}
+.toc a{text-decoration:none;color:var(--ink)}.toc a b{color:var(--accent);font:600 12px 'JetBrains Mono',monospace;margin-right:8px}
+.finding h3{font-size:1.25rem}
+.finding .take{font-size:1.02rem;color:var(--ink);margin:4px 0 10px}
+.tw{overflow-x:auto}.finding table{min-width:0}
+@media (max-width:720px){.toc{grid-template-columns:1fr}.finding{padding:18px 14px 10px}td,th{padding:7px 4px;font-size:.86rem}}
+
+:root{--c1:#2a78d6;--c2:#eb6834;--grid:#e8e6e0;--axis:#9a9ea6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--c1:#3987e5;--c2:#d95926;--grid:#2b2f36;--axis:#6f7580}}
+.chart{margin:14px 0 8px}
+.chart h4{font:700 1.08rem/1.3 Archivo,system-ui,sans-serif;margin:0 0 2px;color:var(--ink)}
+.chart .csub{font-size:.88rem;color:var(--muted);margin:0 0 8px;line-height:1.45}
+.chart .plot{position:relative;width:100%;touch-action:pan-y}
+.chart svg{display:block;overflow:visible}
+.chart svg text{font-family:'Instrument Sans',system-ui,sans-serif}
+.chart .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--card);font-size:.84rem;line-height:1.35;
+  padding:6px 9px;border-radius:6px;white-space:nowrap;opacity:0;transition:opacity .1s;z-index:2}
+.chart .tip b{font-weight:700}
+.chart details{margin-top:6px}.chart summary{font-size:.84rem;color:var(--muted);cursor:pointer}
+.chart details table{font-size:.86rem}
+</style></head><body>
+<header class=hero><div class=wrap>
+<div class=kicker>Background research · Python</div>
+<h1>How Accurate Are Football Betting Odds?</h1>
+<p class=lede>Odds are forecasts: +150 says a result has about a 40% chance. I tested those forecasts on 52,841 matches
+from the Bundesliga, English Premier League, English Championship, Ligue 1, Serie A and La Liga, every season since 2000.</p>
+<div class=result><b>In short</b>The odds are very accurate and a model built from past results couldn't beat them.
+But they have blind spots: long shots are overpriced, the opening price is slow to react to news, and the simple
+way to price a game at half-time overrates the team that's ahead.</div>
+<a class=cta href="index.html">← Back to this week's odds comparison</a>
+<p class=note><code>Odds</code> +150 means a $100 bet wins $150; −200 means you bet $200 to win $100. The data is from
+European bookmakers, because free historical odds from American sites don't exist.</p>
+</div></header>
+<main class=wrap>
+<div class=stats>
+<div class=stat><div class=v>52,841</div><div class=l>matches tested</div></div>
+<div class=stat><div class=v>27</div><div class=l>seasons</div></div>
+<div class=stat><div class=v>$27</div><div class=l>lost per $100 on long shots</div></div>
+<div class=stat><div class=v>6.5%</div><div class=l>bookmaker's cut today, down from 13.0%</div></div>
+</div>
+
+<h2>What I found</h2>
+<ul class=toc><li><a href="#accurate"><b>01</b>The odds are accurate</a></li><li><a href="#longshots"><b>02</b>Long shots are the worst bet</a></li><li><a href="#margins"><b>03</b>Bookmakers take a smaller cut than they used to</a></li><li><a href="#still-longshots"><b>04</b>Cheaper betting didn't fix the long-shot problem</a></li><li><a href="#line-moves"><b>05</b>Prices that move before kick-off move the right way</a></li><li><a href="#model"><b>06</b>A model built from past results can't beat the odds</a></li><li><a href="#leagues"><b>07</b>The second division isn't easier to beat</a></li><li><a href="#half-time"><b>08</b>After half-time, the team that's behind scores more than expected</a></li></ul>
+<div class=finding id="accurate"><div class=n>FINDING 1</div><h3>The odds are accurate</h3><p class=take>Results the odds gave a 67% chance happened 70% of the time. Results given a 12% chance happened 10% of the time.</p><div class=chart data-spec="spec-calibration"><h4>When the odds say 40%, it happens about 40% of the time</h4><p class=csub>Each dot is a group of results with similar odds. Dots on the dashed line mean the odds were exactly right.</p><div class=plot></div><details><summary>Show the numbers</summary><div class=tw><table><tr><th>Odds said</th><th class=num>Happened</th><th class=num>Results</th></tr><tr><td>12%</td><td class=num>10%</td><td class=num>13,211</td></tr><tr><td>19%</td><td class=num>18%</td><td class=num>13,210</td></tr><tr><td>23%</td><td class=num>22%</td><td class=num>13,210</td></tr><tr><td>26%</td><td class=num>25%</td><td class=num>13,210</td></tr><tr><td>28%</td><td class=num>28%</td><td class=num>13,210</td></tr><tr><td>28%</td><td class=num>28%</td><td class=num>13,210</td></tr><tr><td>30%</td><td class=num>30%</td><td class=num>13,211</td></tr><tr><td>33%</td><td class=num>32%</td><td class=num>13,210</td></tr><tr><td>38%</td><td class=num>38%</td><td class=num>13,210</td></tr><tr><td>44%</td><td class=num>45%</td><td class=num>13,210</td></tr><tr><td>52%</td><td class=num>53%</td><td class=num>13,210</td></tr><tr><td>67%</td><td class=num>70%</td><td class=num>13,211</td></tr></table></div></details><script type="application/json" id="spec-calibration">{"type":"scatter","points":[[11.8,10.4,13211],[19.0,17.8,13210],[23.2,22.3,13210],[25.9,25.0,13210],[27.5,27.8,13210],[28.5,28.5,13210],[29.9,30.0,13211],[33.0,32.1,13210],[38.2,38.4,13210],[44.0,44.8,13210],[51.9,53.3,13210],[67.1,69.7,13211]],"max":70,"xlab":"chance the odds gave it","ylab":"how often it happened","diag":"odds exactly right","tip":"Odds said <b>{x}<\/b><br>Happened <b>{y}<\/b> of the time<br>{n} results","alt":"When the odds say 40%, it happens about 40% of the time"}</script></div><p>I grouped every result by the chance its odds implied, then checked how often it happened. The dots sit almost on the line, so the odds are very good forecasts. They miss slightly in one direction: favourites win a little more often than the odds say, and long shots a little less.</p></div><div class=finding id="longshots"><div class=n>FINDING 2</div><h3>Long shots are the worst bet</h3><p class=take>Betting $100 on every heavy favourite (−200 or shorter) lost $1 on average. Betting $100 on every long shot (+900 or longer) lost $27.</p><div class=chart data-spec="spec-longshot"><h4>The longer the odds, the more you lose</h4><p class=csub>Average result of a $100 bet on every result in each odds range, at a typical bookmaker&#x27;s price</p><div class=plot></div><details><summary>Show the numbers</summary><div class=tw><table><tr><th>Odds</th><th class=num>Won or lost per $100</th></tr><tr><td>−200 or shorter</td><td class=num>−$1</td></tr><tr><td>−200 to +100</td><td class=num>−$4</td></tr><tr><td>+100 to +150</td><td class=num>−$4</td></tr><tr><td>+150 to +200</td><td class=num>−$9</td></tr><tr><td>+200 to +300</td><td class=num>−$7</td></tr><tr><td>+300 to +400</td><td class=num>−$12</td></tr><tr><td>+400 to +600</td><td class=num>−$11</td></tr><tr><td>+600 to +900</td><td class=num>−$20</td></tr><tr><td>+900 or longer</td><td class=num>−$27</td></tr></table></div></details><script type="application/json" id="spec-longshot">{"type":"hbar","labels":["\u2212200 or shorter","\u2212200 to +100","+100 to +150","+150 to +200","+200 to +300","+300 to +400","+400 to +600","+600 to +900","+900 or longer"],"values":[-1.03,-4.01,-4.36,-9.08,-7.09,-11.72,-10.86,-19.59,-27.3],"fmt":"usd","unit":"per $100 bet","notes":["8,311 bets","18,708 bets","20,998 bets","17,224 bets","59,066 bets","15,060 bets","10,835 bets","4,988 bets","3,333 bets"],"alt":"The longer the odds, the more you lose"}</script></div><p>Bookmakers build more of their cut into long shots, because bettors like them and rarely notice. This favourite–long-shot bias also shows up in horse racing and other betting markets. Taking the best price across about ten bookmakers gets favourites close to breaking even, but that means holding an account with every one of them.</p></div><div class=finding id="margins"><div class=n>FINDING 3</div><h3>Bookmakers take a smaller cut than they used to</h3><p class=take>The average bookmaker's margin fell from 13.0% in 2000 to 6.5% this season.</p><div class=chart data-spec="spec-margins"><h4>Bookmakers&#x27; cut has fallen from 13% to 7%</h4><p class=csub>The bookmaker&#x27;s built-in cut on an average match, by season</p><div class=plot></div><details><summary>Show the numbers</summary><div class=tw><table><tr><th>Season</th><th class=num>Cut</th></tr><tr><td>2000/01</td><td class=num>13.0%</td></tr><tr><td>2001/02</td><td class=num>12.1%</td></tr><tr><td>2002/03</td><td class=num>11.5%</td></tr><tr><td>2003/04</td><td class=num>11.7%</td></tr><tr><td>2004/05</td><td class=num>11.2%</td></tr><tr><td>2005/06</td><td class=num>10.4%</td></tr><tr><td>2006/07</td><td class=num>9.9%</td></tr><tr><td>2007/08</td><td class=num>9.1%</td></tr><tr><td>2008/09</td><td class=num>8.2%</td></tr><tr><td>2009/10</td><td class=num>7.6%</td></tr><tr><td>2010/11</td><td class=num>6.9%</td></tr><tr><td>2011/12</td><td class=num>6.8%</td></tr><tr><td>2012/13</td><td class=num>6.3%</td></tr><tr><td>2013/14</td><td class=num>6.1%</td></tr><tr><td>2014/15</td><td class=num>5.6%</td></tr><tr><td>2015/16</td><td class=num>5.6%</td></tr><tr><td>2016/17</td><td class=num>5.1%</td></tr><tr><td>2017/18</td><td class=num>5.2%</td></tr><tr><td>2018/19</td><td class=num>4.8%</td></tr><tr><td>2019/20</td><td class=num>5.0%</td></tr><tr><td>2020/21</td><td class=num>4.9%</td></tr><tr><td>2021/22</td><td class=num>4.5%</td></tr><tr><td>2022/23</td><td class=num>4.5%</td></tr><tr><td>2023/24</td><td class=num>4.5%</td></tr><tr><td>2024/25</td><td class=num>4.9%</td></tr><tr><td>2025/26</td><td class=num>6.4%</td></tr><tr><td>2026/27</td><td class=num>6.5%</td></tr></table></div></details><script type="application/json" id="spec-margins">{"type":"line","x":["2000/01","2001/02","2002/03","2003/04","2004/05","2005/06","2006/07","2007/08","2008/09","2009/10","2010/11","2011/12","2012/13","2013/14","2014/15","2015/16","2016/17","2017/18","2018/19","2019/20","2020/21","2021/22","2022/23","2023/24","2024/25","2025/26","2026/27"],"ticks":["2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026"],"fmt":"pct1","series":[{"values":[13.02,12.05,11.54,11.65,11.23,10.4,9.87,9.11,8.24,7.6,6.89,6.75,6.34,6.13,5.56,5.6,5.07,5.25,4.84,5.0,4.89,4.55,4.52,4.47,4.94,6.44,6.53],"color":"a","mark":[0,26]}],"alt":"Bookmakers' cut has fallen from 13% to 7%"}</script></div><p>The margin is the bookmaker's built-in cut: add up the chances the odds give a home win, a draw and an away win, and the total is a little over 100%. Online competition has pushed it down steadily.</p></div><div class=finding id="still-longshots"><div class=n>FINDING 4</div><h3>Cheaper betting didn't fix the long-shot problem</h3><p class=take>Long shots were the worse bet in 25 of 27 seasons, even as margins fell.</p><div class=chart data-spec="spec-longshot-seasons"><h4>Long shots were the worse bet in 25 of 27 seasons</h4><p class=csub>Result of a $100 bet on every heavy favourite or every long shot (smoothed over 3 seasons)</p><div class=plot></div><details><summary>Show the numbers</summary><div class=tw><table><tr><th>Season</th><th class=num>Favourites</th><th class=num>Long shots</th></tr><tr><td>2000/01</td><td class=num>−$5</td><td class=num>−$2</td></tr><tr><td>2001/02</td><td class=num>−$2</td><td class=num>−$18</td></tr><tr><td>2002/03</td><td class=num>−$1</td><td class=num>−$16</td></tr><tr><td>2003/04</td><td class=num>−$8</td><td class=num>−$11</td></tr><tr><td>2004/05</td><td class=num>−$8</td><td class=num>−$25</td></tr><tr><td>2005/06</td><td class=num>−$4</td><td class=num>−$36</td></tr><tr><td>2006/07</td><td class=num>−$5</td><td class=num>−$22</td></tr><tr><td>2007/08</td><td class=num>−$5</td><td class=num>−$11</td></tr><tr><td>2008/09</td><td class=num>−$1</td><td class=num>−$22</td></tr><tr><td>2009/10</td><td class=num>−$4</td><td class=num>−$24</td></tr><tr><td>2010/11</td><td class=num>−$6</td><td class=num>−$11</td></tr><tr><td>2011/12</td><td class=num>−$4</td><td class=num>−$11</td></tr><tr><td>2012/13</td><td class=num>−$3</td><td class=num>−$16</td></tr><tr><td>2013/14</td><td class=num>$0</td><td class=num>−$16</td></tr><tr><td>2014/15</td><td class=num>−$3</td><td class=num>−$12</td></tr><tr><td>2015/16</td><td class=num>−$4</td><td class=num>−$24</td></tr><tr><td>2016/17</td><td class=num>+$3</td><td class=num>−$23</td></tr><tr><td>2017/18</td><td class=num>−$2</td><td class=num>−$16</td></tr><tr><td>2018/19</td><td class=num>−$2</td><td class=num>−$15</td></tr><tr><td>2019/20</td><td class=num>−$3</td><td class=num>+$1</td></tr><tr><td>2020/21</td><td class=num>−$1</td><td class=num>−$1</td></tr><tr><td>2021/22</td><td class=num>−$2</td><td class=num>−$8</td></tr><tr><td>2022/23</td><td class=num>−$3</td><td class=num>−$3</td></tr><tr><td>2023/24</td><td class=num>$0</td><td class=num>−$26</td></tr><tr><td>2024/25</td><td class=num>−$3</td><td class=num>−$22</td></tr><tr><td>2025/26</td><td class=num>−$7</td><td class=num>−$23</td></tr><tr><td>2026/27</td><td class=num>−$7</td><td class=num>−$26</td></tr></table></div></details><script type="application/json" id="spec-longshot-seasons">{"type":"line","x":["2000/01","2001/02","2002/03","2003/04","2004/05","2005/06","2006/07","2007/08","2008/09","2009/10","2010/11","2011/12","2012/13","2013/14","2014/15","2015/16","2016/17","2017/18","2018/19","2019/20","2020/21","2021/22","2022/23","2023/24","2024/25","2025/26","2026/27"],"ticks":["2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020","2021","2022","2023","2024","2025","2026"],"fmt":"usd","zero":true,"series":[{"name":"favourites","values":[-3.4,-2.5,-3.5,-5.7,-6.9,-6.1,-5.1,-4.1,-3.5,-3.8,-4.7,-4.4,-2.5,-2.2,-2.6,-1.3,-1.0,-0.3,-2.3,-1.9,-2.0,-2.1,-1.8,-2.1,-3.3,-5.6,-6.8],"color":"a"},{"name":"long shots","values":[-10.0,-12.1,-15.4,-17.6,-24.3,-27.7,-22.9,-18.1,-18.6,-18.7,-15.3,-12.7,-14.4,-14.6,-17.3,-19.6,-20.9,-17.9,-10.1,-5.3,-3.0,-4.3,-12.4,-17.0,-23.6,-23.8,-24.6],"color":"b"}],"alt":"Long shots were the worse bet in 25 of 27 seasons"}</script></div><p>If smaller margins meant fairer prices across the board, the two lines would have come together. They didn't: favourites got close to break-even, and long shots kept losing.</p></div><div class=finding id="line-moves"><div class=n>FINDING 5</div><h3>Prices that move before kick-off move the right way</h3><p class=take>When a result's chance rose 3+ points before kick-off, a $100 bet at the opening price made +$11. When it fell, the bet lost $15.</p><div class=chart data-spec="spec-line-moves"><h4>Betting early pays off when the price later moves your way</h4><p class=csub>Result of a $100 bet at the opening price, split by whether the chance moved 3+ points before kick-off</p><div class=plot></div><details><summary>Show the numbers</summary><div class=tw><table><tr><th>Before kick-off</th><th class=num>Won or lost per $100</th></tr><tr><td>Chance rose</td><td class=num>+$11</td></tr><tr><td>Chance fell</td><td class=num>−$15</td></tr></table></div></details><script type="application/json" id="spec-line-moves">{"type":"hbar","labels":["Chance rose","Chance fell"],"values":[11.32,-15.1],"colors":["a","b"],"fmt":"usd","unit":"per $100 bet","notes":["7,482 bets","7,587 bets"],"alt":"Betting early pays off when the price later moves your way"}</script></div><p>The data has an opening price and a closing price (just before kick-off) for 31,790 matches from 2012 to 2026, and the closing price was the better forecast. This isn't a strategy, because you can't know the move in advance. It shows that team news and injuries arrive before kick-off and the opening price hasn't caught up yet. Other cut-offs, not just 3 points, point the same way.</p></div><div class=finding id="model"><div class=n>FINDING 6</div><h3>A model built from past results can't beat the odds</h3><p class=take>My model was much better than guessing, but clearly worse than the odds, and adding it to the odds didn't help.</p><div class=chart data-spec="spec-value-bets"><h4>My model&#x27;s picks lost money over time</h4><p class=csub>Running total from a $100 bet on every result my model rated 5%+ more likely than the odds</p><div class=plot></div><details><summary>Show the numbers</summary><div class=tw><table><tr><th>Price</th><th class=num>Running total at the end</th></tr><tr><td>best price</td><td class=num>−$112k</td></tr><tr><td>typical price</td><td class=num>−$300k</td></tr></table></div></details><script type="application/json" id="spec-value-bets">{"type":"line","x":["Aug 2010","Sep 2010","Oct 2010","Nov 2010","Dec 2010","Jan 2011","Feb 2011","Mar 2011","Apr 2011","May 2011","Aug 2011","Sep 2011","Oct 2011","Nov 2011","Dec 2011","Jan 2012","Feb 2012","Mar 2012","Apr 2012","May 2012","Aug 2012","Sep 2012","Oct 2012","Nov 2012","Dec 2012","Jan 2013","Feb 2013","Mar 2013","Apr 2013","May 2013","Jun 2013","Aug 2013","Sep 2013","Oct 2013","Nov 2013","Dec 2013","Jan 2014","Feb 2014","Mar 2014","Apr 2014","May 2014","Aug 2014","Sep 2014","Oct 2014","Nov 2014","Dec 2014","Jan 2015","Feb 2015","Mar 2015","Apr 2015","May 2015","Aug 2015","Sep 2015","Oct 2015","Nov 2015","Dec 2015","Jan 2016","Feb 2016","Mar 2016","Apr 2016","May 2016","Aug 2016","Sep 2016","Oct 2016","Nov 2016","Dec 2016","Jan 2017","Feb 2017","Mar 2017","Apr 2017","May 2017","Aug 2017","Sep 2017","Oct 2017","Nov 2017","Dec 2017","Jan 2018","Feb 2018","Mar 2018","Apr 2018","May 2018","Aug 2018","Sep 2018","Oct 2018","Nov 2018","Dec 2018","Jan 2019","Feb 2019","Mar 2019","Apr 2019","May 2019","Aug 2019","Sep 2019","Oct 2019","Nov 2019","Dec 2019","Jan 2020","Feb 2020","Mar 2020","May 2020","Jun 2020","Jul 2020","Aug 2020","Sep 2020","Oct 2020","Nov 2020","Dec 2020","Jan 2021","Feb 2021","Mar 2021","Apr 2021","May 2021","Aug 2021","Sep 2021","Oct 2021","Nov 2021","Dec 2021","Jan 2022","Feb 2022","Mar 2022","Apr 2022","May 2022","Jul 2022","Aug 2022","Sep 2022","Oct 2022","Nov 2022","Dec 2022","Jan 2023","Feb 2023","Mar 2023","Apr 2023","May 2023","Jun 2023","Aug 2023","Sep 2023","Oct 2023","Nov 2023","Dec 2023","Jan 2024","Feb 2024","Mar 2024","Apr 2024","May 2024","Jun 2024","Aug 2024","Sep 2024","Oct 2024","Nov 2024","Dec 2024","Jan 2025","Feb 2025","Mar 2025","Apr 2025","May 2025","Aug 2025","Sep 2025","Oct 2025","Nov 2025","Dec 2025","Jan 2026","Feb 2026","Mar 2026","Apr 2026","May 2026","Aug 2026","Sep 2026","Oct 2026"],"ticks":["","","","","","2011","","","","","","","","","","2012","","","","","","","","","","2013","","","","","","","","","","","2014","","","","","","","","","","2015","","","","","","","","","","2016","","","","","","","","","","2017","","","","","","","","","","2018","","","","","","","","","","2019","","","","","","","","","","2020","","","","","","","","","","","2021","","","","","","","","","","2022","","","","","","","","","","","2023","","","","","","","","","","","2024","","","","","","","","","","","2025","","","","","","","","","","2026","","","","","","",""],"fmt":"usdk","zero":true,"series":[{"name":"best price","values":[5.9,5.0,2.0,-1.3,-4.8,-10.4,-11.8,-9.6,-11.4,-11.6,-11.9,-13.8,-19.4,-17.3,-15.0,-8.1,-9.4,-4.8,-6.9,-9.4,-9.2,-9.3,-12.0,-6.2,-3.9,0.7,0.9,0.6,-5.3,-6.3,-6.5,-12.2,-18.0,-19.3,-21.4,-24.5,-28.4,-27.4,-24.3,-27.8,-19.8,-18.9,-13.9,-20.3,-17.1,-16.8,-15.5,-10.7,-8.0,-12.6,-13.1,-9.9,-9.7,-11.2,-11.0,-7.3,-9.0,-10.3,-8.0,-6.2,-4.5,-4.1,-0.5,-2.2,-4.4,-9.6,-5.0,-6.0,-11.6,-9.6,-14.8,-13.4,-22.4,-20.3,-22.7,-21.8,-20.2,-24.6,-30.7,-28.6,-27.2,-27.1,-27.6,-31.3,-32.0,-33.4,-29.6,-32.4,-34.3,-31.7,-34.4,-33.6,-30.0,-25.3,-19.5,-21.3,-15.9,-19.2,-19.7,-21.0,-25.2,-27.6,-27.5,-26.5,-28.5,-30.9,-30.7,-33.7,-38.8,-37.5,-41.4,-43.1,-47.0,-49.5,-50.2,-48.1,-43.7,-45.8,-43.5,-41.4,-45.8,-44.4,-45.2,-47.9,-44.8,-47.7,-48.8,-49.1,-49.3,-48.3,-52.4,-51.4,-50.7,-50.4,-50.7,-51.4,-57.2,-61.0,-65.3,-65.4,-65.0,-69.4,-70.4,-74.0,-73.5,-73.1,-75.7,-79.7,-79.5,-79.4,-82.0,-81.0,-79.7,-80.7,-81.3,-85.8,-89.0,-90.6,-94.6,-94.5,-97.6,-100.2,-100.8,-103.0,-102.4,-106.7,-109.7,-112.3],"color":"b"},{"name":"typical price","values":[4.4,3.0,0.2,-5.5,-6.6,-10.8,-13.2,-13.3,-16.4,-17.9,-18.9,-20.9,-25.5,-25.8,-27.6,-25.2,-26.9,-29.3,-30.9,-33.3,-34.7,-32.6,-34.2,-31.5,-31.2,-30.8,-31.8,-33.4,-39.3,-40.7,-40.8,-46.0,-52.4,-54.8,-58.3,-62.6,-65.8,-65.4,-65.0,-67.9,-67.1,-66.9,-64.8,-69.1,-70.4,-71.3,-71.0,-68.2,-67.6,-70.0,-72.8,-72.8,-75.7,-77.6,-79.8,-79.2,-80.7,-84.9,-86.1,-86.3,-87.2,-88.1,-87.0,-89.2,-90.8,-97.7,-94.5,-95.8,-101.4,-100.8,-106.7,-108.4,-117.9,-117.4,-121.1,-121.7,-120.7,-124.5,-130.8,-131.5,-131.2,-131.7,-134.6,-138.7,-140.4,-142.5,-141.1,-141.9,-144.2,-146.6,-149.7,-149.9,-148.4,-144.1,-140.5,-143.3,-140.4,-142.5,-143.3,-145.2,-149.0,-152.8,-153.5,-154.0,-156.0,-159.6,-161.2,-163.5,-167.6,-168.6,-175.4,-177.0,-182.6,-185.8,-187.5,-186.8,-188.6,-192.0,-190.9,-191.0,-197.0,-196.2,-196.7,-201.6,-198.9,-203.2,-205.1,-206.5,-207.7,-208.1,-211.0,-211.4,-213.5,-212.8,-212.5,-216.1,-219.3,-222.5,-226.4,-229.7,-231.4,-235.6,-238.0,-241.5,-241.1,-243.1,-246.4,-250.3,-253.0,-257.1,-260.6,-260.2,-262.1,-263.8,-264.8,-268.5,-272.0,-273.8,-278.6,-278.8,-282.4,-285.6,-287.8,-291.1,-290.9,-294.0,-297.4,-300.3],"color":"a"}],"alt":"My model's picks lost money over time"}</script></div><p>The model rates each team's attack and defence from its recent goals (Dixon and Coles, 1997). Every week it is refitted on matches already played, so it never sees the future. Its one setting was chosen on seasons before 2008 and then left alone.</p><div class=tw><table><tr><th>Forecast (38,261 matches from 2010)</th><th class=num>Error score (lower is better)</th></tr><tr><td>Equal chances (⅓ each)</td><td class=num>1.099</td></tr><tr><td>My model</td><td class=num>1.016</td></tr><tr><td>The odds</td><td class=num>0.986</td></tr><tr><td>The odds, slightly adjusted</td><td class=num>0.986</td></tr><tr><td>The odds and my model combined</td><td class=num>0.986</td></tr></table></div><p>Betting $100 on every result the model rated at least 5% more likely than the odds lost $11 a bet at the average price. Even at the best price available, it only roughly broke even (−$3 a bet).</p></div><div class=finding id="leagues"><div class=n>FINDING 7</div><h3>The second division isn't easier to beat</h3><p class=take>Less money is bet on the Championship than the Premier League, but its odds are just as accurate.</p><div class=tw><table><tr><th>League</th><th class=num>Matches</th><th class=num>Margin</th><th class=num>Betting $100 on everything</th></tr><tr><td>Premier League</td><td class=num>9,806</td><td class=num>5.7%</td><td class=num>−$8</td></tr><tr><td>Championship</td><td class=num>12,680</td><td class=num>6.4%</td><td class=num>−$7</td></tr></table></div><p>My model didn't help in either league.</p></div><div class=finding id="half-time"><div class=n>FINDING 8</div><h3>After half-time, the team that's behind scores more than expected</h3><p class=take>Teams losing by 2+ at half-time scored 15% more in the second half than the odds predicted. Teams winning by 2+ scored 5% fewer.</p><div class=chart data-spec="spec-half-time"><h4>At half-time, teams that are behind score more than expected</h4><p class=csub>Second-half goals compared with what the pre-match odds predicted, by the team&#x27;s score at half-time</p><div class=plot></div><details><summary>Show the numbers</summary><div class=tw><table><tr><th>At half-time</th><th class=num>Goals vs expected</th></tr><tr><td>down 2+</td><td class=num>+15%</td></tr><tr><td>down 1</td><td class=num>+10%</td></tr><tr><td>level</td><td class=num>-2%</td></tr><tr><td>up 1</td><td class=num>-5%</td></tr><tr><td>up 2+</td><td class=num>-5%</td></tr></table></div></details><script type="application/json" id="spec-half-time">{"type":"vbar","labels":["down\n2+","down\n1","level","up\n1","up\n2+"],"values":[14.7,9.9,-2.5,-5.3,-5.2],"colors":["b","b","a","a","a"],"fmt":"pctS","unit":"goals vs expected","alt":"At half-time, teams that are behind score more than expected"}</script></div><p>The simplest way to price a match at half-time is to assume both teams keep scoring at the rate the pre-match odds expected. That's wrong: teams that are behind push forward, and teams that are ahead sit back.</p><p>So that simple price overrates the team in front. A slight favourite leading 1–0 at half-time was given a 76% chance of winning and won 72% of the time. Games level at half-time ended in a draw 40% of the time, not the 38% predicted. The data has no live odds, so this shows where a simple live price goes wrong, not whether bookmakers make the same mistake.</p><p><b>Is it really the scoreline?</b> Maybe games with early goals are just more open. To rule that out, I compared the two teams in the same match, which cancels out anything that affects both sides. The pattern holds in all 12 checks: with or without red cards, in both decades, in both English leagues, and after quiet or busy first halves.</p><div class=chart data-spec="spec-checks"><h4>The pattern holds in every check</h4><p class=csub>How much more of the second-half scoring the trailing team got than the odds expected</p><div class=plot></div><details><summary>Show the numbers</summary><div class=tw><table><tr><th>Check</th><th class=num>Extra share</th></tr><tr><td>All matches with a lead at half-time</td><td class=num>+8%</td></tr><tr><td>Lead of one goal</td><td class=num>+7%</td></tr><tr><td>Lead of two or more</td><td class=num>+10%</td></tr><tr><td>One goal in the first half (1–0)</td><td class=num>+7%</td></tr><tr><td>Three or more first-half goals</td><td class=num>+10%</td></tr><tr><td>No red card in the match</td><td class=num>+8%</td></tr><tr><td>Home team trailing</td><td class=num>+4%</td></tr><tr><td>Away team trailing</td><td class=num>+11%</td></tr><tr><td>2000–2010</td><td class=num>+8%</td></tr><tr><td>2010–2020</td><td class=num>+8%</td></tr><tr><td>Premier League</td><td class=num>+7%</td></tr><tr><td>Championship</td><td class=num>+7%</td></tr></table></div></details><script type="application/json" id="spec-checks">{"type":"hbar","labels":["All matches with a lead at half-time","Lead of one goal","Lead of two or more","One goal in the first half (1\u20130)","Three or more first-half goals","No red card in the match","Home team trailing","Away team trailing","2000\u20132010","2010\u20132020","Premier League","Championship"],"values":[7.6,6.9,9.7,6.8,9.6,7.8,4.3,10.8,8.0,7.5,6.7,6.6],"fmt":"pctS","unit":"more than expected","alt":"The pattern holds in every check"}</script></div></div>
+
+<h2>What I learned</h2>
+<div class=cards>
+<div class=card><h3>Judge the chances, not the picks</h3><p>Counting how often a forecast picks the winner throws away most of the information. An error score rewards a forecast for being confident only when it should be.</p></div>
+<div class=card><h3>Never let the model see the future</h3><p>The model only uses matches already played, and its setting was chosen on separate early seasons. Without that, a backtest can look profitable by accident.</p></div>
+<div class=card><h3>Always show the uncertainty</h3><p>Betting results are noisy. Several strategies that looked promising here turned out to be luck once the uncertainty was measured.</p></div>
+</div>
+
+<h2>How it's built</h2>
+<ul>
+<li><b>Data:</b> results and odds from up to ten bookmakers per match, from <a href="https://www.football-data.co.uk">football-data.co.uk</a>.</li>
+<li><b>Removing the margin:</b> three methods compared (proportional, power and Shin's 1993 model).</li>
+<li><b>Model:</b> team ratings refitted every week on past matches only, in scikit-learn.</li>
+<li><b>Uncertainty:</b> 95% ranges from resampling whole matches (the bootstrap).</li>
+<li><b>Tests:</b> automated checks, including one that the model never sees a match before predicting it.</li>
+</ul>
+<h2>Limits</h2>
+<ul>
+<li>The odds are snapshots collected by football-data.co.uk, not every price on offer.</li>
+<li>The history is European bookmakers; American sites may price differently.</li>
+<li>This is a study of forecasting, not betting advice. Mostly, it shows how hard the market is to beat.</li>
+</ul>
+</main>
+<footer><div class=wrap>Code and data: <a href="https://github.com/HughFOD/soccer-markets">github.com/HughFOD/soccer-markets</a></div></footer>
+<script>
+(function(){
+const NS='http://www.w3.org/2000/svg';
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
+function txt(p,x,y,s,a){const t=el('text',Object.assign({x:x,y:y},a||{}),p);t.textContent=s;return t}
+const ctx=document.createElement('canvas').getContext('2d');
+function tw(s,size,bold){ctx.font=(bold?'700 ':'400 ')+size+'px "Instrument Sans",system-ui,sans-serif';return ctx.measureText(s).width}
+function F(v,f){const r=Math.round(v),a=Math.abs(r);
+  if(f==='usd')return r<0?'−$'+a:r>0?'+$'+a:'$0';
+  if(f==='usdk')return r<0?'−$'+a.toLocaleString()+'k':r>0?'+$'+a.toLocaleString()+'k':'$0';
+  if(f==='pct')return r+'%';
+  if(f==='pctS')return r<0?'−'+a+'%':r>0?'+'+a+'%':'0%';
+  if(f==='pct1')return v.toFixed(1)+'%';
+  return String(v)}
+function tf(f){return f==='pct1'?'pct':f}
+/* nice axis: returns {lo,hi,t:[ticks]} covering [lo,hi], about n ticks, rounded outward */
+function axis(lo,hi,n){if(lo===hi){hi=lo+1}const span=hi-lo;let st=Math.pow(10,Math.floor(Math.log10(span/Math.max(n,1))));
+  const e=span/Math.max(n,1)/st;if(e>=7.5)st*=10;else if(e>=3.5)st*=5;else if(e>=1.5)st*=2;
+  const L=Math.floor(lo/st+1e-9)*st,H=Math.ceil(hi/st-1e-9)*st,t=[];for(let v=L;v<=H+st*1e-6;v+=st)t.push(+v.toFixed(8));return {lo:L,hi:H,t}}
+function col(c){return c==='b'?'var(--c2)':'var(--c1)'}
+const AX=13, VAL=14, PAD=6;
+function tipper(box){const tip=document.createElement('div');tip.className='tip';box.appendChild(tip);
+  return {show(h,x,y){tip.innerHTML=h;tip.style.opacity=1;const W=box.clientWidth,w=tip.offsetWidth,ht=tip.offsetHeight;
+      let L=x+12;if(L+w>W)L=Math.max(0,x-w-12);let T=y-ht-10;if(T<0)T=y+14;tip.style.left=L+'px';tip.style.top=T+'px'},
+    hide(){tip.style.opacity=0}}}
+function hover(g,svg,tp,h){g.addEventListener('pointermove',e=>{const r=svg.getBoundingClientRect();tp.show(h,e.clientX-r.left,e.clientY-r.top)});
+  g.addEventListener('pointerleave',()=>tp.hide());g.addEventListener('pointerdown',e=>{const r=svg.getBoundingClientRect();tp.show(h,e.clientX-r.left,e.clientY-r.top)})}
+function xTicks(svg,ax,sc,y,f,x0,x1){/* draw value ticks along a horizontal axis without overlap or clipping */
+  let last=-1e9;ax.t.forEach(t=>{const s=F(t,f),w=tw(s,AX-1),X=sc(t);if(X-w/2<x0-PAD-20||X+w/2>x1+PAD+20)return;
+    if(X-w/2<last+10)return;last=X+w/2;txt(svg,X,y,s,{'text-anchor':'middle','font-size':AX-1,style:'fill:var(--axis)'})})}
+
+function hbar(svg,s,W,tp){
+  const n=s.values.length,f=s.fmt;
+  const labW=Math.max(...s.labels.map(l=>tw(l,AX)))+12;
+  const stacked=labW>W*0.36;                       /* narrow screens: label above each bar */
+  const rowH=stacked?46:(W<520?30:34),top=4;
+  const lo0=Math.min(0,...s.values),hi0=Math.max(0,...s.values);
+  const vw=Math.max(...s.values.map(v=>tw(F(v,f),VAL,true)))+10;
+  const edge=tw(F(0,f),AX-1)/2+2,x0=Math.max((stacked?0:labW)+(lo0<0?vw:0),edge),x1=W-Math.max(hi0>0?vw+PAD:0,edge,PAD);
+  const ax=axis(lo0,hi0,Math.max(2,Math.floor((x1-x0)/80)));
+  const lo=Math.min(lo0,ax.lo<lo0&&lo0<0?ax.lo:lo0),hi=Math.max(hi0,ax.hi>hi0&&hi0>0?ax.hi:hi0);
+  const sc=v=>x0+(v-lo)/((hi-lo)||1)*(x1-x0);
+  const H=top+n*rowH+26;svg.setAttribute('height',H);
+  ax.t.filter(t=>t>=lo-1e-9&&t<=hi+1e-9).forEach(t=>el('line',{x1:sc(t),x2:sc(t),y1:top,y2:top+n*rowH,style:'stroke:var(--grid)'},svg));
+  xTicks(svg,{t:ax.t.filter(t=>t>=lo-1e-9&&t<=hi+1e-9)},sc,top+n*rowH+18,f,x0,x1);
+  s.values.forEach((v,i)=>{const y=top+i*rowH,bh=stacked?16:rowH*0.62,by=stacked?y+rowH-bh-6:y+(rowH-bh)/2,a=sc(Math.min(v,0)),b=sc(Math.max(v,0));
+    const g=el('g',{},svg);el('rect',{x:0,y:y,width:W,height:rowH,fill:'transparent'},g);
+    el('rect',{x:a,y:by,width:Math.max(b-a,1.5),height:bh,rx:3,style:'fill:'+col((s.colors||[])[i])},g);
+    if(stacked)txt(g,v<0?sc(0):sc(0),by-6,s.labels[i],{'text-anchor':v<0?'end':'start','font-size':AX,style:'fill:var(--ink2)'});
+    else txt(g,labW-10,y+rowH/2+4.5,s.labels[i],{'text-anchor':'end','font-size':AX,style:'fill:var(--ink2)'});
+    txt(g,v<0?a-6:b+6,by+bh/2+5,F(v,f),{'text-anchor':v<0?'end':'start','font-size':VAL,'font-weight':700,style:'fill:var(--ink)'});
+    hover(g,svg,tp,'<b>'+s.labels[i]+'</b><br>'+F(v,f)+(s.unit?' '+s.unit:'')+(s.notes?'<br>'+s.notes[i]:''))});
+  const z=sc(0);el('line',{x1:z,x2:z,y1:top-2,y2:top+n*rowH,style:'stroke:var(--ink)','stroke-width':1.2},svg)}
+
+function vbar(svg,s,W,tp){
+  const n=s.values.length,f=s.fmt,mob=W<520,H=mob?290:330,lines=Math.max(...s.labels.map(l=>l.split('\n').length));
+  const bot=14+lines*16,top=26;
+  const ax=axis(Math.min(0,...s.values),Math.max(0,...s.values),mob?4:5);
+  const yl=Math.max(...ax.t.map(t=>tw(F(t,tf(f)),AX-1)))+10,x0=yl,x1=W-PAD;
+  const sy=v=>top+(ax.hi-v)/((ax.hi-ax.lo)||1)*(H-top-bot);
+  svg.setAttribute('height',H);
+  ax.t.forEach(t=>{const Y=sy(t);el('line',{x1:x0,x2:x1,y1:Y,y2:Y,style:'stroke:var(--grid)'},svg);
+    txt(svg,x0-8,Y+4,F(t,tf(f)),{'text-anchor':'end','font-size':AX-1,style:'fill:var(--axis)'})});
+  const cw=(x1-x0)/n;
+  s.values.forEach((v,i)=>{const cx=x0+cw*(i+.5),bw=Math.min(cw*0.62,72),a=sy(Math.max(v,0)),b=sy(Math.min(v,0));
+    const g=el('g',{},svg);el('rect',{x:cx-cw/2,y:0,width:cw,height:H,fill:'transparent'},g);
+    el('rect',{x:cx-bw/2,y:a,width:bw,height:Math.max(b-a,1.5),rx:3,style:'fill:'+col((s.colors||[])[i])},g);
+    txt(g,cx,v<0?b+18:a-7,F(v,f),{'text-anchor':'middle','font-size':VAL,'font-weight':700,style:'fill:var(--ink)'});
+    s.labels[i].split('\n').forEach((ln,k)=>txt(g,cx,H-bot+22+k*16,ln,{'text-anchor':'middle','font-size':AX,style:'fill:var(--ink2)'}));
+    hover(g,svg,tp,'<b>'+s.labels[i].replace('\n',' ')+'</b><br>'+F(v,f)+(s.unit?' '+s.unit:'')+(s.notes?'<br>'+s.notes[i]:''))});
+  const Z=sy(0);el('line',{x1:x0,x2:x1,y1:Z,y2:Z,style:'stroke:var(--ink)','stroke-width':1.2},svg)}
+
+function line(svg,s,W,tp){
+  const mob=W<520,H=mob?270:320,top=24,bot=30,n=s.x.length,f=s.fmt;
+  const all=[].concat(...s.series.map(q=>q.values)).filter(v=>v!=null);
+  let lo=Math.min(...all),hi=Math.max(...all);if(s.zero){lo=Math.min(lo,0);hi=Math.max(hi,0)}
+  if(s.from0)lo=0;
+  if(s.zero&&hi>0&&hi<(hi-lo)*0.04)hi=0;
+  const ax=axis(lo,hi,mob?4:5);
+  const yl=Math.max(...ax.t.map(t=>tw(F(t,tf(f)),AX-1)))+10;
+  const endW=Math.max(0,...s.series.map(q=>q.name?tw(q.name,AX,true)+12:0));
+  const lastTick=s.ticks.filter(t=>t).slice(-1)[0]||'';
+  const markW=Math.max(0,...s.series.map(q=>(q.mark||[]).includes(n-1)?tw(F(q.values[n-1],f),VAL,true)+14:0));
+  const x0=yl,x1=W-Math.max(endW,markW,tw(lastTick,AX-1)/2+PAD,PAD+4);
+  const sx=i=>x0+i/(n-1)*(x1-x0),sy=v=>top+(ax.hi-v)/((ax.hi-ax.lo)||1)*(H-top-bot);
+  svg.setAttribute('height',H);
+  ax.t.forEach(t=>{const Y=sy(t);el('line',{x1:x0,x2:x1,y1:Y,y2:Y,style:'stroke:var(--grid)'},svg);
+    txt(svg,x0-8,Y+4,F(t,tf(f)),{'text-anchor':'end','font-size':AX-1,style:'fill:var(--axis)'})});
+  if(s.zero&&ax.lo<0){const Z=sy(0);el('line',{x1:x0,x2:x1,y1:Z,y2:Z,style:'stroke:var(--ink)','stroke-width':1.2},svg)}
+  const cand=s.ticks.map((t,i)=>[i,t]).filter(p=>p[1]);const gap=Math.max(...cand.map(p=>tw(p[1],AX-1)))+22;
+  const every=Math.max(1,Math.ceil(gap/((x1-x0)/Math.max(cand.length,1))));
+  cand.forEach(([i,t],k)=>{if(k%every)return;txt(svg,sx(i),H-bot+20,t,{'text-anchor':'middle','font-size':AX-1,style:'fill:var(--axis)'})});
+  const ends=[];
+  s.series.forEach(q=>{let d='';q.values.forEach((v,i)=>{if(v==null)return;d+=(d?'L':'M')+sx(i).toFixed(1)+','+sy(v).toFixed(1)});
+    el('path',{d:d,fill:'none','stroke-width':2.5,'stroke-linejoin':'round','stroke-linecap':'round',style:'stroke:'+col(q.color)},svg);
+    if(q.name)ends.push({y:sy(q.values[n-1]),q:q});
+    (q.mark||[]).forEach(i=>{const X=sx(i),Y=sy(q.values[i]);el('circle',{cx:X,cy:Y,r:4.5,style:'fill:'+col(q.color)+';stroke:var(--card)','stroke-width':2},svg);
+      txt(svg,i===0?X+8:X+8,i===0?Y-10:Y+5,F(q.values[i],f),{'text-anchor':'start','font-size':VAL,'font-weight':700,style:'fill:var(--ink)'})})});
+  ends.sort((a,b)=>a.y-b.y);for(let i=1;i<ends.length;i++)if(ends[i].y-ends[i-1].y<18)ends[i].y=ends[i-1].y+18;
+  ends.forEach(e=>txt(svg,x1+8,e.y+4.5,e.q.name,{'font-size':AX,'font-weight':700,style:'fill:'+col(e.q.color)}));
+  const cross=el('line',{y1:top,y2:H-bot,style:'stroke:var(--axis);opacity:0','stroke-dasharray':'3 3'},svg);
+  const dots=s.series.map(q=>el('circle',{r:4.5,style:'fill:'+col(q.color)+';stroke:var(--card);opacity:0','stroke-width':2},svg));
+  const hit=el('rect',{x:x0-6,y:0,width:x1-x0+12,height:H,fill:'transparent'},svg);
+  function at(e){const r=svg.getBoundingClientRect(),px=e.clientX-r.left;
+    const i=Math.max(0,Math.min(n-1,Math.round((px-x0)/(x1-x0)*(n-1)))),X=sx(i);
+    cross.setAttribute('x1',X);cross.setAttribute('x2',X);cross.style.opacity=1;
+    let h='<b>'+s.x[i]+'</b>';s.series.forEach((q,k)=>{const v=q.values[i];if(v==null)return;
+      dots[k].setAttribute('cx',X);dots[k].setAttribute('cy',sy(v));dots[k].style.opacity=1;
+      h+='<br>'+(q.name?q.name+': ':'')+F(v,f)});
+    tp.show(h,X,e.clientY-r.top)}
+  hit.addEventListener('pointermove',at);hit.addEventListener('pointerdown',at);
+  hit.addEventListener('pointerleave',()=>{tp.hide();cross.style.opacity=0;dots.forEach(d=>d.style.opacity=0)})}
+
+function scatter(svg,s,W,tp){
+  const mob=W<520,top=10,bot=46;
+  const ax=axis(0,Math.max(...s.points.map(p=>Math.max(p[0],p[1])))+3,mob?4:7),max=ax.hi;
+  const yl=tw(F(max,'pct'),AX-1)+30,x0=yl,x1=W-tw(F(max,'pct'),AX-1)/2-PAD,H=Math.min(x1-x0,mob?330:420)+top+bot;
+  const sx=v=>x0+v/max*(x1-x0),sy=v=>top+(max-v)/max*(H-top-bot);
+  svg.setAttribute('height',H);
+  ax.t.forEach(t=>{el('line',{x1:x0,x2:x1,y1:sy(t),y2:sy(t),style:'stroke:var(--grid)'},svg);
+    el('line',{x1:sx(t),x2:sx(t),y1:top,y2:H-bot,style:'stroke:var(--grid)'},svg);
+    txt(svg,x0-8,sy(t)+4,F(t,'pct'),{'text-anchor':'end','font-size':AX-1,style:'fill:var(--axis)'});
+    txt(svg,sx(t),H-bot+18,F(t,'pct'),{'text-anchor':'middle','font-size':AX-1,style:'fill:var(--axis)'})});
+  txt(svg,(x0+x1)/2,H-6,s.xlab,{'text-anchor':'middle','font-size':AX,style:'fill:var(--ink2)'});
+  const yt=txt(svg,0,0,s.ylab,{'text-anchor':'middle','font-size':AX,style:'fill:var(--ink2)'});
+  yt.setAttribute('transform','translate(12,'+((top+H-bot)/2)+') rotate(-90)');
+  el('line',{x1:sx(0),y1:sy(0),x2:sx(max),y2:sy(max),style:'stroke:var(--axis)','stroke-dasharray':'5 4','stroke-width':1.3},svg);
+  const lt=txt(svg,0,0,s.diag,{'text-anchor':'middle','font-size':AX-1,style:'fill:var(--axis)'});
+  const ang=-Math.atan2(sy(0)-sy(max),sx(max)-sx(0))*180/Math.PI,mx=sx(max*0.78),my=sy(max*0.78)+16;
+  lt.setAttribute('transform','translate('+mx+','+my+') rotate('+ang+')');
+  s.points.forEach(p=>{const g=el('g',{},svg);el('circle',{cx:sx(p[0]),cy:sy(p[1]),r:14,fill:'transparent'},g);
+    el('circle',{cx:sx(p[0]),cy:sy(p[1]),r:5.5,style:'fill:var(--c1);stroke:var(--card)','stroke-width':2},g);
+    hover(g,svg,tp,s.tip.replace('{x}',F(p[0],'pct')).replace('{y}',F(p[1],'pct')).replace('{n}',(p[2]||0).toLocaleString()))})}
+
+const KINDS={hbar,vbar,line,scatter};
+function init(){document.querySelectorAll('.chart[data-spec]').forEach(c=>{
+  const s=JSON.parse(document.getElementById(c.dataset.spec).textContent),box=c.querySelector('.plot'),tp=tipper(box);
+  let w0=0;function draw(){const W=Math.round(box.clientWidth);if(!W||W===w0)return;w0=W;box.querySelectorAll('svg').forEach(x=>x.remove());
+    const svg=el('svg',{width:W,role:'img','aria-label':s.alt||''});box.insertBefore(svg,box.firstChild);KINDS[s.type](svg,s,W,tp)}
+  draw();new ResizeObserver(draw).observe(box);
+  if(document.fonts)document.fonts.ready.then(()=>{w0=0;draw()})})}
+init();
+})();
+</script>
+</body></html>

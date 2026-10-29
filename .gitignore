@@ -6,3 +6,5 @@ output/
 data/fixtures.csv
 odds_api_key.txt
 data/us_odds.json
+_to_delete/
+refresh_odds.command
