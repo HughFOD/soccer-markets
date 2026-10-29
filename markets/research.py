@@ -23,6 +23,7 @@ EXTRA_CSS = """
 .finding{background:var(--bg2);border-radius:28px;padding:40px 40px 30px;margin:0 0 22px}
 .finding .n{font-size:14px;font-weight:600;color:#bf4800;margin-bottom:6px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .finding .n{color:#ff9f0a}}
+:root[data-theme="dark"] .finding .n{color:#ff9f0a}
 .finding h3{font-size:clamp(26px,3.4vw,34px);line-height:1.12;font-weight:700;letter-spacing:-.012em;margin:0 0 12px}
 .finding .take{font-size:19px;line-height:1.42;color:var(--ink2);margin:0 0 22px;max-width:740px}
 .finding p{color:var(--muted);font-size:17px;line-height:1.5;max-width:740px}

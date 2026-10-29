@@ -40,6 +40,7 @@ html:not(.js) .daytabs{display:none}html:not(.js) .daypane{display:block!importa
 .bet-row:first-child .rank{color:var(--blue)}
 .bet-what{font-size:19px;font-weight:600;letter-spacing:-.015em;line-height:1.25}
 .bet-match{font-size:14px;color:var(--muted);margin-top:2px}
+.bet-why{font-size:14px;color:var(--ink2);margin-top:6px}.bet-why b{font-weight:600;color:var(--ink)}
 .bet-where{text-align:right}.bet-odds{font:700 24px/1.1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .bet-site{font-size:14px;color:var(--link);font-weight:500}
 .bet-value{text-align:right;min-width:116px}.bet-value .edge{margin:0}.bet-chance{font-size:13px;color:var(--muted);margin-top:4px}
@@ -71,6 +72,12 @@ def _ko(ts) -> str:
     return t.strftime("%a %b %-d, %-I:%M %p") + " ET"
 
 
+def usd(x: float) -> str:
+    """Expected return per $1 -> per $100 in dollars, e.g. -0.077 -> '−$7.70'."""
+    v = 100 * x
+    return f"−${-v:.2f}" if v < -0.005 else f"+${v:.2f}"
+
+
 def _pct(x, d=1, sign=True):
     return f"{100 * x:+.{d}f}%" if sign else f"{100 * x:.{d}f}%"
 
@@ -80,10 +87,11 @@ MIN_EDGE = 0.001  # a bet is listed only if its best price beats the fair (conse
 
 
 def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None = None) -> list[tuple[str, list[dict]]]:
-    """[(day label, [bet, ...])] for each day from today on, best value first.
+    """[(day label, [bet, ...])] for each day from today on, highest expected return first.
 
-    A bet is one result of one match at its best price across the sites. Value is how much that
-    price pays compared with the consensus fair price. Matches that have already kicked off are left out.
+    A bet is one result of one match at its best price across the sites. Its expected chance is the
+    consensus of all the sites with their cuts removed; its expected return is expected chance x decimal
+    odds - 1. Only bets with a positive expected return are kept. Matches that have kicked off are left out.
     """
     if not len(M) or not len(quotes):
         return []
@@ -103,7 +111,7 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
         if not (MIN_EDGE < edge <= MAX_EDGE):
             continue
         team = r["home"] if res == "h" else r["away"] if res == "a" else None
-        rows.append({"day": r["ko"].date(), "ko": r["ko"], "edge": edge, "odds": american(r["odds"]),
+        rows.append({"day": r["ko"].date(), "ko": r["ko"], "edge": edge, "odds": american(r["odds"]), "paid": 1 / float(r["odds"]),
                      "bet": f"{team} to win" if team else "Draw", "match": f"{r['home']} v {r['away']}",
                      "league": r["league"], "sites": [SITES[x][0] for x in g["site"]],
                      "chance": float(r[f"cons_{res}"])})
@@ -118,11 +126,17 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
     return out
 
 
+def chance_pair(expected: float, paid: float) -> tuple[str, str]:
+    """Both chances as percentages, with one decimal place when whole numbers would look the same."""
+    a, b = f"{100 * expected:.0f}%", f"{100 * paid:.0f}%"
+    return (a, b) if a != b else (f"{100 * expected:.1f}%", f"{100 * paid:.1f}%")
+
+
 def days_html(days: list[tuple[str, list[dict]]]) -> str:
     e = html.escape
     when = lambda lab: lab.lower() if lab in ("Today", "Tomorrow") else "on " + e(lab)
     if not days:
-        return ("<div class=empty>No price beats the fair price on any match coming up. "
+        return ("<div class=empty>No bet beats what's expected on any match coming up. "
                 "That happens on quiet days; check back after the next update.</div>")
     first = next((i for i, (_, b) in enumerate(days) if b), 0)      # open on the first day that has bets
     tabs = "".join(f'<button class=daytab data-day="{i}"{" aria-selected=true" if i == first else ""}>{e(lab)}'
@@ -131,15 +145,16 @@ def days_html(days: list[tuple[str, list[dict]]]) -> str:
     for i, (lab, bets) in enumerate(days):
         items = "".join(f"""<li class=bet-row><span class=rank>{k}</span>
 <div class=bet-main><div class=bet-what>{e(b['bet'])}</div>
-<div class=bet-match>{e(b['match'])} · {e(b['league'])} · {b['ko'].strftime('%-I:%M %p')} ET</div></div>
+<div class=bet-match>{e(b['match'])} · {e(b['league'])} · {b['ko'].strftime('%-I:%M %p')} ET</div>
+<div class=bet-why>Expected to win <b>{chance_pair(b['chance'], b['paid'])[0]}</b> of the time, paid as if <b>{chance_pair(b['chance'], b['paid'])[1]}</b></div></div>
 <div class=bet-where><div class=bet-odds>{b['odds'].replace('-', '−')}</div><div class=bet-site>{e(' or '.join(b['sites']))}</div></div>
-<div class=bet-value><span class=edge>{_pct(b['edge'])}</span><div class=bet-chance>{100 * b['chance']:.0f}% fair chance</div></div></li>"""
+<div class=bet-value><span class=edge>+${100 * b['edge']:.2f}</span><div class=bet-chance>expected per $100</div></div></li>"""
                         for k, b in enumerate(bets, 1))
-        note = (f"<div class=empty>No price beats the fair price {when(lab)}. "
-                "Every site is charging its full cut, so there's nothing worth backing.</div>" if not bets else
+        note = (f"<div class=empty>No bet beats what's expected {when(lab)}. "
+                "Every site is charging its full cut, so every bet is expected to lose money.</div>" if not bets else
                 "" if len(bets) >= 5 else
-                f"<p class=few>Only {len(bets)} price{'s' if len(bets) != 1 else ''} beat{'s' if len(bets) == 1 else ''} "
-                f"the fair price {when(lab)}. The rest pay less than fair, so they're left out.</p>")
+                f"<p class=few>Only {len(bets)} bet{'s' if len(bets) != 1 else ''} beat{'s' if len(bets) == 1 else ''} "
+                f"what's expected {when(lab)}. The rest are expected to lose money, so they're left out.</p>")
         panes.append(f'<div class=daypane data-day="{i}"{" hidden" if i != first else ""}><h3 class=dayhead>{e(lab)}</h3>'
                      + (f'<ol class=bets>{items}</ol>' if bets else '') + f'{note}</div>')
     js = ("<script>document.querySelectorAll('.daytab').forEach(t=>t.addEventListener('click',()=>{"
@@ -166,7 +181,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
             brows += (f"<tr><td><b>{e(b['name'])}</b><br><span class=kind>{e(b['kind'])}</span></td><td class=n>{b['matches']}</td>"
                       f"<td class=n>{_pct(b['margin'], 1, False)}</td>"
                       f"<td class=n><span class=bar style='width:{60 * b['best_share'] / top:.0f}px'></span>{100 * b['best_share']:.0f}%</td>"
-                      f"<td class=n>{_pct(b['avg_edge'])}</td><td class=n>{b['flagged']}</td></tr>")
+                      f"<td class=n>{usd(b['avg_edge'])}</td></tr>")
     # best average price among sites quoting at least a quarter of the matches (so a site with a handful of prices can't win)
     big = board[board["matches"] >= 0.25 * board["matches"].max()] if len(board) else board
     best_site = big.loc[big["avg_edge"].idxmax(), "name"] if len(big) else "–"
@@ -186,13 +201,13 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
                     cls = " class='n best'" if np.isfinite(v) and v >= r[f"best_{o}"] - 1e-9 else " class=n"
                     cells += f"<td{cls}>{american(v)}</td>"
                 body += f"<tr><td>{e(SITES[s][0])}</td>{cells}</tr>"
-            body += ("<tr class=cons><td>Consensus</td>" + "".join(
+            body += ("<tr class=cons><td>Expected</td>" + "".join(
                 f"<td class=n>{r[f'cons_us_{o}']} <small>({100 * r[f'cons_{o}']:.0f}%)</small></td>" for o in "hda") + "</tr>")
             blocks.append(f"""<div class=match><h4>{e(r['home'])} v {e(r['away'])} <small>· {_ko(r['kickoff'])}</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>{e(r['home'])}</th><th class=n>Draw</th><th class=n>{e(r['away'])}</th></tr>{body}</table></div></div>""")
         nflag = int((G["flag"] != "").sum())
         leagues.append(f"<details class=league{' open' if not leagues else ''}><summary>{e(lg)} <span>· {len(G)} matches"
-                       f"{f' · {nflag} flagged' if nflag else ''}</span></summary>{''.join(blocks)}</details>")
+                       f"</span></summary>{''.join(blocks)}</details>")
 
     # ---- does it work (history)
     hist = ""
@@ -200,29 +215,29 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
     if cs:
         rr = {x["threshold"]: x for x in cs["rules"]}
         r2 = rr.get(0.02)
-        hrows = "".join(f"<tr><td>More than {100 * x['threshold']:.0f}% better</td><td class=n>{x['bets']:,}</td>"
+        hrows = "".join(f"<tr><td>Over {100 * x['threshold']:.0f}%</td><td class=n>{x['bets']:,}</td>"
                         f"<td class=n>{_pct(x['expected'])}</td><td class=n>{_pct(x['edge_vs_close'])}</td><td class=n>{100 * x['beat_close']:.0f}%</td></tr>"
                         for x in cs["rules"])
-        hist = f"""<h2>Does beating the consensus mean anything?</h2>
-<p class=sub>A price that beats the consensus could just be noise. The test is whether it still looks good at kick-off,
+        hist = f"""<h2>Does beating what's expected hold up?</h2>
+<p class=sub>A bet that beats what's expected could just be noise. The test is whether it still beats it at kick-off,
 when every site has caught up with the news. Free historical odds from American sportsbooks and prediction markets
 don't exist, so this test uses the same method on {len(cs['books'])} European bookmakers, {cs['seasons'][0][:4]} to {cs['seasons'][-1][-4:]}
-({cs['matches']:,} matches), comparing each flagged price with the consensus closing price.</p>
-<div class=tablewrap><table><tr><th>When a price beat the consensus by</th><th class=n>Prices</th><th class=n>Gap when flagged</th><th class=n>Gap at kick-off</th><th class=n>Still better at kick-off</th></tr>{hrows}</table></div>
-<p class=note>Prices more than 2% better than the consensus were still better at kick-off {100 * r2['beat_close']:.0f}% of the time, by {_pct(r2['edge_vs_close'], 1, False)} on average
+({cs['matches']:,} matches), comparing each bet with the expected chance just before kick-off.</p>
+<div class=tablewrap><table><tr><th>Bets with an expected return of</th><th class=n>Bets</th><th class=n>Expected return when found</th><th class=n>Expected return at kick-off</th><th class=n>Still ahead at kick-off</th></tr>{hrows}</table></div>
+<p class=note>Bets with an expected return over 2% were still ahead at kick-off {100 * r2['beat_close']:.0f}% of the time, by {_pct(r2['edge_vs_close'], 1, False)} on average
 (95% range {_pct(r2['lo'], 1, False)} to {_pct(r2['hi'], 1, False)}). Small gaps (under 1%) are mostly noise. Profit over a few hundred bets
 is too noisy to judge either way, which is why the kick-off price is the better test. This is a study of pricing, not betting advice.</p>"""
 
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 <title>Soccer Odds Compared</title>
-<meta name=description content="This week's soccer odds at FanDuel, DraftKings, Fanatics, BetMGM, Caesars, Kalshi and Polymarket, compared with the consensus of all of them.">
+<meta name=description content="Every day's soccer bets that pay more than their chance of winning deserves, across FanDuel, DraftKings, Fanatics, BetMGM, Caesars, Kalshi and Polymarket.">
 <style>{CSS}</style></head><body>
 {theme.nav("week")}
 <section class=hero><div class=wrap>
 <p class=eyebrow>Updated every morning</p>
-<h1>The best bets, every day.</h1>
-<p class=lede>The best-value soccer bets for every day, from the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and the Championship.</p>
-<div class=ctas><a class=btn href="#best">See today's best bets</a><a class="btn ghost" href="research.html">How accurate are odds</a></div>
+<h1>Bets that beat what's expected.</h1>
+<p class=lede>Every day's soccer bets that pay more than their chance of winning deserves, from the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and the Championship.</p>
+<div class=ctas><a class=btn href="#best">See today's bets</a><a class="btn ghost" href="research.html">How accurate are odds</a></div>
 <p class=updated>Last updated {stamp}</p>
 </div></section>
 
@@ -230,25 +245,25 @@ is too noisy to judge either way, which is why the kick-off price is the better 
 <div class=stats>
 <div class=stat><div class=v>{len(M)}</div><div class=l>matches this week</div></div>
 <div class=stat><div class=v>{len(present)}</div><div class=l>sportsbooks and prediction markets</div></div>
-<div class=stat><div class=v>{n_flags}</div><div class=l>prices {THRESHOLD:.0%}+ better than consensus</div></div>
-<div class=stat><div class=v>{e(best_site)}</div><div class=l>best prices on average</div></div>
+<div class=stat><div class=v>{sum(len(b) for _, b in days)}</div><div class=l>bets that beat what's expected</div></div>
+<div class=stat><div class=v>{e(best_site)}</div><div class=l>pays closest to expected</div></div>
 </div></div></section>
 
 <section class=section id=best><div class=wrap>
-<h2>Ranked, day by day.</h2>
-<p class=sub>Each day's bets where one site pays more than the fair price, ranked by value. Back the result shown, at the site shown, at those odds or better. The green figure is how much more it pays than fair.</p>
+<h2>Ranked by expected return.</h2>
+<p class=sub>Each bet's expected chance comes from all five sites combined, with their cuts removed. A bet beats what's expected when its odds pay as if it were less likely than that. The green figure is the average profit per $100 if you made that bet many times. Back the result shown, at the site shown, at those odds or better.</p>
 {picks_html}
 </div></section>
 
 <section class=band><div class=wrap>
-<h2>Which site pays the most.</h2>
-<p class=sub>Listed by US market share. The margin is each site's built-in cut (lower is better). "Best price" is how often it has the top odds. "Vs consensus" is how much it pays compared with the fair price.</p>
-<div class=tablewrap><table><tr><th>Site</th><th class=n>Matches</th><th class=n>Margin</th><th class=n>Best price</th><th class=n>Vs consensus</th><th class=n>Flags</th></tr>{brows}</table></div>
+<h2>Which site comes closest.</h2>
+<p class=sub>Listed by US market share. The cut is each site's built-in margin (lower is better). "Best price" is how often it has the top odds. "Expected return" is the average result of betting $100 on every result it prices.</p>
+<div class=tablewrap><table><tr><th>Site</th><th class=n>Matches</th><th class=n>Cut</th><th class=n>Best price</th><th class=n>Expected return per $100</th></tr>{brows}</table></div>
 </div></section>
 
 <section class=section><div class=wrap>
 <h2>Every match.</h2>
-<p class=sub>+150 means a $100 bet wins $150; −200 means you bet $200 to win $100. The best price for each result is in green, and the consensus row shows the fair odds and chance.</p>
+<p class=sub>+150 means a $100 bet wins $150; −200 means you bet $200 to win $100. The best price for each result is in green. The "Expected" row shows each result's expected chance and the odds that would exactly match it.</p>
 {''.join(leagues)}
 </div></section>
 
@@ -259,8 +274,8 @@ is too noisy to judge either way, which is why the kick-off price is the better 
 <p class=sub>Three steps, rerun every week.</p>
 <div class=cards>
 <div class=card><h3>Collect the odds.</h3><p>From FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus Kalshi and Polymarket, through The Odds API. Caesars and Fanatics appear only on a paid data plan.</p></div>
-<div class=card><h3>Build the consensus.</h3><p>Each site's odds become chances with its cut removed, then are averaged with equal weight. No site counts more than another.</p></div>
-<div class=card><h3>Flag the gaps.</h3><p>A price more than {THRESHOLD:.0%} better than the consensus is flagged. Gaps over 25% are ignored as stale or mistyped prices.</p></div>
+<div class=card><h3>Work out what's expected.</h3><p>Each site's odds become chances with its cut removed, then are averaged with equal weight. That gives every result's expected chance.</p></div>
+<div class=card><h3>Find the bets that beat it.</h3><p>A bet beats what's expected when its odds pay as if it were less likely than its expected chance. Gaps over 25% are ignored as stale or mistyped prices.</p></div>
 </div>
 </div></section>
 {theme.footer()}
