@@ -1,13 +1,12 @@
 """This week's soccer odds at American sportsbooks and prediction markets, from The Odds API.
 
-Needs a free API key saved in odds_api_key.txt in the project folder (or the
-ODDS_API_KEY environment variable). One refresh of six leagues uses 12 of the
-free plan's 500 monthly credits for match results (two regions per league), plus
-2 credits for goals over/under in each of the (at most) 2 leagues with the most
-matches today: at most 16 a day, under 500 a month.
+Needs an API key saved in odds_api_key.txt in the project folder (or the
+ODDS_API_KEY environment variable). One refresh of six leagues uses 12 credits
+for match results and 12 for goals over/under (two regions per league): about
+720 a month of the 20K plan's 20,000.
 
-- Sites: FanDuel, DraftKings and BetMGM, plus the prediction markets Kalshi and
-  Polymarket (largest first). Every other site is ignored.
+- Sites: FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus the prediction
+  markets Kalshi and Polymarket (largest first). Every other site is ignored.
 - Consensus: every site's odds turned into chances with its margin removed,
   then averaged with equal weight. No site counts more than another.
 - Flags: a site whose odds are more than 2% better than the consensus
@@ -35,12 +34,14 @@ REGIONS = ("us", "us_ex")
 SITES = {  # key -> (display name, kind). Only these sites are used, listed by US market share
     # (sportsbooks: Q3 2026 revenue share; prediction markets: trading volume).
     "fanduel": ("FanDuel", "Sportsbook"), "draftkings": ("DraftKings", "Sportsbook"),
-    "betmgm": ("BetMGM", "Sportsbook"),
+    "fanatics": ("Fanatics", "Sportsbook"), "betmgm": ("BetMGM", "Sportsbook"),
+    "williamhill_us": ("Caesars", "Sportsbook"),
     "kalshi": ("Kalshi", "Prediction market"), "polymarket": ("Polymarket", "Prediction market"),
 }
 THRESHOLD = 0.02
-TOTALS_REGION = "us,us_ex"   # goals over/under: sportsbooks and prediction markets (on the free plan only BetMGM sends goals odds among the sportsbooks)
-TOTALS_MAX_LEAGUES = 2  # goals odds cost 2 credits per league (two regions): 12 + 4 a day stays under 500 a month
+TOTALS_REGION = "us,us_ex"   # goals over/under: sportsbooks and prediction markets
+TOTALS_MAX_LEAGUES = 2  # used only when limiting goals odds to the busiest leagues
+TOTALS_ALL = True       # paid plan: goals odds for every league, every upcoming match
 TOTALS_DAYS = 1        # fetch goals over/under for leagues with a match today (New York time); keeps the free plan under 500 a month
 ET = "America/New_York"
 
@@ -69,7 +70,7 @@ def download(key: str, dest: Path) -> dict:
             except Exception as e:  # league out of season, or a temporary error
                 print(f"  skipped {sport} {region}: {e}")
                 out[f"{sport}|{region}"] = []
-    for sport in soon_sports(out):
+    for sport in (SPORTS if TOTALS_ALL else soon_sports(out)):
         try:
             out[f"{sport}|{TOTALS_REGION}|totals"], remaining = fetch(key, sport, TOTALS_REGION, "totals")
         except Exception as e:

@@ -291,7 +291,7 @@ swing too much to prove anything, so the kick-off odds are the fairer test. This
 <h2>How it works.</h2>
 <p class=sub>Three steps, rerun every morning.</p>
 <div class=cards>
-<div class=card><h3>Collect the odds.</h3><p>From FanDuel, DraftKings and BetMGM, plus Kalshi and Polymarket, through The Odds API.</p></div>
+<div class=card><h3>Collect the odds.</h3><p>From FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus Kalshi and Polymarket, through The Odds API.</p></div>
 <div class=card><h3>Work out what's expected.</h3><p>Each site's odds become chances with its cut removed, then are averaged with equal weight. That gives every result's expected chance.</p></div>
 <div class=card><h3>Find the bets that beat it.</h3><p>A bet makes the list when a site's odds pay more than its chance deserves. Gaps over 25% are left out as likely stale or mistyped prices.</p></div>
 </div>
