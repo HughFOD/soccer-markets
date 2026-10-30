@@ -106,8 +106,8 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None, st
 {theme.nav("prices")}
 <section class=hero><div class=wrap>
 <p class=eyebrow>Best prices</p>
-<h1>Where to place each bet.</h1>
-<p class=lede>For every upcoming match: the best odds for each bet, the site offering them, and the expected result per $100 at that price.</p>
+<h1>The best odds for every match.</h1>
+<p class=lede>Which site pays the most for each bet, and what you can expect to win or lose per $100.</p>
 <p class=updated>Last updated {stamp}</p>
 </div></section>
 <section class=section style="padding-top:0"><div class=wrap>
