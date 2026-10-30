@@ -2,8 +2,7 @@
 
 Every match this week in six top leagues (Premier League, Championship, La
 Liga, Bundesliga, Serie A, Ligue 1), priced by the major US sites only:
-DraftKings, FanDuel, BetMGM, Polymarket and Kalshi. (Caesars and Fanatics
-need a paid Odds API plan, and The Odds API doesn't offer bet365.) Each site's odds are compared with the
+FanDuel, DraftKings, BetMGM, Kalshi and Polymarket. Each site's odds are compared with the
 consensus of all of them, and any price clearly better than the consensus is
 flagged.
 
