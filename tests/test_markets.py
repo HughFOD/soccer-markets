@@ -250,3 +250,42 @@ def test_goals_are_fetched_only_for_leagues_playing_today():
     now = pd.Timestamp("2026-10-31T06:00", tz="America/New_York")
     assert usbooks.soon_sports(raw, now) == ["soccer_epl"]                 # today only by default
     assert usbooks.soon_sports(raw, now - pd.Timedelta(days=1)) == []       # the day before: nothing today
+
+
+def _extras_event():
+    def bk(key, markets):
+        return {"key": key, "markets": [{"key": k, "outcomes": o} for k, o in markets.items()]}
+    corners = lambda o, u: [{"name": "Over", "point": 9.5, "price": o}, {"name": "Under", "point": 9.5, "price": u}]
+    btts = lambda y, n: [{"name": "Yes", "price": y}, {"name": "No", "price": n}]
+    scorer = lambda p: [{"name": "Yes", "description": "Bukayo Saka", "price": p}]
+    return {"e1": {"id": "e1", "home_team": "Arsenal", "away_team": "Chelsea", "bookmakers": [
+        bk("fanduel", {"alternate_totals_corners": corners(1.90, 1.90), "btts": btts(1.80, 2.00),
+                       "player_goal_scorer_anytime": scorer(3.0)}),
+        bk("draftkings", {"alternate_totals_corners": corners(1.95, 1.85), "btts": btts(1.85, 1.95),
+                          "player_goal_scorer_anytime": scorer(3.4)}),
+        bk("bovada", {"alternate_totals_corners": corners(5.0, 5.0)}),        # not a listed site
+    ]}}
+
+
+def test_extra_markets_are_priced_where_both_sides_are_quoted():
+    from markets import extras
+    from markets import usbooks
+    t = extras.table(_extras_event(), usbooks.SITES)
+    assert set(t["site"]) == {"fanduel", "draftkings"}
+    X = extras.price(t)
+    over = X[(X["market"] == "alternate_totals_corners") & (X["outcome"] == "Over")]
+    assert over["label"].iloc[0] == "Over 9.5 corners"
+    assert over["chance"].notna().all() and np.isclose(over["chance"].iloc[0] + X[(X["market"] == "alternate_totals_corners") & (X["outcome"] == "Under")]["chance"].iloc[0], 1)
+    assert over[over["site"] == "draftkings"]["edge"].iloc[0] > over[over["site"] == "fanduel"]["edge"].iloc[0]   # better price, better return
+    s = X[X["market"] == "player_goal_scorer_anytime"]
+    assert s["chance"].isna().all() and s["label"].iloc[0] == "Bukayo Saka to score"                   # one-sided: odds only
+    assert s[s["best"]]["site"].tolist() == ["draftkings"]
+
+
+def test_extras_only_fetched_for_matches_today():
+    from markets import extras
+    now = pd.Timestamp("2026-10-31T12:00Z")
+    raw = {"soccer_epl|us": [{"id": "a", "commence_time": "2026-10-31T15:00:00Z"}, {"id": "b", "commence_time": "2026-11-02T15:00:00Z"}],
+           "soccer_epl|us_ex": [{"id": "a", "commence_time": "2026-10-31T15:00:00Z"}],
+           "soccer_epl|us,us_ex|totals": [{"id": "c", "commence_time": "2026-10-31T13:00:00Z"}]}
+    assert extras.due(raw, now) == [("soccer_epl", "a")]
