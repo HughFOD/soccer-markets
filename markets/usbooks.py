@@ -6,9 +6,8 @@ free plan's 500 monthly credits for match results (two regions per league), plus
 1 credit for goals over/under per league with a match today
 (US sportsbooks only), usually 1 to 6 more: about 460 a month in all.
 
-- Sites: FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus the prediction
-  markets Kalshi and Polymarket (largest first). Every other site is ignored.
-  On the free plan only FanDuel, DraftKings, BetMGM, Kalshi and Polymarket come through.
+- Sites: FanDuel, DraftKings and BetMGM, plus the prediction markets Kalshi and
+  Polymarket (largest first). Every other site is ignored.
 - Consensus: every site's odds turned into chances with its margin removed,
   then averaged with equal weight. No site counts more than another.
 - Flags: a site whose odds are more than 2% better than the consensus
@@ -36,13 +35,11 @@ REGIONS = ("us", "us_ex")
 SITES = {  # key -> (display name, kind). Only these sites are used, listed by US market share
     # (sportsbooks: Q3 2026 revenue share; prediction markets: trading volume).
     "fanduel": ("FanDuel", "Sportsbook"), "draftkings": ("DraftKings", "Sportsbook"),
-    "fanatics": ("Fanatics", "Sportsbook"),  # paid Odds API plans only
     "betmgm": ("BetMGM", "Sportsbook"),
-    "williamhill_us": ("Caesars", "Sportsbook"),  # paid Odds API plans only
     "kalshi": ("Kalshi", "Prediction market"), "polymarket": ("Polymarket", "Prediction market"),
 }
 THRESHOLD = 0.02
-TOTALS_REGION = "us"   # goals over/under: US sportsbooks only, to stay inside the free plan
+TOTALS_REGION = "us,us_ex"   # goals over/under: sportsbooks and prediction markets (on the free plan only BetMGM sends goals odds among the sportsbooks)
 TOTALS_DAYS = 1        # fetch goals over/under for leagues with a match today (New York time); keeps the free plan under 500 a month
 ET = "America/New_York"
 
