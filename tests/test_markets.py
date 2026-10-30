@@ -205,3 +205,48 @@ def test_daily_picks_rank_only_bets_that_beat_the_fair_price():
     assert [b["bet"] for b in bets[:2]] == ["A1 to win", "A2 to win"]           # ranked by value
     assert all(b["edge"] > site.MIN_EDGE for b in bets) and bets[0]["sites"] == ["Kalshi"]
     assert site.daily_picks(M, q, now=pd.Timestamp("2026-10-31T12:00", tz=site.ET)) == [("Today", [])]  # kicked off
+
+
+def _totals_raw(lines, mid="t1", ko="2026-10-31T15:00:00Z"):
+    """lines: {site: (point, over, under)}"""
+    return {"soccer_epl|us|totals": [{"id": mid, "commence_time": ko, "home_team": "A", "away_team": "B",
+             "bookmakers": [{"key": k, "title": k, "markets": [{"key": "totals", "outcomes": [
+                 {"name": "Over", "price": o, "point": p}, {"name": "Under", "price": u, "point": p}]}]}
+                 for k, (p, o, u) in lines.items()]}]}
+
+
+def test_goals_totals_are_priced_like_match_results():
+    from markets import usbooks
+    raw = _totals_raw({"fanduel": (2.5, 1.90, 1.90), "draftkings": (2.5, 1.90, 1.90),
+                       "betmgm": (2.5, 2.10, 1.75), "kalshi": (3.5, 3.0, 1.35)})   # kalshi on another line: ignored
+    t = usbooks.totals_table(raw)
+    assert set(t["point"]) == {2.5, 3.5} and len(t) == 4
+    G = usbooks.price_totals(t)
+    assert set(G["point"]) == {2.5}                                  # 3.5 has one site, below min_sites
+    over = G[(G["side"] == "Over") & G["best"]].iloc[0]
+    assert over["site"] == "betmgm" and over["edge"] > 0               # 2.10 beats the pooled chance
+    assert abs(G.groupby("site")["chance"].first().sum() / 3 - G[G["side"] == "Over"]["chance"].iloc[0]) < 1
+    assert usbooks.to_table(raw).empty                                 # totals never leak into match results
+
+
+def test_daily_picks_include_goals_bets():
+    import pandas as pd
+    from markets import site, usbooks
+    G = usbooks.price_totals(usbooks.totals_table(_totals_raw(
+        {"fanduel": (2.5, 1.90, 1.90), "draftkings": (2.5, 1.90, 1.90), "betmgm": (2.5, 2.10, 1.75)})))
+    M = pd.DataFrame([{"id": "t1"}])
+    q = pd.DataFrame(columns=["id", "site", "result", "odds", "edge", "best"])
+    days = site.daily_picks(M, q, now=pd.Timestamp("2026-10-31T08:00", tz=site.ET), totals=G)
+    bets = days[0][1]
+    assert bets[0]["bet"] == "Over 2.5 goals" and bets[0]["sites"] == ["BetMGM"]
+
+
+def test_goals_are_fetched_only_for_leagues_playing_today():
+    import pandas as pd
+    from markets import usbooks
+    ev = lambda ko: [{"id": ko, "commence_time": ko, "home_team": "A", "away_team": "B", "bookmakers": []}]
+    raw = {"soccer_epl|us": ev("2026-10-31T15:00:00Z"), "soccer_epl|us_ex": ev("2026-10-31T15:00:00Z"),
+           "soccer_spain_la_liga|us": ev("2026-11-03T20:00:00Z"), "soccer_italy_serie_a|us": []}
+    now = pd.Timestamp("2026-10-31T06:00", tz="America/New_York")
+    assert usbooks.soon_sports(raw, now) == ["soccer_epl"]                 # today only by default
+    assert usbooks.soon_sports(raw, now - pd.Timedelta(days=1)) == []       # the day before: nothing today
