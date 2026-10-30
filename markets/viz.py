@@ -259,11 +259,11 @@ def longshot_by_season(table: list) -> str:
     sm = lambda c: [round(v, 1) for v in (100 * t[c]).rolling(3, center=True, min_periods=2).mean()]
     seasons = [f"{s[:4]}/{s[-2:]}" for s in t["season"]]
     return chart("longshot-seasons", f"Long shots were the worse bet in {worse} of {len(t)} seasons",
-                 "Result of a $100 bet on every heavy favourite or every long shot (smoothed over 3 seasons)",
+                 "Result of a $100 bet on every heavy favorite or every long shot (smoothed over 3 seasons)",
                  {"type": "line", "x": seasons, "ticks": [s[:4] for s in t["season"]], "fmt": "usd", "zero": True,
-                  "series": [{"name": "favourites", "values": sm("fav_return"), "color": "a"},
+                  "series": [{"name": "favorites", "values": sm("fav_return"), "color": "a"},
                              {"name": "long shots", "values": sm("longshot_return"), "color": "b"}]},
-                 _table(["Season", "Favourites", "Long shots"],
+                 _table(["Season", "Favorites", "Long shots"],
                         [[s, _sd(100 * a), _sd(100 * b)] for s, a, b in zip(seasons, t["fav_return"], t["longshot_return"])]))
 
 

@@ -60,18 +60,18 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
 
     c = R["calibration"]["pooled"]
     items.append(("accurate", "The odds are accurate",
-                  f"Results the odds gave a {f['top_priced']} chance happened {f['top_happened']} of the time. "
-                  f"Results given a {f['low_priced']} chance happened {f['low_happened']} of the time.",
-                  f"<p>Calibration slope {c['slope']:.2f} (95% range {c['slope_lo']:.2f} to {c['slope_hi']:.2f}), where 1.00 is perfect. "
-                  "Favourites won slightly more often than their odds implied, and long shots slightly less.</p>",
+                  f"When the odds said {f['top_priced']}, it happened {f['top_happened']} of the time. "
+                  f"When they said {f['low_priced']}, it happened {f['low_happened']} of the time.",
+                  "<p>Favorites won slightly more often than their odds said, and long shots slightly less "
+                  f"(calibration slope {c['slope']:.2f}, 95% range {c['slope_lo']:.2f} to {c['slope_hi']:.2f}; 1.00 is perfect).</p>",
                   viz.calibration(R["calibration"]["table"])))
 
     best = R["longshot"].get("best") or []
     items.append(("longshots", "Long shots are the worst bet",
-                  f"Betting $100 on every heavy favourite ({fav_band}) lost {dollars(avg[0]['return'])} on average. "
+                  f"Betting $100 on every heavy favorite ({fav_band}) lost {dollars(avg[0]['return'])} on average. "
                   f"Betting $100 on every long shot ({long_band}) lost {dollars(avg[-1]['return'])}.",
-                  (f"<p>At the best price across bookmakers: {dollars(best[0]['return'], True)} per $100 on heavy favourites, "
-                   f"{dollars(best[-1]['return'], True)} on long shots.</p>" if best else ""),
+                  (f"<p>At the best price across bookmakers, heavy favorites returned {dollars(best[0]['return'], True)} per $100 "
+                   f"and long shots {dollars(best[-1]['return'], True)}.</p>" if best else ""),
                   viz.longshot(avg)))
 
     items.append(("margins", "Bookmakers take a smaller cut than they used to",
@@ -84,16 +84,16 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
         t = bs["table"]
         worse = sum(r["longshot_return"] < r["fav_return"] for r in t)
         items.append(("still-longshots", "Long shots stayed the worse bet as margins fell",
-                      f"Long shots were the worse bet in {worse} of {len(t)} seasons.", "",
+                      f"Long shots lost more than favorites in {worse} of {len(t)} seasons.", "",
                       viz.longshot_by_season(t)))
 
     if R.get("closing"):
         items.append(("line-moves", "Prices that move before kick-off move the right way",
-                      f"When a result's chance rose 3+ points before kick-off, a $100 bet at the opening price made "
-                      f"{dollars(float(f['short_ret'].rstrip('%')) / 100, True)}. When it fell, the bet lost "
+                      f"When the odds shortened before kick-off (chance up 3+ points), a $100 bet at the opening odds made "
+                      f"{dollars(float(f['short_ret'].rstrip('%')) / 100, True)} on average. When they drifted, it lost "
                       f"{dollars(float(f['drift_ret'].rstrip('%')) / 100)}.",
-                      f"<p>{f['cl_matches']} matches with opening and closing prices, {f['cl_years']}. "
-                      f"Error score of the opening price {f['ll_open']}, closing price {f['ll_close']} (lower is better).</p>",
+                      f"<p>{f['cl_matches']} matches, {f['cl_years']}. Closing odds were more accurate than opening odds: "
+                      f"error score {f['ll_close']} against {f['ll_open']} (lower is better).</p>",
                       viz.line_moves(R["closing"]["moves"])))
 
     mm = R["model"]
@@ -102,10 +102,10 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
              "market_recalibrated": "The odds, recalibrated", "market_plus_model": "The odds and the model combined"}
     rows = "".join(f"<tr><td>{names.get(k, k)}</td><td class=num>{v['log_loss']:.3f}</td></tr>" for k, v in sc.items())
     items.append(("model", "A model built from past results can't beat the odds",
-                  f"Error score: odds {sc['market']['log_loss']:.3f}, model {sc['model']['log_loss']:.3f}, "
-                  f"equal chances {sc['uniform']['log_loss']:.3f} (lower is better).",
+                  f"Error score (lower is better): the odds {sc['market']['log_loss']:.3f}, my model {sc['model']['log_loss']:.3f}, "
+                  f"treating all three results as equally likely {sc['uniform']['log_loss']:.3f}.",
                   f"<div class=tw><table><tr><th>Forecast ({f['eval_matches']} matches from {f['eval_from']})</th><th class=num>Error score</th></tr>{rows}</table></div>"
-                  f"<p>Betting $100 on every result the model rated 5%+ more likely than the odds: "
+                  f"<p>Betting $100 whenever my model rated a result 5%+ more likely than the odds: "
                   f"{dollars(float(f['vb_avg'].rstrip('%')) / 100, True)} a bet at the average price, "
                   f"{dollars(float(f['vb_best'].rstrip('%')) / 100, True)} at the best price.</p>",
                   viz.value_bets(curve) if curve is not None and len(curve) else ""))
@@ -114,7 +114,7 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
     if {"E0", "E1"} <= set(bl):
         e0, e1 = bl["E0"], bl["E1"]
         items.append(("leagues", "The second division is priced as accurately as the first",
-                      f"Calibration slope {e0['slope']:.2f} in the Premier League and {e1['slope']:.2f} in the Championship.",
+                      f"Calibration slope (1.00 is perfect): {e0['slope']:.2f} in the Premier League, {e1['slope']:.2f} in the Championship.",
                       f"<div class=tw><table><tr><th>League</th><th class=num>Matches</th><th class=num>Margin</th><th class=num>Slope</th><th class=num>Betting $100 on everything</th></tr>"
                       f"<tr><td>Premier League</td><td class=num>{e0['matches']:,}</td><td class=num>{p(e0['margin'], 1, False)}</td><td class=num>{e0['slope']:.2f}</td><td class=num>{dollars(e0['bet_everything'], True)}</td></tr>"
                       f"<tr><td>Championship</td><td class=num>{e1['matches']:,}</td><td class=num>{p(e1['margin'], 1, False)}</td><td class=num>{e1['slope']:.2f}</td><td class=num>{dollars(e1['bet_everything'], True)}</td></tr></table></div>"))
@@ -130,14 +130,15 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
         checks = ""
         if rb:
             n_ok = sum(r["ratio"] > 1 for r in rb)
-            checks = ((f"<p>Same match, both teams: the trailing team was expected to score {p(allr['expected_share'], 1, False)} "
-                       f"of second-half goals and scored {p(allr['actual_share'], 1, False)}. " if allr else "<p>")
-                      + f"Holds in {n_ok} of {len(rb)} checks.</p>" + viz.score_checks(rb))
+            checks = ((f"<p>In the second half, the team that was behind was expected to score {p(allr['expected_share'], 1, False)} "
+                       f"of the goals and scored {p(allr['actual_share'], 1, False)}. " if allr else "<p>")
+                      + f"This held in {n_ok} of {len(rb)} checks.</p>" + viz.score_checks(rb))
         items.append(("half-time", "After half-time, the team that's behind scores more than expected",
                       f"Teams losing by 2+ at half-time scored {P(se[-2]['ratio'] - 1)} more in the second half than the odds "
                       f"predicted. Teams winning by 2+ scored {P(1 - se[2]['ratio'])} fewer.",
-                      f"<p>Slight favourites leading 1–0 at half-time: predicted to win {P(lead['model_win'])}, won {P(lead['actual_win'])} "
-                      f"({lead['matches']:,} matches). Level at half-time: predicted draw {P(lvl['model_draw'])}, actual {P(lvl['actual_draw'])}.</p>"
+                      f"<p>Slight favorites leading 1–0 at half-time were given a {P(lead['model_win'])} chance to win and won {P(lead['actual_win'])} "
+                      f"of the time ({lead['matches']:,} matches). Games level at half-time were given a {P(lvl['model_draw'])} chance of a draw "
+                      f"and ended level {P(lvl['actual_draw'])} of the time.</p>"
                       + checks,
                       viz.score_effects(lv["score_effects"])))
 
@@ -148,7 +149,7 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
         body.append(b)
 
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
-<title>How Accurate Are Betting Odds?</title>
+{theme.meta("research.html", "How accurate are betting odds? · Today's Soccer Bets", "What 20 years of soccer betting odds show about how accurate the odds are and how much each bookmaker charges.")}
 <meta name=description content="A test of soccer betting odds on {f['matches']} matches: how accurate they are, where they go wrong, and whether a model can beat them.">
 <style>{theme.CSS}{EXTRA_CSS}{viz.CSS}</style></head><body>
 {theme.nav("research")}

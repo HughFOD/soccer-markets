@@ -8,6 +8,23 @@ visitor picks one with the switch in the top bar (remembered on that device).
 from __future__ import annotations
 
 REPO_URL = "https://github.com/HughFOD/soccer-markets"
+SITE_URL = "https://todayssoccerbets.com"
+SITE_NAME = "Today's Soccer Bets"
+ICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E"
+        "%3Crect width='64' height='64' rx='14' fill='%230071e3'/%3E"
+        "%3Cpath d='M14 44l12-12 8 8 16-18' fill='none' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+
+
+def meta(path: str, title: str, desc: str) -> str:
+    """Title, description, address, icon and link-preview tags for one page ("" is the homepage)."""
+    import html as h
+    url, t, d = f"{SITE_URL}/{path}", h.escape(title), h.escape(desc)
+    return (f'<title>{t}</title><meta name=description content="{d}"><link rel=canonical href="{url}">'
+            f'<link rel=icon href="{ICON}"><link rel=apple-touch-icon href="{SITE_URL}/icon.png">'
+            f'<meta property=og:site_name content="{h.escape(SITE_NAME)}"><meta property=og:type content=website>'
+            f'<meta property=og:url content="{url}"><meta property=og:title content="{t}">'
+            f'<meta property=og:description content="{d}"><meta property=og:image content="{SITE_URL}/og.png">'
+            f'<meta name=twitter:card content=summary_large_image>')
 
 CSS = """
 :root{--bg:#fff;--bg2:#f5f5f7;--tile:#fff;--ink:#1d1d1f;--ink2:#424245;--muted:#6e6e73;--line:#d2d2d7;--hair:#e8e8ed;
@@ -97,7 +114,7 @@ footer p{margin:0 0 6px}
 def nav(active: str) -> str:
     def a(href, label, key):
         return f'<a href="{href}"{" class=on" if key == active else ""}>{label}</a>'
-    return (f'<header class=gnav><div class=wrap><a class=brand href="index.html">Soccer Odds</a><div class=right><nav>'
+    return (f'<header class=gnav><div class=wrap><a class=brand href="index.html">{SITE_NAME}</a><div class=right><nav>'
             f'{a("index.html", "Bets", "week")}{a("best-prices.html", "Prices", "prices")}{a("research.html", "Research", "research")}'
             f'{a(REPO_URL, "Code", "code")}</nav>{THEME_BUTTON}</div></div></header>{THEME_SCRIPT}')
 

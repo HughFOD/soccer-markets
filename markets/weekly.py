@@ -112,7 +112,14 @@ def run(raw_dir: Path = ROOT / "data" / "raw", fixtures: Path | None = None, out
         saved = json.loads(path.read_text())
         t = usbooks.to_table(saved["data"])
         M, quotes = usbooks.price(t, threshold)
-        G = usbooks.price_totals(usbooks.totals_table(saved["data"]))
+        T = usbooks.totals_table(saved["data"])
+        G = usbooks.price_totals(T, min_sites=2)
+        if len(T):
+            per = T.groupby(["id", "point"])["site"].nunique().value_counts().sort_index().to_dict()
+            print(f"goals odds: {len(T)} prices from {sorted(T['site'].unique())}; sites per match line {per}; "
+                  f"{G['id'].nunique() if len(G) else 0} matches priced")
+        else:
+            print("goals odds: none returned")
         board = usbooks.scoreboard(quotes, t)
         res = out_dir / "results.json"
         R = json.loads(res.read_text()) if res.exists() else None

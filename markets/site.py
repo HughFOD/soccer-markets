@@ -248,14 +248,13 @@ don't exist, so this test uses the same method on {len(cs['books'])} European bo
 is too noisy to judge either way, which is why the kick-off price is the better test. This is a study of pricing, not betting advice.</p>"""
 
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
-<title>Soccer Odds Compared</title>
-<meta name=description content="Every day's soccer bets that pay more than their chance of winning deserves, across FanDuel, DraftKings, Fanatics, BetMGM, Caesars, Kalshi and Polymarket.">
+{theme.meta("", "Today's Soccer Bets: bets that beat the odds", "Every morning: the soccer bets at FanDuel, DraftKings, BetMGM, Kalshi and Polymarket that pay more than their chance of winning deserves.")}
 <style>{CSS}</style></head><body>
 {theme.nav("week")}
 <section class=hero><div class=wrap>
 <p class=eyebrow>Updated every morning</p>
 <h1>Bets that beat what's expected.</h1>
-<p class=lede>Every day's soccer bets that pay more than their chance of winning deserves, from the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and the Championship.</p>
+<p class=lede>Every morning: the soccer bets that pay more than their chance of winning deserves, from the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and the Championship.</p>
 <div class=ctas><a class=btn href="#best">See today's bets</a><a class="btn ghost" href="research.html">How accurate are odds</a></div>
 <p class=updated>Last updated {stamp}</p>
 </div></section>
@@ -270,7 +269,7 @@ is too noisy to judge either way, which is why the kick-off price is the better 
 
 <section class=section id=best><div class=wrap>
 <h2>Ranked by expected return.</h2>
-<p class=sub>Each bet's expected chance comes from every site that prices it, combined with their cuts removed. A bet beats what's expected when its odds pay as if it were less likely than that. The green figure is the average profit per $100 if you made that bet many times. Back the result shown, at the site shown, at those odds or better.</p>
+<p class=sub>Each result's chance comes from the odds at every site, with each site's cut removed. A bet is listed when one site pays more than that chance deserves. The green number is the average profit per $100 if you made that bet many times. Bet the result shown, at the site shown, at those odds or better.</p>
 {picks_html}
 </div></section>
 
@@ -294,7 +293,7 @@ is too noisy to judge either way, which is why the kick-off price is the better 
 <div class=cards>
 <div class=card><h3>Collect the odds.</h3><p>From FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus Kalshi and Polymarket, through The Odds API. Caesars and Fanatics appear only on a paid data plan.</p></div>
 <div class=card><h3>Work out what's expected.</h3><p>Each site's odds become chances with its cut removed, then are averaged with equal weight. That gives every result's expected chance.</p></div>
-<div class=card><h3>Find the bets that beat it.</h3><p>A bet beats what's expected when its odds pay as if it were less likely than its expected chance. Gaps over 25% are ignored as stale or mistyped prices.</p></div>
+<div class=card><h3>Find the bets that beat it.</h3><p>A bet makes the list when a site's odds pay more than its chance deserves. Gaps over 25% are left out as likely stale or mistyped prices.</p></div>
 </div>
 </div></section>
 {theme.footer()}

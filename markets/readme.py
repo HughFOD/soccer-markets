@@ -50,7 +50,7 @@ BetMGM and Caesars, and by the prediction markets Kalshi and Polymarket.
 consensus of all of them, and any price clearly better than the consensus is
 flagged.
 
-**Website:** https://hughfod.github.io/soccer-markets/
+**Website:** https://todayssoccerbets.com/
 
 ## How it works
 
@@ -73,7 +73,7 @@ Before building the comparison, I studied {R['matches']:,} matches from 2000 to 
 see how accurate betting odds are: long shots are overpriced, prices that
 move before kick-off move the right way, a model from past results can't beat
 the odds, and teams behind at half-time score more than expected. The
-details are on the [research page](https://hughfod.github.io/soccer-markets/research.html).
+details are on the [research page](https://todayssoccerbets.com/research.html).
 
 ## Running it
 

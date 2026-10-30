@@ -100,7 +100,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None, st
     content = (f'<div class=daytabs role=tablist>{tabs}</div>{"".join(panes)}{js}' if days else
                "<div class=empty>No upcoming matches in the latest odds.</div>")
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
-<title>Best Prices by Match</title>
+{theme.meta("best-prices.html", "Best prices by match · Today's Soccer Bets", "Where to place each soccer bet: the best odds for every match result and goals line, across US sportsbooks and prediction markets.")}
 <meta name=description content="The best odds and the site offering them for every bet on every upcoming match.">
 <style>{CSS}{PAGE_CSS}</style></head><body>
 {theme.nav("prices")}
@@ -111,7 +111,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None, st
 <p class=updated>Last updated {stamp}</p>
 </div></section>
 <section class=section style="padding-top:0"><div class=wrap>
-<p class=sub>{len(M)} matches. Match result: {len(set(quotes['site'])) if len(quotes) else 0} sites. Total goals: US sportsbooks, today's matches only. Green: the price beats the expected chance.</p>
+<p class=sub>{len(M)} matches. Match results compared across {len(set(quotes['site'])) if len(quotes) else 0} sites; total goals across US sportsbooks, for today's matches only. Green means the price pays more than the bet's chance deserves.</p>
 {content}
 </div></section>
 {theme.footer()}
