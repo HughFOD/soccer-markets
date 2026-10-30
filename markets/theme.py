@@ -141,7 +141,7 @@ try{cur==='auto'?localStorage.removeItem('theme'):localStorage.setItem('theme',c
 def footer() -> str:
     return (f'<footer><div class=wrap><p>Odds from The Odds API. Match history from football-data.co.uk. '
             f'Prices move constantly, so check the site before acting.</p>'
-            f'<p>A data science project in Python by Hugh. This is a study of pricing, not betting advice. '
+            f'<p>A data science project in Python by Hugh O’Donnell. This is a study of pricing, not betting advice. '
             f'<a href="{REPO_URL}">Code on GitHub</a></p></div></footer>')
 
 
