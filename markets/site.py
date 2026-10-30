@@ -86,35 +86,53 @@ TOP_N = 10      # bets listed per day
 MIN_EDGE = 0.001  # a bet is listed only if its best price beats the fair (consensus) price by 0.1%+
 
 
-def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None = None) -> list[tuple[str, list[dict]]]:
+def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None = None,
+                totals: pd.DataFrame | None = None) -> list[tuple[str, list[dict]]]:
     """[(day label, [bet, ...])] for each day from today on, highest expected return first.
 
     A bet is one result of one match at its best price across the sites. Its expected chance is the
     consensus of all the sites with their cuts removed; its expected return is expected chance x decimal
     odds - 1. Only bets with a positive expected return are kept. Matches that have kicked off are left out.
+    `totals` (from usbooks.price_totals) adds goals over/under bets, priced the same way.
     """
-    if not len(M) or not len(quotes):
+    has_totals = totals is not None and len(totals)
+    if not len(M) or (not len(quotes) and not has_totals):
         return []
     now = now or pd.Timestamp.now(tz=ET)
-    q = quotes.merge(M[["id", "kickoff", "home", "away", "league", "best_h", "best_d", "best_a",
-                        "cons_h", "cons_d", "cons_a"]], on="id")
-    q["ko"] = pd.to_datetime(q["kickoff"]).dt.tz_convert(ET)
-    q = q[q["ko"] > now]
-    q["best_odds"] = [r[f"best_{r['result']}"] for _, r in q.iterrows()]
-    top = q[np.isclose(q["odds"], q["best_odds"])]           # every site offering the best price
     order = {k: i for i, k in enumerate(SITES)}
     rows = []
-    for (mid, res), g in top.groupby(["id", "result"], sort=False):
-        g = g.sort_values("site", key=lambda c: c.map(order))
-        r = g.iloc[0]
-        edge = float(r["edge"])
-        if not (MIN_EDGE < edge <= MAX_EDGE):
-            continue
-        team = r["home"] if res == "h" else r["away"] if res == "a" else None
-        rows.append({"day": r["ko"].date(), "ko": r["ko"], "edge": edge, "odds": american(r["odds"]), "paid": 1 / float(r["odds"]),
-                     "bet": f"{team} to win" if team else "Draw", "match": f"{r['home']} v {r['away']}",
-                     "league": r["league"], "sites": [SITES[x][0] for x in g["site"]],
-                     "chance": float(r[f"cons_{res}"])})
+    if len(quotes):
+        q = quotes.merge(M[["id", "kickoff", "home", "away", "league", "best_h", "best_d", "best_a",
+                            "cons_h", "cons_d", "cons_a"]], on="id")
+        q["ko"] = pd.to_datetime(q["kickoff"]).dt.tz_convert(ET)
+        q = q[q["ko"] > now]
+        q["best_odds"] = [r[f"best_{r['result']}"] for _, r in q.iterrows()]
+        top = q[np.isclose(q["odds"], q["best_odds"])]           # every site offering the best price
+        for (mid, res), g in top.groupby(["id", "result"], sort=False):
+            g = g.sort_values("site", key=lambda c: c.map(order))
+            r = g.iloc[0]
+            edge = float(r["edge"])
+            if not (MIN_EDGE < edge <= MAX_EDGE):
+                continue
+            team = r["home"] if res == "h" else r["away"] if res == "a" else None
+            rows.append({"day": r["ko"].date(), "ko": r["ko"], "edge": edge, "odds": american(r["odds"]), "paid": 1 / float(r["odds"]),
+                         "bet": f"{team} to win" if team else "Draw", "match": f"{r['home']} v {r['away']}",
+                         "league": r["league"], "sites": [SITES[x][0] for x in g["site"]],
+                         "chance": float(r[f"cons_{res}"])})
+    if totals is not None and len(totals):
+        g2 = totals.copy()
+        g2["ko"] = pd.to_datetime(g2["kickoff"]).dt.tz_convert(ET)
+        g2 = g2[(g2["ko"] > now) & g2["best"]]
+        for (mid, point, side), g in g2.groupby(["id", "point", "side"], sort=False):
+            g = g.sort_values("site", key=lambda c: c.map(order))
+            r = g.iloc[0]
+            edge = float(r["edge"])
+            if not (MIN_EDGE < edge <= MAX_EDGE):
+                continue
+            rows.append({"day": r["ko"].date(), "ko": r["ko"], "edge": edge, "odds": american(r["odds"]),
+                         "paid": 1 / float(r["odds"]), "bet": f"{side} {point:g} goals",
+                         "match": f"{r['home']} v {r['away']}", "league": r["league"],
+                         "sites": [SITES[x][0] for x in g["site"]], "chance": float(r["chance"])})
     out = []
     today = now.date()
     if not any(x["day"] == today for x in rows) and len(M):
@@ -164,13 +182,14 @@ def days_html(days: list[tuple[str, list[dict]]]) -> str:
     return f'<div class=daytabs role=tablist>{tabs}</div>{"".join(panes)}{js}'
 
 
-def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | None, stamp: str, remaining=None) -> str:
+def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | None, stamp: str, remaining=None,
+          totals: pd.DataFrame | None = None) -> str:
     e = html.escape
     present = [s for s in SITES if len(quotes) and s in set(quotes["site"])]
     n_flags = int(sum(1 for f in M["flag"] if f)) if len(M) else 0
 
     # ---- today's best bets: per day, up to TOP_N results whose best price beats the fair price
-    days = daily_picks(M, quotes)
+    days = daily_picks(M, quotes, totals=totals)
     picks_html = days_html(days)
 
     # ---- which site pays the most
@@ -251,7 +270,7 @@ is too noisy to judge either way, which is why the kick-off price is the better 
 
 <section class=section id=best><div class=wrap>
 <h2>Ranked by expected return.</h2>
-<p class=sub>Each bet's expected chance comes from all five sites combined, with their cuts removed. A bet beats what's expected when its odds pay as if it were less likely than that. The green figure is the average profit per $100 if you made that bet many times. Back the result shown, at the site shown, at those odds or better.</p>
+<p class=sub>Each bet's expected chance comes from every site that prices it, combined with their cuts removed. A bet beats what's expected when its odds pay as if it were less likely than that. The green figure is the average profit per $100 if you made that bet many times. Back the result shown, at the site shown, at those odds or better.</p>
 {picks_html}
 </div></section>
 

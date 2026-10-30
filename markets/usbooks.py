@@ -2,7 +2,9 @@
 
 Needs a free API key saved in odds_api_key.txt in the project folder (or the
 ODDS_API_KEY environment variable). One refresh of six leagues uses 12 of the
-free plan's 500 monthly credits (two regions per league).
+free plan's 500 monthly credits for match results (two regions per league), plus
+1 credit for goals over/under per league with a match today
+(US sportsbooks only), usually 1 to 6 more: about 460 a month in all.
 
 - Sites: FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus the prediction
   markets Kalshi and Polymarket (largest first). Every other site is ignored.
@@ -40,6 +42,9 @@ SITES = {  # key -> (display name, kind). Only these sites are used, listed by U
     "kalshi": ("Kalshi", "Prediction market"), "polymarket": ("Polymarket", "Prediction market"),
 }
 THRESHOLD = 0.02
+TOTALS_REGION = "us"   # goals over/under: US sportsbooks only, to stay inside the free plan
+TOTALS_DAYS = 1        # fetch goals over/under for leagues with a match today (New York time); keeps the free plan under 500 a month
+ET = "America/New_York"
 
 
 def api_key() -> str | None:
@@ -49,8 +54,8 @@ def api_key() -> str | None:
     return f.read_text().strip() if f.exists() else None
 
 
-def fetch(key: str, sport: str, region: str) -> tuple[list, str | None]:
-    url = (f"https://api.the-odds-api.com/v4/sports/{sport}/odds?regions={region}&markets=h2h"
+def fetch(key: str, sport: str, region: str, markets: str = "h2h") -> tuple[list, str | None]:
+    url = (f"https://api.the-odds-api.com/v4/sports/{sport}/odds?regions={region}&markets={markets}"
            f"&oddsFormat=decimal&apiKey={key}")
     with urllib.request.urlopen(url, timeout=30) as r:
         return json.loads(r.read()), r.headers.get("x-requests-remaining")
@@ -66,10 +71,89 @@ def download(key: str, dest: Path) -> dict:
             except Exception as e:  # league out of season, or a temporary error
                 print(f"  skipped {sport} {region}: {e}")
                 out[f"{sport}|{region}"] = []
+    for sport in soon_sports(out):
+        try:
+            out[f"{sport}|{TOTALS_REGION}|totals"], remaining = fetch(key, sport, TOTALS_REGION, "totals")
+        except Exception as e:
+            print(f"  skipped {sport} totals: {e}")
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(json.dumps({"fetched": datetime.now(timezone.utc).isoformat(), "remaining": remaining, "data": out}))
     print(f"  saved {dest.name}; API credits left this month: {remaining}")
     return out
+
+
+def soon_sports(raw: dict, now: pd.Timestamp | None = None, days: int = TOTALS_DAYS) -> list[str]:
+    """Leagues with at least one match kicking off between now and the end of the last of `days` days."""
+    now = now or pd.Timestamp.now(tz=ET)
+    end = (now.tz_convert(ET).normalize() + pd.Timedelta(days=days))
+    out = []
+    for k, events in raw.items():
+        sport = k.split("|")[0]
+        if k.endswith("|totals") or sport in out:
+            continue
+        for ev in events:
+            ko = pd.Timestamp(ev["commence_time"]).tz_convert(ET)
+            if now < ko < end:
+                out.append(sport)
+                break
+    return out
+
+
+def totals_table(raw: dict) -> pd.DataFrame:
+    """One row per match, site and goals line: decimal odds for over and under."""
+    rows = []
+    for k, events in raw.items():
+        if not k.endswith("|totals"):
+            continue
+        sport = k.split("|")[0]
+        for ev in events:
+            for bk in ev.get("bookmakers", []):
+                if bk["key"] not in SITES:
+                    continue
+                mk = next((m for m in bk.get("markets", []) if m.get("key") == "totals"), None)
+                if not mk:
+                    continue
+                by_point = {}
+                for o in mk.get("outcomes", []):
+                    if o.get("point") is not None and o.get("name") in ("Over", "Under"):
+                        by_point.setdefault(float(o["point"]), {})[o["name"]] = o["price"]
+                for point, pr in by_point.items():
+                    if "Over" in pr and "Under" in pr:
+                        rows.append({"id": ev["id"], "league": SPORTS.get(sport, sport), "kickoff": ev["commence_time"],
+                                     "home": ev["home_team"], "away": ev["away_team"], "site": bk["key"],
+                                     "point": point, "over": pr["Over"], "under": pr["Under"]})
+    t = pd.DataFrame(rows)
+    return t.drop_duplicates(["id", "site", "point"]).reset_index(drop=True) if len(t) else t
+
+
+def price_totals(t: pd.DataFrame, min_sites: int = 3) -> pd.DataFrame:
+    """Goals over/under, priced the same way as match results.
+
+    For each match and goals line quoted by at least `min_sites` sites: every site's over/under odds
+    become chances with its cut removed, the chances are pooled with equal weight into the expected
+    chance, and each site's expected return is expected chance x decimal odds - 1.
+    One row per match, line, side and site.
+    """
+    out = []
+    if t is None or not len(t):
+        return pd.DataFrame(out)
+    for (mid, point), g in t.groupby(["id", "point"], sort=False):
+        O = g[["over", "under"]].to_numpy(float)
+        P = _probs(O)
+        ok = np.isfinite(P).all(1)
+        g, O, P = g[ok], O[ok], P[ok]
+        if len(g) < min_sites:
+            continue
+        C = pool(np.log(P)[:, None, :], np.ones(len(g)) / len(g), 1.0)[0]
+        r0 = g.iloc[0]
+        for k, side in enumerate(("Over", "Under")):
+            E = C[k] * O[:, k] - 1
+            best = O[:, k].max()
+            for i in range(len(g)):
+                out.append({"id": mid, "league": r0["league"], "kickoff": r0["kickoff"], "home": r0["home"],
+                            "away": r0["away"], "point": point, "side": side, "site": g["site"].iloc[i],
+                            "odds": O[i, k], "chance": C[k], "edge": E[i], "best": bool(np.isclose(O[i, k], best))})
+    return pd.DataFrame(out)
 
 
 def to_table(raw: dict) -> pd.DataFrame:
