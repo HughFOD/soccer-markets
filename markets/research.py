@@ -161,14 +161,6 @@ from the {f['leagues']}, every season since {R['seasons'][0][:4]}.</p>
 <div class=ctas><a class=btn href="#found">See the findings</a><a class="btn ghost" href="index.html">This week's best bets</a></div>
 </div></section>
 
-<section class=band><div class=wrap>
-<div class=stats>
-<div class=stat><div class=v>{f['matches']}</div><div class=l>matches tested</div></div>
-<div class=stat><div class=v>{f['n_seasons']}</div><div class=l>seasons</div></div>
-<div class=stat><div class=v>{dollars(avg[-1]['return'])}</div><div class=l>lost per $100 on long shots</div></div>
-<div class=stat><div class=v>{f['margin_last']}</div><div class=l>bookmaker's cut today, down from {f['margin_first']}</div></div>
-</div></div></section>
-
 <section class=section id=found><div class=wrap>
 <h2>What I found.</h2>
 <ul class=toc>{''.join(toc)}</ul>
