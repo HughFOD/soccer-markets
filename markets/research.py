@@ -141,8 +141,7 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
 <section class=hero><div class=wrap>
 <p class=eyebrow>Research</p>
 <h1>How accurate are betting odds?</h1>
-<p class=lede>I tested betting odds on {f['matches']} matches
-from the {f['leagues']}, every season since {R['seasons'][0][:4]}.</p>
+<p class=lede>{f['matches']} matches from six top European leagues since {R['seasons'][0][:4]}, checked against their betting odds.</p>
 <div class=ctas><a class=btn href="#found">See the findings</a><a class="btn ghost" href="index.html">This week's best bets</a></div>
 </div></section>
 

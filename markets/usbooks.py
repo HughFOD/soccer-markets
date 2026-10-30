@@ -79,8 +79,18 @@ def download(key: str, dest: Path) -> dict:
             out[f"{sport}|{TOTALS_REGION}|totals"], remaining = fetch(key, sport, TOTALS_REGION, "totals")
         except Exception as e:
             print(f"  skipped {sport} totals: {e}")
+    from . import extras
+    before = remaining
+    ext, remaining = extras.download(key, out, remaining)
+    if ext:
+        try:
+            used = float(before) - float(remaining)
+        except (TypeError, ValueError):
+            used = float("nan")
+        print(f"  extra markets for {len(ext)} matches ({used:.0f} credits)")
     dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_text(json.dumps({"fetched": datetime.now(timezone.utc).isoformat(), "remaining": remaining, "data": out}))
+    dest.write_text(json.dumps({"fetched": datetime.now(timezone.utc).isoformat(), "remaining": remaining,
+                                "data": out, "extras": ext}))
     print(f"  saved {dest.name}; API credits left this month: {remaining}")
     return out
 

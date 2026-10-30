@@ -12,13 +12,14 @@ import pandas as pd
 
 from . import theme
 from .site import CSS, ET, _ko
+from .extras import MARKETS
 from .usbooks import SITES, american
 
 PAGE_CSS = """
 .mlist{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
 .mcard{background:var(--bg2);border-radius:18px;padding:18px 22px 10px}
 .mcard h3{font-size:19px;margin:0}.mcard .meta{font-size:13px;color:var(--muted);margin:2px 0 10px}
-.mcard table{font-size:15px;table-layout:fixed;width:100%}.mcard th:nth-child(2){width:30%}.mcard th:nth-child(3){width:26%}.mcard td{overflow-wrap:anywhere}.mcard th,.mcard td{padding:9px 6px}.mcard td.n{white-space:nowrap}.mcard th.n{white-space:normal}
+.mcard table{font-size:15px;table-layout:fixed;width:100%}.mcard td{overflow-wrap:anywhere}.mcard th,.mcard td{padding:9px 6px}.mcard td.n{white-space:nowrap}.mcard th.n{white-space:normal}
 .mcard .odds{font-weight:700;font-variant-numeric:tabular-nums}
 .mcard .site{display:block;color:var(--link);font-weight:500;font-size:13px}
 .mcard .pos{color:var(--good);font-weight:700}.mcard .neg{color:var(--muted)}
@@ -36,12 +37,20 @@ PAGE_CSS = """
 .filters select{font:inherit;font-size:15px;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
 .filters label{display:flex;gap:6px;align-items:center;cursor:pointer}
 .filters[hidden]{display:none}.hint{font-size:13px;color:var(--muted);margin:0 0 16px}.nomatch{display:none}
+.more{margin:6px 0 8px}.more>summary,.mgrp>summary{cursor:pointer;list-style:none;font-weight:600;font-size:15px;padding:10px 6px;color:var(--link)}
+.more>summary::-webkit-details-marker,.mgrp>summary::-webkit-details-marker{display:none}
+.more>summary::after,.mgrp>summary::after{content:" ›";display:inline-block;transition:transform .15s}
+.more[open]>summary::after,.mgrp[open]>summary::after{transform:rotate(90deg)}
+.more>summary span,.mgrp>summary span{color:var(--muted);font-weight:400;font-size:13px;margin-left:4px}
+.mgrp{border-top:1px solid var(--hair)}.mgrp>summary{color:var(--ink);font-size:14px}
 html:not(.js) .finder,html:not(.js) .filters,html:not(.js) .hint{display:none}
 @media (max-width:520px){.mcard{padding:16px 14px 8px}.mcard table{font-size:14px}.mcard th,.mcard td{padding:8px 4px}}
 """
 
 
 def _usd(x: float) -> str:
+    if x is None or not np.isfinite(x):
+        return "—"
     v = 100 * x
     return f"−${-v:.2f}" if v < -0.005 else f"+${v:.2f}"
 
@@ -53,17 +62,18 @@ def _odds(o: float) -> str:
 def _row(kind: str, bet: str, odds: float, sites: list[str], edge: float, every: list[tuple]) -> str:
     """One bet: best odds, the sites offering them and the expected result; tapping it shows every site."""
     e = html.escape
-    cls = "pos" if edge > 0 else "neg"
-    allr = "".join(f"<b>{e(SITES[s][0])}</b><span class=n>{_odds(o)}</span><span class='n {'pos' if g > 0 else 'neg'}'>{_usd(g)}</span>"
-                   for s, o, g in every)
-    return (f"<tr class=bet data-kind={kind} data-pos={int(edge > 0)} tabindex=0 aria-expanded=false><td>{e(bet)}</td>"
+    good = bool(np.isfinite(edge) and edge > 0)
+    cls = "pos" if good else "neg"
+    allr = "".join(f"<b>{e(SITES[s][0])}</b><span class=n>{_odds(o)}</span>"
+                   f"<span class='n {'pos' if np.isfinite(g) and g > 0 else 'neg'}'>{_usd(g)}</span>" for s, o, g in every)
+    return (f"<tr class=bet data-kind=\"{e(kind)}\" data-pos={int(good)} data-t=\"{e(bet.lower())}\" tabindex=0 aria-expanded=false><td>{e(bet)}</td>"
             f"<td class=n><span class=odds>{_odds(odds)}</span><span class=site>{e(' / '.join(sites))}</span></td>"
             f"<td class='n {cls}'>{_usd(edge)}</td></tr>"
             f"<tr class=all hidden><td colspan=3><div class=allsites>{allr}</div></td></tr>")
 
 
 def matches_by_day(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None,
-                   now: pd.Timestamp | None = None) -> list[tuple[str, list[dict]]]:
+                   now: pd.Timestamp | None = None, extras: pd.DataFrame | None = None) -> list[tuple[str, list[dict]]]:
     """[(day label, [match, ...])]; each match has its bets with the best odds and sites."""
     if not len(M):
         return []
@@ -94,7 +104,20 @@ def matches_by_day(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame |
                 allq = totals[(totals["id"] == r["id"]) & (totals["point"] == point) & (totals["side"] == side)]
                 bets.append(("Goals", f"{side} {point:g} goals", float(g["odds"].iloc[0]),
                              [SITES[s][0] for s in g["site"]], float(g["edge"].iloc[0]), every(allq)))
-        out.setdefault(ko.date(), []).append({"ko": ko, "home": r["home"], "away": r["away"], "league": r["league"], "bets": bets})
+        more = {}
+        if extras is not None and len(extras):
+            x = extras[extras["id"] == r["id"]]
+            mo = {k: i for i, k in enumerate(MARKETS)}
+            x = x.assign(_m=x["market"].map(mo), _p=x["point"].abs(),
+                         _o=x["outcome"].map({"Over": 0, "Under": 1, "Yes": 0, "No": 1}).fillna(2)
+                         ).sort_values(["_m", "who", "_p", "point", "_o", "outcome"])
+            for (mk, line, outc), g in x.groupby(["market", "line", "outcome"], sort=False):
+                b = g[g["best"]].sort_values("site", key=lambda c: c.map(order))
+                more.setdefault(g["group"].iloc[0], []).append(
+                    (g["group"].iloc[0], g["label"].iloc[0], float(b["odds"].iloc[0]), [SITES[s][0] for s in b["site"]],
+                     float(b["edge"].max()) if b["edge"].notna().any() else float("nan"), every(g)))
+        out.setdefault(ko.date(), []).append({"ko": ko, "home": r["home"], "away": r["away"], "league": r["league"],
+                                              "bets": bets, "more": more})
     today = now.date()
     res = []
     for day in sorted(out):
@@ -103,9 +126,12 @@ def matches_by_day(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame |
     return res
 
 
-def build(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None, stamp: str) -> str:
+def build(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None, stamp: str,
+          extras: pd.DataFrame | None = None) -> str:
+    from .extras import GROUPS
     e = html.escape
-    days = matches_by_day(M, quotes, totals)
+    days = matches_by_day(M, quotes, totals, extras=extras)
+    cols = '<colgroup><col><col style="width:30%"><col style="width:26%"></colgroup>'
     tabs = "".join(f'<button class=daytab data-day="{i}"{" aria-selected=true" if i == 0 else ""}>{e(lab)}'
                    f'<span>{len(ms)}</span></button>' for i, (lab, ms) in enumerate(days))
     panes = []
@@ -119,9 +145,17 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None, st
                     grp = g
                 body += _row(g, bet, odds, sites, edge, allp)
             find = e(f"{m['home']} {m['away']} {m['league']}".lower())
+            more = ""
+            if m["more"]:
+                n = sum(len(v) for v in m["more"].values())
+                parts = "".join(
+                    f'<details class=mgrp><summary>{e(gname)} <span>{len(m["more"][gname])}</span></summary>'
+                    f'<div class=tw><table>{cols}{"".join(_row(*b) for b in m["more"][gname])}</table></div></details>'
+                    for gname in GROUPS if gname in m["more"])
+                more = f'<details class=more><summary>More bets <span>{n}</span></summary>{parts}</details>'
             cards.append(f"""<div class=mcard data-find="{find}" data-league="{e(m['league'])}"><h3>{e(m['home'])} v {e(m['away'])}</h3>
 <div class=meta>{e(m['league'])} · {m['ko'].strftime('%a %b %-d, %-I:%M %p')} ET</div>
-<div class=tw><table><tr><th>Bet</th><th class=n>Best odds</th><th class=n>Expected per $100</th></tr>{body}</table></div></div>""")
+<div class=tw><table>{cols}<tr><th>Bet</th><th class=n>Best odds</th><th class=n>Expected per $100</th></tr>{body}</table></div>{more}</div>""")
         panes.append(f'<div class=daypane data-day="{i}"{" hidden" if i else ""}><h3 class=dayhead>{e(lab)}</h3>'
                      f'<div class=mlist>{"".join(cards)}</div><div class="empty nomatch">No matches fit your search on this day.</div></div>')
     leagues = sorted({m["league"] for _, ms in days for m in ms})
@@ -130,7 +164,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None, st
               f'<div class=filters id=filters hidden><select id=lg aria-label=League><option value="">All leagues</option>'
               + "".join(f"<option>{e(l)}</option>" for l in leagues) +
               '</select><select id=kind aria-label="Bet type"><option value="">All bets</option><option value=Result>Match result</option>'
-              '<option value=Goals>Total goals</option></select>'
+              '<option value=Goals>Goals</option>' + "".join(f'<option>{g}</option>' for g in GROUPS[2:]) + '</select>'
               '<label><input type=checkbox id=pos> Only green bets</label></div>'
               '<p class=hint>Tap any bet to compare every site\'s odds.</p>')
     js = """<script>(function(){
@@ -139,10 +173,13 @@ q=document.getElementById('q'),lg=document.getElementById('lg'),kind=document.ge
 fb=document.getElementById('fbtn'),fp=document.getElementById('filters'),day='0';
 function show(){var term=q.value.trim().toLowerCase();
  panes.forEach(function(p,i){var n=0;
-  p.querySelectorAll('.mcard').forEach(function(c){var ok=(!term||c.dataset.find.indexOf(term)>=0)&&(!lg.value||c.dataset.league===lg.value),rows=0;
-   c.querySelectorAll('tr.bet').forEach(function(r){var v=ok&&(!kind.value||r.dataset.kind===kind.value)&&(!pos.checked||r.dataset.pos==='1');
+  p.querySelectorAll('.mcard').forEach(function(c){var cm=!term||c.dataset.find.indexOf(term)>=0,ok=!lg.value||c.dataset.league===lg.value,rows=0;
+   c.querySelectorAll('tr.bet').forEach(function(r){var v=ok&&(cm||r.dataset.t.indexOf(term)>=0)&&(!kind.value||r.dataset.kind===kind.value)&&(!pos.checked||r.dataset.pos==='1');
     r.hidden=!v;if(!v){r.classList.remove('open');r.nextElementSibling.hidden=true}if(v)rows++});
    c.querySelectorAll('tr.grp').forEach(function(g){g.hidden=!!kind.value&&g.dataset.kind!==kind.value||!c.querySelector('tr.bet[data-kind='+g.dataset.kind+']:not([hidden])')});
+   var act=!!(kind.value||pos.checked||(term&&!cm));
+   c.querySelectorAll('details').forEach(function(d){var has=!!d.querySelector('tr.bet:not([hidden])');d.hidden=!has;
+    if(act){if(has&&!d.open){d.open=true;d.dataset.auto=1}}else if(d.dataset.auto){d.open=false;delete d.dataset.auto}});
    c.hidden=!rows;if(rows)n++});
   tabs[i].querySelector('span').textContent=n;p.querySelector('.nomatch').style.display=n?'none':'block';
   p.hidden=p.dataset.day!==day});}

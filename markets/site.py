@@ -87,13 +87,14 @@ MIN_EDGE = 0.001  # a bet is listed only if its best price beats the fair (conse
 
 
 def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None = None,
-                totals: pd.DataFrame | None = None) -> list[tuple[str, list[dict]]]:
+                totals: pd.DataFrame | None = None, extras: pd.DataFrame | None = None) -> list[tuple[str, list[dict]]]:
     """[(day label, [bet, ...])] for each day from today on, highest expected return first.
 
     A bet is one result of one match at its best price across the sites. Its expected chance is the
     consensus of all the sites with their cuts removed; its expected return is expected chance x decimal
     odds - 1. Only bets with a positive expected return are kept. Matches that have kicked off are left out.
-    `totals` (from usbooks.price_totals) adds goals over/under bets, priced the same way.
+    `totals` (from usbooks.price_totals) adds goals over/under bets, priced the same way, and `extras`
+    (from extras.price) adds corners, cards, player and other bets that have an expected chance.
     """
     has_totals = totals is not None and len(totals)
     if not len(M) or (not len(quotes) and not has_totals):
@@ -133,6 +134,20 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
                          "paid": 1 / float(r["odds"]), "bet": f"{side} {point:g} goals",
                          "match": f"{r['home']} v {r['away']}", "league": r["league"],
                          "sites": [SITES[x][0] for x in g["site"]], "chance": float(r["chance"])})
+    if extras is not None and len(extras):
+        info = M.set_index("id")[["kickoff", "home", "away", "league"]]
+        x = extras[extras["best"] & extras["edge"].notna() & extras["id"].isin(info.index)]
+        for (mid, mk, line, outc), g in x.groupby(["id", "market", "line", "outcome"], sort=False):
+            g = g.sort_values("site", key=lambda c: c.map(order))
+            r = g.iloc[0]
+            edge = float(r["edge"])
+            ko = pd.Timestamp(info.loc[mid, "kickoff"]).tz_convert(ET)
+            if ko <= now or not (MIN_EDGE < edge <= MAX_EDGE):
+                continue
+            rows.append({"day": ko.date(), "ko": ko, "edge": edge, "odds": american(r["odds"]),
+                         "paid": 1 / float(r["odds"]), "bet": r["label"],
+                         "match": f"{info.loc[mid, 'home']} v {info.loc[mid, 'away']}", "league": info.loc[mid, "league"],
+                         "sites": [SITES[s][0] for s in g["site"]], "chance": float(r["chance"])})
     out = []
     today = now.date()
     if not any(x["day"] == today for x in rows) and len(M):
@@ -183,13 +198,13 @@ def days_html(days: list[tuple[str, list[dict]]]) -> str:
 
 
 def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | None, stamp: str, remaining=None,
-          totals: pd.DataFrame | None = None) -> str:
+          totals: pd.DataFrame | None = None, extras: pd.DataFrame | None = None) -> str:
     e = html.escape
     present = [s for s in SITES if len(quotes) and s in set(quotes["site"])]
     n_flags = int(sum(1 for f in M["flag"] if f)) if len(M) else 0
 
     # ---- today's best bets: per day, up to TOP_N results whose best price beats the fair price
-    days = daily_picks(M, quotes, totals=totals)
+    days = daily_picks(M, quotes, totals=totals, extras=extras)
     picks_html = days_html(days)
 
     # ---- which site pays the most
@@ -269,7 +284,7 @@ swing too much to prove anything, so the kick-off odds are the fairer test. This
 
 <section class=section id=best><div class=wrap>
 <h2>Ranked by expected return.</h2>
-<p class=sub>Each result's chance comes from the odds at every site, with each site's cut removed. A bet is listed when one site pays more than that chance deserves. The green number is the expected profit per $100 bet. Bet the result shown, at the site shown, at those odds or better.</p>
+<p class=sub>Each outcome is assigned an estimated true probability based on odds from multiple sportsbooks, with each sportsbook's built-in margin removed. A bet is flagged when a sportsbook offers better odds than the estimated probability justifies, creating a positive expected value opportunity. The green number represents the projected profit per $100 wagered over the long run.</p>
 {picks_html}
 </div></section>
 

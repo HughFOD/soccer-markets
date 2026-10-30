@@ -120,17 +120,22 @@ def run(raw_dir: Path = ROOT / "data" / "raw", fixtures: Path | None = None, out
                   f"{G['id'].nunique() if len(G) else 0} matches priced")
         else:
             print("goals odds: none returned")
+        from . import extras
+        X = extras.price(extras.table(saved.get("extras") or {}, usbooks.SITES))
+        if len(X):
+            print(f"extra markets: {X['id'].nunique()} matches, {X.groupby(['id', 'market', 'line', 'outcome']).ngroups} bets, "
+                  f"{int(X['edge'].notna().sum())} prices with an expected chance; groups {X['group'].value_counts().to_dict()}")
         board = usbooks.scoreboard(quotes, t)
         res = out_dir / "results.json"
         R = json.loads(res.read_text()) if res.exists() else None
         out_dir.mkdir(parents=True, exist_ok=True)
         M.to_csv(out_dir / "this_week_us.csv", index=False)
         board.to_csv(out_dir / "site_scoreboard.csv", index=False)
-        page_html = site.build(M, quotes, board, R, stamp, saved.get("remaining"), totals=G)
+        page_html = site.build(M, quotes, board, R, stamp, saved.get("remaining"), totals=G, extras=X)
         for name in ("index.html", "this-week.html"):
             (docs / name).write_text(page_html)
         from . import prices
-        (docs / "best-prices.html").write_text(prices.build(M, quotes, G, stamp))
+        (docs / "best-prices.html").write_text(prices.build(M, quotes, G, stamp, extras=X))
         print(f"{len(M)} matches across {board.shape[0]} sites, {int((M['flag'] != '').sum()) if len(M) else 0} flagged -> docs/index.html")
         return M
     print("No Odds API key (odds_api_key.txt), so pricing against European bookmakers from football-data.co.uk instead.")
