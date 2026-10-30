@@ -264,7 +264,7 @@ swing too much to prove anything, so the kick-off odds are the fairer test. This
 <div class=stat><div class=v>{len(M)}</div><div class=l>matches this week</div></div>
 <div class=stat><div class=v>{len(present)}</div><div class=l>sportsbooks and prediction markets</div></div>
 <div class=stat><div class=v>{sum(len(b) for _, b in days)}</div><div class=l>bets that beat what's expected</div></div>
-<div class=stat><div class=v>{e(best_site)}</div><div class=l>pays closest to expected</div></div>
+<div class=stat><div class=v>{e(best_site)}</div><div class=l>best odds on average</div></div>
 </div></div></section>
 
 <section class=section id=best><div class=wrap>
