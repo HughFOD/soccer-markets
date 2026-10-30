@@ -269,7 +269,7 @@ swing too much to prove anything, so the kick-off odds are the fairer test. This
 
 <section class=section id=best><div class=wrap>
 <h2>Ranked by expected return.</h2>
-<p class=sub>Each result's chance comes from the odds at every site, with each site's cut removed. A bet is listed when one site pays more than that chance deserves. The green number is the average profit per $100 if you made that bet many times. Bet the result shown, at the site shown, at those odds or better.</p>
+<p class=sub>Each result's chance comes from the odds at every site, with each site's cut removed. A bet is listed when one site pays more than that chance deserves. The green number is the expected profit per $100 bet. Bet the result shown, at the site shown, at those odds or better.</p>
 {picks_html}
 </div></section>
 

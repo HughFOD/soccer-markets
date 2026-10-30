@@ -3,8 +3,8 @@
 Needs a free API key saved in odds_api_key.txt in the project folder (or the
 ODDS_API_KEY environment variable). One refresh of six leagues uses 12 of the
 free plan's 500 monthly credits for match results (two regions per league), plus
-1 credit for goals over/under per league with a match today
-(US sportsbooks only), usually 1 to 6 more: about 460 a month in all.
+2 credits for goals over/under in each of the (at most) 2 leagues with the most
+matches today: at most 16 a day, under 500 a month.
 
 - Sites: FanDuel, DraftKings and BetMGM, plus the prediction markets Kalshi and
   Polymarket (largest first). Every other site is ignored.
@@ -40,6 +40,7 @@ SITES = {  # key -> (display name, kind). Only these sites are used, listed by U
 }
 THRESHOLD = 0.02
 TOTALS_REGION = "us,us_ex"   # goals over/under: sportsbooks and prediction markets (on the free plan only BetMGM sends goals odds among the sportsbooks)
+TOTALS_MAX_LEAGUES = 2  # goals odds cost 2 credits per league (two regions): 12 + 4 a day stays under 500 a month
 TOTALS_DAYS = 1        # fetch goals over/under for leagues with a match today (New York time); keeps the free plan under 500 a month
 ET = "America/New_York"
 
@@ -79,21 +80,22 @@ def download(key: str, dest: Path) -> dict:
     return out
 
 
-def soon_sports(raw: dict, now: pd.Timestamp | None = None, days: int = TOTALS_DAYS) -> list[str]:
-    """Leagues with at least one match kicking off between now and the end of the last of `days` days."""
+def soon_sports(raw: dict, now: pd.Timestamp | None = None, days: int = TOTALS_DAYS,
+                limit: int = TOTALS_MAX_LEAGUES) -> list[str]:
+    """Leagues with a match kicking off between now and the end of the last of `days` days:
+    the `limit` leagues with the most such matches."""
     now = now or pd.Timestamp.now(tz=ET)
     end = (now.tz_convert(ET).normalize() + pd.Timedelta(days=days))
-    out = []
+    count: dict[str, set] = {}
     for k, events in raw.items():
-        sport = k.split("|")[0]
-        if k.endswith("|totals") or sport in out:
+        if k.endswith("|totals"):
             continue
+        sport = k.split("|")[0]
         for ev in events:
             ko = pd.Timestamp(ev["commence_time"]).tz_convert(ET)
             if now < ko < end:
-                out.append(sport)
-                break
-    return out
+                count.setdefault(sport, set()).add(ev["id"])
+    return sorted(count, key=lambda s: -len(count[s]))[:limit]
 
 
 def totals_table(raw: dict) -> pd.DataFrame:
