@@ -41,7 +41,7 @@ SITES = {  # key -> (display name, kind). Only these sites are used, listed by U
 THRESHOLD = 0.02
 TOTALS_REGION = "us,us_ex"   # goals over/under: sportsbooks and prediction markets
 TOTALS_MAX_LEAGUES = 2  # used only when limiting goals odds to the busiest leagues
-TOTALS_ALL = True       # paid plan: goals odds for every league, every upcoming match
+TOTALS_ALL_ABOVE = 2000  # with more credits than this left (a paid plan), fetch goals odds for every league
 TOTALS_DAYS = 1        # fetch goals over/under for leagues with a match today (New York time); keeps the free plan under 500 a month
 ET = "America/New_York"
 
@@ -70,7 +70,11 @@ def download(key: str, dest: Path) -> dict:
             except Exception as e:  # league out of season, or a temporary error
                 print(f"  skipped {sport} {region}: {e}")
                 out[f"{sport}|{region}"] = []
-    for sport in (SPORTS if TOTALS_ALL else soon_sports(out)):
+    try:
+        paid = float(remaining) > TOTALS_ALL_ABOVE
+    except (TypeError, ValueError):
+        paid = False
+    for sport in (SPORTS if paid else soon_sports(out)):
         try:
             out[f"{sport}|{TOTALS_REGION}|totals"], remaining = fetch(key, sport, TOTALS_REGION, "totals")
         except Exception as e:

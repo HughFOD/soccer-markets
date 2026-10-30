@@ -96,20 +96,6 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
                       f"error score {f['ll_close']} against {f['ll_open']} (lower is better).</p>",
                       viz.line_moves(R["closing"]["moves"])))
 
-    mm = R["model"]
-    sc = mm["scores"]
-    names = {"uniform": "Equal chances (⅓ each)", "model": "Model from past results", "market": "The odds",
-             "market_recalibrated": "The odds, recalibrated", "market_plus_model": "The odds and the model combined"}
-    rows = "".join(f"<tr><td>{names.get(k, k)}</td><td class=num>{v['log_loss']:.3f}</td></tr>" for k, v in sc.items())
-    items.append(("model", "A model built from past results can't beat the odds",
-                  f"Error score (lower is better): the odds {sc['market']['log_loss']:.3f}, my model {sc['model']['log_loss']:.3f}, "
-                  f"treating all three results as equally likely {sc['uniform']['log_loss']:.3f}.",
-                  f"<div class=tw><table><tr><th>Forecast ({f['eval_matches']} matches from {f['eval_from']})</th><th class=num>Error score</th></tr>{rows}</table></div>"
-                  f"<p>Betting $100 whenever my model rated a result 5%+ more likely than the odds: "
-                  f"{dollars(float(f['vb_avg'].rstrip('%')) / 100, True)} a bet at the average price, "
-                  f"{dollars(float(f['vb_best'].rstrip('%')) / 100, True)} at the best price.</p>",
-                  viz.value_bets(curve) if curve is not None and len(curve) else ""))
-
     bl = {r["league"]: r for r in R.get("by_league", [])}
     if {"E0", "E1"} <= set(bl):
         e0, e1 = bl["E0"], bl["E1"]
@@ -150,7 +136,6 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
 
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 {theme.meta("research.html", "How accurate are betting odds? · Today's Soccer Bets", "What 20 years of soccer betting odds show about how accurate the odds are and how much each bookmaker charges.")}
-<meta name=description content="A test of soccer betting odds on {f['matches']} matches: how accurate they are, where they go wrong, and whether a model can beat them.">
 <style>{theme.CSS}{EXTRA_CSS}{viz.CSS}</style></head><body>
 {theme.nav("research")}
 <section class=hero><div class=wrap>
@@ -172,9 +157,8 @@ from the {f['leagues']}, every season since {R['seasons'][0][:4]}.</p>
 <ul class=plain>
 <li><b>Data.</b> Results and odds from up to ten bookmakers per match, from <a href="https://www.football-data.co.uk">football-data.co.uk</a>.</li>
 <li><b>Removing the margin.</b> Three methods compared: proportional, power and Shin's 1993 model.</li>
-<li><b>Model.</b> Team ratings refitted every week on past matches only, in scikit-learn.</li>
 <li><b>Uncertainty.</b> 95% ranges from resampling whole matches (the bootstrap).</li>
-<li><b>Tests.</b> Automated checks, including one that the model never sees a match before predicting it.</li>
+<li><b>Tests.</b> Automated checks on every calculation.</li>
 <li><b>Odds.</b> Snapshots from European bookmakers collected by football-data.co.uk.</li>
 </ul>
 </div></section>
