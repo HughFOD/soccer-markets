@@ -169,7 +169,7 @@ document.documentElement.classList.add('js');})();</script>"""
 <p class=updated>Last updated {stamp}</p>
 </div></section>
 <section class=section style="padding-top:0"><div class=wrap>
-<p class=sub>{len(M)} matches. Match results compared across {len(set(quotes['site'])) if len(quotes) else 0} sites; total goals for today's matches in the two busiest leagues. Green means the price pays more than the bet's chance deserves.</p>
+<p class=sub>Green marks a good bet: the odds pay more than its chance of winning deserves.</p>
 {content}
 </div></section>
 {theme.footer()}
