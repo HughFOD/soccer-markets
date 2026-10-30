@@ -254,7 +254,7 @@ swing too much to prove anything, so the kick-off odds are the fairer test. This
 <section class=hero><div class=wrap>
 <p class=eyebrow>Updated every morning</p>
 <h1>Bets that beat what's expected.</h1>
-<p class=lede>Every day's soccer bets that pay more than their chance of winning deserves, from the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and the Championship.</p>
+<p class=lede>Today's best-value soccer bets, and where to place them.</p>
 <div class=ctas><a class=btn href="#best">See today's bets</a><a class="btn ghost" href="research.html">How accurate are odds</a></div>
 <p class=updated>Last updated {stamp}</p>
 </div></section>
