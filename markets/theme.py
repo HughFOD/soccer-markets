@@ -48,13 +48,13 @@ h1,h2,h3,h4,.display{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Displa
 .gnav{position:sticky;top:0;z-index:10;background:var(--nav);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
   border-bottom:1px solid var(--hair)}
 .gnav .wrap{display:flex;align-items:center;justify-content:space-between;height:48px}
-.gnav .brand{font-weight:600;font-size:17px;color:var(--ink);letter-spacing:-.02em}
+.gnav .brand{font-weight:600;font-size:17px;color:var(--ink);letter-spacing:-.02em;margin-right:16px}
 .gnav nav{display:flex;gap:22px;font-size:14px}.gnav nav a{color:var(--ink2)}.gnav nav a.on{color:var(--ink);font-weight:600}
 .gnav nav a:hover{color:var(--ink);text-decoration:none}
 .gnav .right{display:flex;align-items:center;gap:18px}
 .gnav a,.gnav nav{white-space:nowrap}
 @media (max-width:420px){.gnav .wrap{padding:0 14px}.gnav .brand{font-size:15px}.gnav nav{gap:12px;font-size:13px}.gnav .right{gap:8px}}
-@media (max-width:370px){.gnav nav a[href^="https"]{display:none}}
+@media (max-width:440px){.gnav nav a[href^="https"]{display:none}}
 .themebtn{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:0;border-radius:50%;background:transparent;
   color:var(--ink2);cursor:pointer;padding:0}
 .themebtn:hover{background:var(--hair);color:var(--ink)}.themebtn svg{width:17px;height:17px;display:none}
@@ -106,7 +106,7 @@ footer .wrap{border-top:1px solid var(--line);padding-top:18px}
 footer p{margin:0 0 6px}
 
 @media (max-width:820px){.stats{grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr}}
-@media (max-width:520px){.hero{padding:48px 0 34px}.band,.section{padding:44px 0}.stat{padding:18px 16px}.gnav nav{gap:14px}
+@media (max-width:520px){.hero{padding:48px 0 34px}.band,.section{padding:44px 0}.stat{padding:18px 16px}
   th,td{padding:10px 10px}.card{padding:22px 18px}}
 """
 
