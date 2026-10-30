@@ -2,7 +2,7 @@
 
 Every match this week in six top leagues (Premier League, Championship, La
 Liga, Bundesliga, Serie A, Ligue 1), priced by the major US sites only:
-FanDuel, DraftKings, BetMGM, Kalshi and Polymarket. Each site's odds are compared with the
+FanDuel, DraftKings, Fanatics, BetMGM, Caesars, Kalshi and Polymarket. Each site's odds are compared with the
 consensus of all of them, and any price clearly better than the consensus is
 flagged.
 
