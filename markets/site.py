@@ -237,15 +237,15 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
         hrows = "".join(f"<tr><td>Over {100 * x['threshold']:.0f}%</td><td class=n>{x['bets']:,}</td>"
                         f"<td class=n>{_pct(x['expected'])}</td><td class=n>{_pct(x['edge_vs_close'])}</td><td class=n>{100 * x['beat_close']:.0f}%</td></tr>"
                         for x in cs["rules"])
-        hist = f"""<h2>Does beating what's expected hold up?</h2>
-<p class=sub>A bet that beats what's expected could just be noise. The test is whether it still beats it at kick-off,
-when every site has caught up with the news. Free historical odds from American sportsbooks and prediction markets
-don't exist, so this test uses the same method on {len(cs['books'])} European bookmakers, {cs['seasons'][0][:4]} to {cs['seasons'][-1][-4:]}
-({cs['matches']:,} matches), comparing each bet with the expected chance just before kick-off.</p>
-<div class=tablewrap><table><tr><th>Bets with an expected return of</th><th class=n>Bets</th><th class=n>Expected return when found</th><th class=n>Expected return at kick-off</th><th class=n>Still ahead at kick-off</th></tr>{hrows}</table></div>
-<p class=note>Bets with an expected return over 2% were still ahead at kick-off {100 * r2['beat_close']:.0f}% of the time, by {_pct(r2['edge_vs_close'], 1, False)} on average
-(95% range {_pct(r2['lo'], 1, False)} to {_pct(r2['hi'], 1, False)}). Small gaps (under 1%) are mostly noise. Profit over a few hundred bets
-is too noisy to judge either way, which is why the kick-off price is the better test. This is a study of pricing, not betting advice.</p>"""
+        hist = f"""<h2>Are the flagged bets real?</h2>
+<p class=sub>A flagged bet could just be noise. The odds just before kick-off are the most accurate there are, because
+by then all the news is in. So each flagged bet is checked again at kick-off: was it still a good bet? Old odds from
+American sportsbooks and prediction markets aren't available for free, so this test uses the same method on {len(cs['books'])} European bookmakers, {cs['seasons'][0][:4]} to {cs['seasons'][-1][-4:]}
+({cs['matches']:,} matches).</p>
+<div class=tablewrap><table><tr><th>Flagged at</th><th class=n>Bets</th><th class=n>Looked like when flagged</th><th class=n>Was worth at kick-off</th><th class=n>Still a good bet at kick-off</th></tr>{hrows}</table></div>
+<p class=note>Bets flagged at over 2% were still good bets at kick-off {100 * r2['beat_close']:.0f}% of the time, worth {_pct(r2['edge_vs_close'], 1, False)} on average
+(95% range {_pct(r2['lo'], 1, False)} to {_pct(r2['hi'], 1, False)}). Gaps under 1% were mostly noise. Actual wins and losses over a few hundred bets
+swing too much to prove anything, so the kick-off odds are the fairer test. This is a study of pricing, not betting advice.</p>"""
 
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 {theme.meta("", "Today's Soccer Bets: bets that beat the odds", "Every morning: the soccer bets at FanDuel, DraftKings, BetMGM, Kalshi and Polymarket that pay more than their chance of winning deserves.")}
@@ -254,7 +254,7 @@ is too noisy to judge either way, which is why the kick-off price is the better 
 <section class=hero><div class=wrap>
 <p class=eyebrow>Updated every morning</p>
 <h1>Bets that beat what's expected.</h1>
-<p class=lede>Every morning: the soccer bets that pay more than their chance of winning deserves, from the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and the Championship.</p>
+<p class=lede>Every day's soccer bets that pay more than their chance of winning deserves, from the Premier League, La Liga, Bundesliga, Serie A, Ligue 1 and the Championship.</p>
 <div class=ctas><a class=btn href="#best">See today's bets</a><a class="btn ghost" href="research.html">How accurate are odds</a></div>
 <p class=updated>Last updated {stamp}</p>
 </div></section>
