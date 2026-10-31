@@ -168,8 +168,9 @@ def test_american_odds():
     assert american(2.5) == "+150" and american(1.5) == "-200" and american(2.0) == "+100"
 
 
-def test_consensus_comparison_flags_the_generous_site():
+def test_consensus_comparison_flags_the_generous_site(monkeypatch):
     from markets import usbooks
+    monkeypatch.setattr(usbooks, "FEE_RATES", {})   # tests the consensus logic alone; fees have their own tests
     ev = lambda books: {"id": "e1", "commence_time": "2026-10-31T15:00:00Z", "home_team": "A", "away_team": "B",
                         "bookmakers": [{"key": k, "title": k, "markets": [{"key": "h2h", "outcomes": [
                             {"name": "A", "price": h}, {"name": "B", "price": a}, {"name": "Draw", "price": d}]}]}
@@ -186,9 +187,10 @@ def test_consensus_comparison_flags_the_generous_site():
     assert list(board["site"]) == [k for k in usbooks.SITES if k in set(board["site"])]    # listed in market-share order
 
 
-def test_daily_picks_rank_only_bets_that_beat_the_fair_price():
+def test_daily_picks_rank_only_bets_that_beat_the_fair_price(monkeypatch):
     import pandas as pd
     from markets import site, usbooks
+    monkeypatch.setattr(usbooks, "FEE_RATES", {})   # tests the ranking alone; fees have their own tests
     ko = "2026-10-31T15:00:00Z"
     ev = lambda mid, books: {"id": mid, "commence_time": ko, "home_team": "A" + mid, "away_team": "B" + mid,
                              "bookmakers": [{"key": k, "title": k, "markets": [{"key": "h2h", "outcomes": [
@@ -289,3 +291,32 @@ def test_extras_only_fetched_for_matches_today():
            "soccer_epl|us_ex": [{"id": "a", "commence_time": "2026-10-31T15:00:00Z"}],
            "soccer_epl|us,us_ex|totals": [{"id": "c", "commence_time": "2026-10-31T13:00:00Z"}]}
     assert extras.due(raw, now) == [("soccer_epl", "a")]
+
+
+def test_prediction_market_fees_lower_the_odds():
+    from markets.usbooks import after_fees
+    # Kalshi at 50 cents: fee 0.07 x 0.5 x 0.5 = 1.75 cents, so $1 costs 51.75 cents.
+    assert abs(after_fees("kalshi", 2.0) - 1 / 0.5175) < 1e-9
+    assert abs(after_fees("polymarket", 2.0) - 1 / 0.5125) < 1e-9
+    assert after_fees("fanduel", 2.0) == 2.0            # sportsbooks: the cut is already in the odds
+    assert after_fees("kalshi", 10.0) < 10.0 and after_fees("kalshi", 1.1) < 1.1
+
+
+def test_prediction_market_edge_shrinks_once_fees_are_paid():
+    """The same prediction-market quote is worth less to a bettor once its fee is counted."""
+    from markets import usbooks
+    ev = {"id": "m1", "home_team": "A", "away_team": "B", "commence_time": "2026-11-01T15:00:00Z", "bookmakers": []}
+    for key, (h, d, a) in {"fanduel": (2.3, 3.2, 3.0), "draftkings": (2.3, 3.25, 2.95),
+                           "betmgm": (2.35, 3.2, 2.95), "kalshi": (2.45, 3.45, 3.15)}.items():
+        ev["bookmakers"].append({"key": key, "markets": [{"key": "h2h", "outcomes": [
+            {"name": "A", "price": h}, {"name": "Draw", "price": d}, {"name": "B", "price": a}]}]})
+    raw = {"soccer_epl|us": [ev]}
+    usbooks.FEE_RATES, saved = {}, dict(usbooks.FEE_RATES)
+    try:
+        _, q_free = usbooks.price(usbooks.to_table(raw))
+    finally:
+        usbooks.FEE_RATES = saved
+    _, q_fee = usbooks.price(usbooks.to_table(raw))
+    kal_free = q_free[q_free.site == "kalshi"].edge.max()
+    kal_fee = q_fee[q_fee.site == "kalshi"].edge.max()
+    assert kal_fee < kal_free - 0.02
