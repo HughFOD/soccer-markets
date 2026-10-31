@@ -270,7 +270,7 @@ swing too much to prove anything, so the kick-off odds are the fairer test. This
 <p class=eyebrow>Updated every morning</p>
 <h1>Bets that beat what's expected.</h1>
 <p class=lede>Today's best-value soccer bets, and where to place them.</p>
-<div class=ctas><a class=btn href="#best">See today's bets</a><a class="btn ghost" href="research.html">How accurate are odds</a></div>
+<div class=ctas><a class=btn href="#best">See today's bets</a><a class="btn ghost" href="best-prices.html">Best price for every bet</a></div>
 <p class=updated>Last updated {stamp}</p>
 </div></section>
 
@@ -286,6 +286,7 @@ swing too much to prove anything, so the kick-off odds are the fairer test. This
 <h2>Ranked by expected return.</h2>
 <p class=sub>Each outcome is assigned an estimated true probability based on odds from multiple sportsbooks, with each sportsbook's built-in margin removed. A bet is flagged when a sportsbook offers better odds than the estimated probability justifies, creating a positive expected value opportunity. The green number represents the projected profit per $100 wagered over the long run. Kalshi and Polymarket charge a trading fee on every bet, so their odds here are what you actually get after that fee.</p>
 {picks_html}
+<p class=sub style="margin-top:18px"><b>Looking for a bet that isn't listed?</b> Most bets don't beat what's expected at any site, but one site still pays the most. <a href="best-prices.html">See the best price for every bet&nbsp;›</a></p>
 </div></section>
 
 <section class=band><div class=wrap>
