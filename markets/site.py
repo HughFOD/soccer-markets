@@ -87,7 +87,8 @@ MIN_EDGE = 0.001  # a bet is listed only if its best price beats the fair (conse
 
 
 def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None = None,
-                totals: pd.DataFrame | None = None, extras: pd.DataFrame | None = None) -> list[tuple[str, list[dict]]]:
+                totals: pd.DataFrame | None = None, extras: pd.DataFrame | None = None,
+                everything: bool = False):
     """[(day label, [bet, ...])] for each day from today on, highest expected return first.
 
     A bet is one result of one match at its best price across the sites. Its expected chance is the
@@ -95,12 +96,21 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
     odds - 1. Only bets with a positive expected return are kept. Matches that have kicked off are left out.
     `totals` (from usbooks.price_totals) adds goals over/under bets, priced the same way, and `extras`
     (from extras.price) adds corners, cards, player and other bets that have an expected chance.
+    everything=True returns one flat list of every best-price bet, whatever its expected return
+    (used by the track record to re-check earlier picks).
     """
+    keep = (lambda edge, n: True) if everything else (lambda edge, n: MIN_EDGE < edge <= MAX_EDGE)
     has_totals = totals is not None and len(totals)
     if not len(M) or (not len(quotes) and not has_totals):
         return []
     now = now or pd.Timestamp.now(tz=ET)
     order = {k: i for i, k in enumerate(SITES)}
+    # how many sites price each bet
+    nsites_result = M.set_index("id")["n_sites"].to_dict() if "n_sites" in M else {}
+    nsites_totals = (totals.groupby(["id", "point"])["site"].nunique().to_dict()
+                     if totals is not None and len(totals) else {})
+    nsites_extra = (extras[extras["edge"].notna()].groupby(["id", "market", "line"])["site"].nunique().to_dict()
+                    if extras is not None and len(extras) else {})
     rows = []
     if len(quotes):
         q = quotes.merge(M[["id", "kickoff", "home", "away", "league", "best_h", "best_d", "best_a",
@@ -113,13 +123,15 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
             g = g.sort_values("site", key=lambda c: c.map(order))
             r = g.iloc[0]
             edge = float(r["edge"])
-            if not (MIN_EDGE < edge <= MAX_EDGE):
+            n = int(nsites_result.get(mid, 0))
+            if not keep(edge, n):
                 continue
             team = r["home"] if res == "h" else r["away"] if res == "a" else None
             rows.append({"day": r["ko"].date(), "ko": r["ko"], "edge": edge, "odds": american(r["odds"]), "paid": 1 / float(r["odds"]),
                          "bet": f"{team} to win" if team else "Draw", "match": f"{r['home']} v {r['away']}",
                          "league": r["league"], "sites": [SITES[x][0] for x in g["site"]],
-                         "chance": float(r[f"cons_{res}"])})
+                         "chance": float(r[f"cons_{res}"]), "n_sites": n,
+                         "id": mid, "dec": float(r["odds"]), "kind": "result", "outcome": res, "point": np.nan})
     if totals is not None and len(totals):
         g2 = totals.copy()
         g2["ko"] = pd.to_datetime(g2["kickoff"]).dt.tz_convert(ET)
@@ -128,12 +140,14 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
             g = g.sort_values("site", key=lambda c: c.map(order))
             r = g.iloc[0]
             edge = float(r["edge"])
-            if not (MIN_EDGE < edge <= MAX_EDGE):
+            n = int(nsites_totals.get((mid, point), 0))
+            if not keep(edge, n):
                 continue
             rows.append({"day": r["ko"].date(), "ko": r["ko"], "edge": edge, "odds": american(r["odds"]),
                          "paid": 1 / float(r["odds"]), "bet": f"{side} {point:g} goals",
                          "match": f"{r['home']} v {r['away']}", "league": r["league"],
-                         "sites": [SITES[x][0] for x in g["site"]], "chance": float(r["chance"])})
+                         "sites": [SITES[x][0] for x in g["site"]], "chance": float(r["chance"]), "n_sites": n,
+                         "id": mid, "dec": float(r["odds"]), "kind": "totals", "outcome": side, "point": float(point)})
     if extras is not None and len(extras):
         info = M.set_index("id")[["kickoff", "home", "away", "league"]]
         x = extras[extras["best"] & extras["edge"].notna() & extras["id"].isin(info.index)]
@@ -142,12 +156,17 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
             r = g.iloc[0]
             edge = float(r["edge"])
             ko = pd.Timestamp(info.loc[mid, "kickoff"]).tz_convert(ET)
-            if ko <= now or not (MIN_EDGE < edge <= MAX_EDGE):
+            n = int(nsites_extra.get((mid, mk, line), 0))
+            if ko <= now or not keep(edge, n):
                 continue
             rows.append({"day": ko.date(), "ko": ko, "edge": edge, "odds": american(r["odds"]),
                          "paid": 1 / float(r["odds"]), "bet": r["label"],
                          "match": f"{info.loc[mid, 'home']} v {info.loc[mid, 'away']}", "league": info.loc[mid, "league"],
-                         "sites": [SITES[s][0] for s in g["site"]], "chance": float(r["chance"])})
+                         "sites": [SITES[s][0] for s in g["site"]], "chance": float(r["chance"]), "n_sites": n,
+                         "id": mid, "dec": float(r["odds"]), "kind": mk, "outcome": outc,
+                         "point": float(r["point"]) if pd.notna(r["point"]) else np.nan})
+    if everything:
+        return rows
     out = []
     today = now.date()
     if not any(x["day"] == today for x in rows) and len(M):
@@ -198,7 +217,7 @@ def days_html(days: list[tuple[str, list[dict]]]) -> str:
 
 
 def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | None, stamp: str, remaining=None,
-          totals: pd.DataFrame | None = None, extras: pd.DataFrame | None = None) -> str:
+          totals: pd.DataFrame | None = None, extras: pd.DataFrame | None = None, record_html: str = "") -> str:
     e = html.escape
     present = [s for s in SITES if len(quotes) and s in set(quotes["site"])]
     n_flags = int(sum(1 for f in M["flag"] if f)) if len(M) else 0
@@ -288,6 +307,7 @@ swing too much to prove anything, so the kick-off odds are the fairer test. This
 {picks_html}
 <p class=sub style="margin-top:18px"><b>Looking for a bet that isn't listed?</b> Most bets don't beat what's expected at any site, but one site still pays the most. <a href="best-prices.html">See the best price for every bet&nbsp;›</a></p>
 </div></section>
+{record_html}
 
 <section class=band><div class=wrap>
 <h2>Which site comes closest.</h2>

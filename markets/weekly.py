@@ -131,7 +131,22 @@ def run(raw_dir: Path = ROOT / "data" / "raw", fixtures: Path | None = None, out
         out_dir.mkdir(parents=True, exist_ok=True)
         M.to_csv(out_dir / "this_week_us.csv", index=False)
         board.to_csv(out_dir / "site_scoreboard.csv", index=False)
-        page_html = site.build(M, quotes, board, R, stamp, saved.get("remaining"), totals=G, extras=X)
+        # track record: save today's listed bets, re-check earlier ones, settle finished matches
+        from . import track
+        now = pd.Timestamp.now(tz=site.ET)
+        days = site.daily_picks(M, quotes, now=now, totals=G, extras=X)
+        L = track.load()
+        L = track.record(L, days, now)
+        L = track.update(L, site.daily_picks(M, quotes, now=now, totals=G, extras=X, everything=True), now)
+        need = track.sports_needed(L, now)
+        if key and download and need:
+            L = track.grade(L, track.fetch_scores(key, need), now)
+        else:
+            L = track.grade(L, {}, now)
+        track.save(L)
+        print(f"track record: {len(L)} bets saved, {int(L['result'].isin(['won', 'lost', 'push', 'half won', 'half lost']).sum())} settled")
+        page_html = site.build(M, quotes, board, R, stamp, saved.get("remaining"), totals=G, extras=X,
+                               record_html=track.html_section(L))
         for name in ("index.html", "this-week.html"):
             (docs / name).write_text(page_html)
         from . import prices
