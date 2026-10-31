@@ -331,3 +331,48 @@ def test_impossible_odds_are_skipped_not_fatal():
         assert np.isfinite(P[2]).all() and np.isclose(P[2].sum(), 1)
     P = margin.power(odds)
     assert np.isfinite(P[1]).all() and np.isclose(P[1].sum(), 1)
+
+
+def _row(kind, outcome, point=None, home="A", away="B"):
+    return {"kind": kind, "outcome": outcome, "point": point if point is not None else float("nan"),
+            "home": home, "away": away}
+
+
+def test_track_record_settles_from_the_final_score():
+    from markets import track
+    P = lambda row, hg, ag, odds=2.0: track.profit_and_label(track.settle(row, hg, ag), odds)
+    assert P(_row("result", "h"), 2, 1) == (100.0, "won")
+    assert P(_row("result", "d"), 2, 1) == (-100.0, "lost")
+    assert P(_row("totals", "Over", 2.5), 2, 1) == (100.0, "won")
+    assert P(_row("alternate_totals", "Under", 3.0), 2, 1) == (0.0, "push")
+    assert P(_row("alternate_spreads", "A", -1.5), 2, 1) == (-100.0, "lost")
+    assert P(_row("alternate_spreads", "B", 1.5), 2, 1) == (100.0, "won")
+    assert P(_row("alternate_spreads", "A", -0.25), 1, 1) == (-50.0, "half lost")   # half push, half loss
+    assert P(_row("alternate_totals", "Over", 2.75), 3, 0) == (50.0, "half won")    # half win, half push
+    assert P(_row("btts", "Yes"), 1, 1) == (100.0, "won")
+    assert P(_row("draw_no_bet", "B"), 1, 1) == (0.0, "push")
+    assert track.settle(_row("alternate_totals_corners", "Over", 9.5), 1, 0) is None
+
+
+def test_track_record_saves_once_rechecks_and_grades(tmp_path, monkeypatch):
+    import pandas as pd
+    from markets import track
+    monkeypatch.setattr(track, "LEDGER", tmp_path / "track_record.csv")
+    ko = pd.Timestamp("2026-11-01T15:00", tz="UTC")
+    bet = {"id": "m1", "kind": "result", "outcome": "h", "point": float("nan"), "match": "A v B", "ko": ko,
+           "league": "Premier League", "bet": "A to win", "sites": ["FanDuel"], "n_sites": 5, "dec": 2.2,
+           "chance": 0.48, "edge": 0.056}
+    corner = {**bet, "kind": "alternate_totals_corners", "outcome": "Over", "point": 9.5, "bet": "Over 9.5 corners"}
+    t0 = pd.Timestamp("2026-10-31T10:00", tz="UTC")
+    L = track.record(track.load(), [("Tomorrow", [bet, corner])], t0)
+    L = track.record(L, [("Tomorrow", [bet])], t0 + pd.Timedelta(hours=1))          # already saved: not duplicated
+    assert len(L) == 2
+    L = track.update(L, [{**bet, "chance": 0.44}], pd.Timestamp("2026-11-01T10:00", tz="UTC"))
+    r = L[L["kind"] == "result"].iloc[0]
+    assert abs(r["last_value"] - (0.44 * 2.2 - 1)) < 1e-9                          # price no longer beats expected
+    assert track.sports_needed(L, ko + pd.Timedelta(hours=3)) == ["soccer_epl"]
+    L = track.grade(L, {"m1": (2, 0)}, ko + pd.Timedelta(hours=3))
+    assert list(L["result"]) == ["won", "not graded"] and L["profit"].iloc[0] == 120.0
+    track.save(L)
+    L2 = track.load()
+    assert len(L2) == 2 and "How the picks have done" in track.html_section(L2)
