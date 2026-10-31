@@ -320,3 +320,14 @@ def test_prediction_market_edge_shrinks_once_fees_are_paid():
     kal_free = q_free[q_free.site == "kalshi"].edge.max()
     kal_fee = q_fee[q_fee.site == "kalshi"].edge.max()
     assert kal_fee < kal_free - 0.02
+
+
+def test_impossible_odds_are_skipped_not_fatal():
+    """Odds of 1.0 or less (a "certain" result) once crashed the daily update; they are now left out."""
+    odds = np.array([[1.0, 15.0], [1.001, 30.0], [1.9, 1.95]])
+    for f in (margin.power, margin.shin):   # the solvers that used to crash
+        P = f(odds)
+        assert np.isnan(P[0]).all()
+        assert np.isfinite(P[2]).all() and np.isclose(P[2].sum(), 1)
+    P = margin.power(odds)
+    assert np.isfinite(P[1]).all() and np.isclose(P[1].sum(), 1)
