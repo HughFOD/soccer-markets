@@ -1,8 +1,8 @@
 # Soccer Odds Compared Across US Sportsbooks and Prediction Markets
 
 Every match this week in six top leagues (Premier League, Championship, La
-Liga, Bundesliga, Serie A, Ligue 1), priced by the major US sites only:
-FanDuel, DraftKings, Fanatics, BetMGM, Caesars, Kalshi and Polymarket. Each site's odds are compared with the
+Liga, Bundesliga, Serie A, Ligue 1), priced by FanDuel, DraftKings, Fanatics,
+BetMGM and Caesars, and by the prediction markets Kalshi and Polymarket. Each site's odds are compared with the
 consensus of all of them, and any price clearly better than the consensus is
 flagged.
 
@@ -11,7 +11,11 @@ flagged.
 ## How it works
 
 1. **Collect the odds.** The Odds API supplies current odds from the major US
-   sportsbooks and prediction markets.
+   sportsbooks and prediction markets. Kalshi and Polymarket charge a trading
+   fee on every bet (rate x p x (1 - p) per $1 contract: 0.07 at Kalshi, 0.05
+   at Polymarket US), so their prices are converted to what a bettor actually
+   gets after the fee. Without this, prediction markets look like the best
+   price far more often than they really are.
 2. **Build the consensus.** Each site's odds are turned into chances with its
    cut removed, then averaged with equal weight. No site counts more than
    another. With the cuts removed, the consensus is the fair price.
