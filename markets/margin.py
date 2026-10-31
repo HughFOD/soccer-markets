@@ -36,6 +36,8 @@ def _rows(odds: np.ndarray, solve) -> np.ndarray:
     r = raw(odds)
     out = np.full_like(r, np.nan)
     for i, row in enumerate(r):
+        if np.any(row >= 1.0) or np.any(row <= 0.0):
+            continue  # decimal odds of 1.0 or less (a "certain" result) can't be a real price: leave NaN
         if np.all(np.isfinite(row)) and row.sum() > 1.0:
             out[i] = solve(row)
         elif np.all(np.isfinite(row)):
@@ -45,7 +47,13 @@ def _rows(odds: np.ndarray, solve) -> np.ndarray:
 
 def power(odds: np.ndarray) -> np.ndarray:
     def solve(row):
-        k = brentq(lambda k: np.sum(row ** k) - 1.0, 1.0, 10.0)
+        f = lambda k: np.sum(row ** k) - 1.0
+        hi = 10.0
+        while f(hi) > 0 and hi < 1e4:  # a heavy favourite near 100% needs a larger exponent
+            hi *= 4
+        if f(hi) > 0:
+            return row / row.sum()
+        k = brentq(f, 1.0, hi)
         return row ** k
     return _rows(odds, solve)
 
