@@ -284,7 +284,7 @@ swing too much to prove anything, so the kick-off odds are the fairer test. This
 
 <section class=section id=best><div class=wrap>
 <h2>Ranked by expected return.</h2>
-<p class=sub>Each outcome is assigned an estimated true probability based on odds from multiple sportsbooks, with each sportsbook's built-in margin removed. A bet is flagged when a sportsbook offers better odds than the estimated probability justifies, creating a positive expected value opportunity. The green number represents the projected profit per $100 wagered over the long run.</p>
+<p class=sub>Each outcome is assigned an estimated true probability based on odds from multiple sportsbooks, with each sportsbook's built-in margin removed. A bet is flagged when a sportsbook offers better odds than the estimated probability justifies, creating a positive expected value opportunity. The green number represents the projected profit per $100 wagered over the long run. Kalshi and Polymarket charge a trading fee on every bet, so their odds here are what you actually get after that fee.</p>
 {picks_html}
 </div></section>
 
@@ -296,7 +296,7 @@ swing too much to prove anything, so the kick-off odds are the fairer test. This
 
 <section class=section><div class=wrap>
 <h2>Every match.</h2>
-<p class=sub>+150 means a $100 bet wins $150; −200 means you bet $200 to win $100. The best price for each result is in green. The "Expected" row shows each result's expected chance and the odds that would exactly match it.</p>
+<p class=sub>+150 means a $100 bet wins $150; −200 means you bet $200 to win $100. The best price for each result is in green. Kalshi and Polymarket odds are shown after their trading fees, so they look slightly worse than on those apps. The "Expected" row shows each result's expected chance and the odds that would exactly match it.</p>
 {''.join(leagues)}
 </div></section>
 
@@ -306,7 +306,7 @@ swing too much to prove anything, so the kick-off odds are the fairer test. This
 <h2>How it works.</h2>
 <p class=sub>Three steps, rerun every morning.</p>
 <div class=cards>
-<div class=card><h3>Collect the odds.</h3><p>From FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus Kalshi and Polymarket, through The Odds API.</p></div>
+<div class=card><h3>Collect the odds.</h3><p>From FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus Kalshi and Polymarket, through The Odds API. Prediction-market prices are converted to what you get after their trading fee (Kalshi 0.07 &times; p &times; (1&minus;p) per $1 contract, Polymarket 0.05 &times; p &times; (1&minus;p)).</p></div>
 <div class=card><h3>Work out what's expected.</h3><p>Each site's odds become chances with its cut removed, then are averaged with equal weight. That gives every result's expected chance.</p></div>
 <div class=card><h3>Find the bets that beat it.</h3><p>A bet makes the list when a site's odds pay more than its chance deserves. Gaps over 25% are left out as likely stale or mistyped prices.</p></div>
 </div>

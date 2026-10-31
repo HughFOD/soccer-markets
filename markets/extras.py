@@ -20,6 +20,7 @@ import pandas as pd
 
 from .consensus import _probs
 from .fairprice import pool
+from .usbooks import after_fees
 
 REGIONS = "us,us_ex"
 WINDOW_HOURS = 24        # fetch matches kicking off within this many hours of the run
@@ -147,7 +148,7 @@ def table(extra: dict, sites: dict) -> pd.DataFrame:
                     rows.append({"id": eid, "market": m, "group": MARKETS[m][0], "kind": kind,
                                  "line": json.dumps(line), "outcome": name, "site": bk["key"],
                                  "who": desc or "", "point": float(point) if point is not None else np.nan,
-                                 "odds": float(o["price"]),
+                                 "odds": float(after_fees(bk["key"], o["price"])),
                                  "label": _label(m, name, desc, point, home, away)})
     t = pd.DataFrame(rows)
     return t.drop_duplicates(["id", "market", "line", "outcome", "site"]).reset_index(drop=True) if len(t) else t

@@ -39,6 +39,25 @@ SITES = {  # key -> (display name, kind). Only these sites are used, listed by U
     "kalshi": ("Kalshi", "Prediction market"), "polymarket": ("Polymarket", "Prediction market"),
 }
 THRESHOLD = 0.02
+
+# Prediction markets quote prices before their trading fee; sportsbooks build their cut into the odds.
+# To compare like with like, Kalshi and Polymarket odds are converted to what a bettor actually gets
+# after the fee for buying at the listed price (a "taker" trade). Both charge
+#   fee per contract = rate x price x (1 - price)      (price in dollars, contract pays $1)
+# Kalshi: rate 0.07 (its general fee schedule). Polymarket US: rate 0.05 for sports (from July 2026).
+# Both round the fee up to the next cent per order, which is ignored here (it matters only for tiny orders).
+FEE_RATES = {"kalshi": 0.07, "polymarket": 0.05}
+
+
+def after_fees(site: str, odds: float) -> float:
+    """Decimal odds a bettor really gets at `site` once its trading fee is paid."""
+    rate = FEE_RATES.get(site)
+    if not rate or odds is None or not np.isfinite(odds) or odds <= 1:
+        return odds
+    p = 1 / odds
+    return 1 / (p + rate * p * (1 - p))
+
+
 TOTALS_REGION = "us,us_ex"   # goals over/under: sportsbooks and prediction markets
 TOTALS_MAX_LEAGUES = 2  # used only when limiting goals odds to the busiest leagues
 TOTALS_ALL_ABOVE = 2000  # with more credits than this left (a paid plan), fetch goals odds for every league
@@ -130,7 +149,7 @@ def totals_table(raw: dict) -> pd.DataFrame:
                 by_point = {}
                 for o in mk.get("outcomes", []):
                     if o.get("point") is not None and o.get("name") in ("Over", "Under"):
-                        by_point.setdefault(float(o["point"]), {})[o["name"]] = o["price"]
+                        by_point.setdefault(float(o["point"]), {})[o["name"]] = after_fees(bk["key"], o["price"])
                 for point, pr in by_point.items():
                     if "Over" in pr and "Under" in pr:
                         rows.append({"id": ev["id"], "league": SPORTS.get(sport, sport), "kickoff": ev["commence_time"],
@@ -182,7 +201,7 @@ def to_table(raw: dict) -> pd.DataFrame:
                 h2h = next((mk for mk in bk.get("markets", []) if mk.get("key") == "h2h"), None)
                 if not h2h:
                     continue
-                price = {o["name"]: o["price"] for o in h2h.get("outcomes", [])}
+                price = {o["name"]: after_fees(bk["key"], o["price"]) for o in h2h.get("outcomes", [])}
                 oh, od, oa = price.get(ev["home_team"]), price.get("Draw"), price.get(ev["away_team"])
                 if None in (oh, od, oa):
                     continue
