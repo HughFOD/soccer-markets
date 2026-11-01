@@ -329,6 +329,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
             f"<span class=hv>{100 * r['beat_close']:.0f}%</span><span class=hn>{r['bets']:,} bets</span></div>"
             for r in cs["rules"])
         hist = f"""<h2>Are the flagged bets real?</h2>
+<p class=sub><b>What's a flagged bet?</b> One where a site's odds pay more than the bet's chance of winning deserves, judged against all seven sites combined. It can still lose, and often does. The price is in your favor, so over many flagged bets you should come out ahead.</p>
 <p class=sub>The test: is a flagged bet still a good bet at kick-off, when the odds are at their most accurate?</p>
 <div class=bigstat><div class=v>{100 * r2['beat_close']:.0f}%</div><div class=l>of bets flagged with a gap of 2% or more were still good bets at kick-off,
 worth {_pct(r2['edge_vs_close'], 1, False)} per bet on average.</div></div>
