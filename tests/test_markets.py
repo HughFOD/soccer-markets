@@ -372,7 +372,7 @@ def test_track_record_saves_once_rechecks_and_grades(tmp_path, monkeypatch):
     assert abs(r["last_value"] - (0.44 * 2.2 - 1)) < 1e-9                          # price no longer beats expected
     assert track.sports_needed(L, ko + pd.Timedelta(hours=3)) == ["soccer_epl"]
     L = track.grade(L, {"m1": (2, 0)}, ko + pd.Timedelta(hours=3))
-    assert list(L["result"]) == ["won", "not graded"] and L["profit"].iloc[0] == 120.0
+    assert list(L["result"]) == ["won", ""] and L["profit"].iloc[0] == 120.0        # corners wait for the stats file
     track.save(L)
     L2 = track.load()
     assert len(L2) == 2 and "How the picks have done" in track.html_section(L2)
@@ -385,3 +385,26 @@ def test_weekly_tally_counts_only_the_last_7_days():
                       "result": ["won", "lost", "won"], "profit": [120.0, -100.0, 90.0]})
     h = track.weekly_html(g, now)
     assert "2 bets settled, 1 won and 1 lost" in h and "+$20" in h and "Oct" not in h
+
+
+def test_corner_and_card_bets_are_settled_from_match_stats():
+    import pandas as pd
+    from markets import track
+    ko = "2026-10-25T10:00:00-04:00"
+    files = {("E0", "2627"): pd.DataFrame({"Date": ["25/10/2026", "25/10/2026"], "HomeTeam": ["Man United", "Liverpool"],
+                                           "AwayTeam": ["Bournemouth", "Brighton"], "HC": [7, 3], "AC": [4, 6],
+                                           "HY": [2, 1], "AY": [3, 0], "HR": [0, 0], "AR": [1, 0]})}
+    base = {"kickoff": ko, "league": "Premier League", "home": "Manchester United", "away": "Bournemouth",
+            "result": "", "profit": float("nan"), "odds": 1.9}
+    L = pd.DataFrame([
+        {**base, "kind": "alternate_totals_corners", "outcome": "Over", "point": 9.5, "bet": "Over 9.5 corners"},       # 11: won
+        {**base, "kind": "alternate_team_totals_corners", "outcome": "Under", "point": 4.5,
+         "bet": "Bournemouth Under 4.5 corners"},                                                                         # 4: won
+        {**base, "kind": "alternate_spreads_corners", "outcome": "Bournemouth", "point": 2.5, "bet": "Bournemouth +2.5 corners"},  # 4-7=-3: lost
+        {**base, "kind": "corners_1x2", "outcome": "Manchester United", "point": float("nan"), "bet": "Most corners"},  # won
+        {**base, "kind": "alternate_totals_cards", "outcome": "Under", "point": 5.5, "bet": "Under 5.5 cards"},         # 6: lost
+        {**base, "kind": "alternate_totals_corners", "outcome": "Over", "point": 9.5, "bet": "x", "league": "Europa League"},
+    ])
+    L = track.grade_stats(L, pd.Timestamp("2026-10-28T12:00", tz="UTC"), files=files)
+    assert list(L["result"]) == ["won", "won", "lost", "won", "lost", ""]
+    assert abs(L["profit"].iloc[0] - 90) < 1e-9 and L["profit"].iloc[2] == -100
