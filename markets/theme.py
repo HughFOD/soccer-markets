@@ -78,7 +78,7 @@ h1,h2,h3,h4,.display{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Displa
 .band{background:var(--bg2);padding:64px 0}
 .section{padding:64px 0}
 h2{font-size:clamp(32px,4.6vw,48px);line-height:1.08;font-weight:700;letter-spacing:-.01em;margin:0 0 10px}
-.sub{font-size:19px;line-height:1.42;color:var(--muted);margin:0 0 30px;max-width:720px}
+.sub{font-size:19px;line-height:1.42;color:var(--muted);margin:0 0 30px}
 h3{font-size:21px;line-height:1.2;font-weight:600;margin:0 0 6px;letter-spacing:-.015em}
 
 /* big numbers */
