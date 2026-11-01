@@ -369,7 +369,7 @@ def html_section(L: pd.DataFrame) -> str:
              "Before kick-off it's checked again against the latest odds, and after the match it's settled "
              "from the final score. Profit assumes $100 on each bet.")
     if not len(g):
-        return (f"<section class=section><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>"
+        return (f"<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>"
                 f"<p class=sub><b>{len(L)} bets recorded so far.</b> Results appear here once their matches finish."
                 + (f" So far, <b>{still}</b> of the bets re-checked before kick-off were still good value." if len(checked) else "")
                 + "</p></div></section>")
@@ -392,7 +392,7 @@ def html_section(L: pd.DataFrame) -> str:
     note = (f" {other} bet{' is' if other == 1 else 's are'}n't counted: player bets, and corners or cards outside the six leagues "
             "(Premier League, Championship, La Liga, Bundesliga, Serie A, Ligue 1), because there's no free record of how they ended."
             if other else "")
-    return (f"<section class=section><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>{week}"
+    return (f"<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>{week}"
             f"<h3 class=tally>All time</h3>{tiles}"
             f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
             f"several hundred. The \"still good value\" share is the steadier test.{note}</p>"
