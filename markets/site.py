@@ -26,7 +26,16 @@ CSS = theme.CSS + """
 .pick .bet b{display:block;font:700 30px/1.1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;color:var(--ink);letter-spacing:-.02em;margin:2px 0}
 .pick .vs{font-size:14px;color:var(--muted)}
 .edge{display:inline-block;background:var(--goodbg);color:var(--good);font-size:13px;font-weight:600;padding:3px 10px;border-radius:980px;margin-left:6px;vertical-align:middle}
-.tally{font-size:19px;margin:26px 0 8px}.why{grid-column:2/-1;margin-top:-6px;font-size:14px;min-width:0}.bet-main{min-width:0}.why summary{cursor:pointer;color:var(--link);font-weight:500;list-style:none}
+.tally{font-size:19px;margin:26px 0 8px}.bigstat{display:flex;gap:18px;align-items:center;background:var(--tile);border-radius:18px;padding:22px 24px;margin:18px 0}
+.bigstat .v{font:700 52px/1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;letter-spacing:-.03em;color:var(--good)}
+.bigstat .l{color:var(--ink2);font-size:16px}.csub{color:var(--muted);font-size:14px;margin:0 0 12px}
+.hbars{display:grid;gap:10px;margin-bottom:16px}.hb{display:grid;grid-template-columns:78px 1fr 44px 80px;gap:12px;align-items:center;font-size:14px}
+.hl{color:var(--ink2)}.hv{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}.hn{color:var(--muted);font-size:12px;text-align:right}
+.ht{position:relative;height:14px;background:var(--hair);border-radius:7px}.hf{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:7px}
+.h50{position:absolute;left:50%;top:-4px;bottom:-4px;width:2px;background:var(--ink2);opacity:.5}
+.nums summary{cursor:pointer;color:var(--link);font-weight:500;margin:6px 0 10px}
+@media (max-width:520px){.bigstat{flex-direction:column;align-items:flex-start}.hb{grid-template-columns:70px 1fr 40px}.hn{display:none}}
+.why{grid-column:2/-1;margin-top:-6px;font-size:14px;min-width:0}.bet-main{min-width:0}.why summary{cursor:pointer;color:var(--link);font-weight:500;list-style:none}
 .why summary::-webkit-details-marker{display:none}.why summary::after{content:" ›";display:inline-block;transition:transform .15s}
 .why[open] summary::after{transform:rotate(90deg)}.why p{margin:8px 0;color:var(--ink2);line-height:1.45}
 .whygrid{display:grid;grid-template-columns:1fr auto auto;gap:3px 14px;font-size:13px;background:var(--bg2);border-radius:10px;padding:8px 12px}
@@ -309,15 +318,24 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
         hrows = "".join(f"<tr><td>Over {100 * x['threshold']:.0f}%</td><td class=n>{x['bets']:,}</td>"
                         f"<td class=n>{_pct(x['expected'])}</td><td class=n>{_pct(x['edge_vs_close'])}</td><td class=n>{100 * x['beat_close']:.0f}%</td></tr>"
                         for x in cs["rules"])
+        bars = "".join(
+            f"<div class=hb><span class=hl>{100 * r['threshold']:.0f}%+ gap</span>"
+            f"<span class=ht><span class=hf style='width:{100 * r['beat_close']:.0f}%'></span><span class=h50></span></span>"
+            f"<span class=hv>{100 * r['beat_close']:.0f}%</span><span class=hn>{r['bets']:,} bets</span></div>"
+            for r in cs["rules"])
         hist = f"""<h2>Are the flagged bets real?</h2>
-<p class=sub>A flagged bet could just be noise. The odds just before kick-off are the most accurate there are, because
-by then all the news is in. So each flagged bet is checked again at kick-off: was it still a good bet? Old odds from
-American sportsbooks and prediction markets aren't available for free, so this test uses the same method on {len(cs['books'])} European bookmakers, {cs['seasons'][0][:4]} to {cs['seasons'][-1][-4:]}
-({cs['matches']:,} matches).</p>
-<div class=tablewrap><table><tr><th>Flagged at</th><th class=n>Bets</th><th class=n>Looked like when flagged</th><th class=n>Was worth at kick-off</th><th class=n>Still a good bet at kick-off</th></tr>{hrows}</table></div>
-<p class=note>Bets flagged at over 2% were still good bets at kick-off {100 * r2['beat_close']:.0f}% of the time, worth {_pct(r2['edge_vs_close'], 1, False)} on average
-(95% range {_pct(r2['lo'], 1, False)} to {_pct(r2['hi'], 1, False)}). Gaps under 1% were mostly noise. Actual wins and losses over a few hundred bets
-swing too much to prove anything, so the kick-off odds are the fairer test. This is a study of pricing, not betting advice.</p>"""
+<p class=sub>The test: is a flagged bet still a good bet at kick-off, when the odds are at their most accurate?</p>
+<div class=bigstat><div class=v>{100 * r2['beat_close']:.0f}%</div><div class=l>of bets flagged with a gap of 2% or more were still good bets at kick-off,
+worth {_pct(r2['edge_vs_close'], 1, False)} per bet on average.</div></div>
+<h3 class=tally>The bigger the gap, the more often it holds up</h3>
+<p class=csub>Share still a good bet at kick-off, by the gap when flagged. The line marks 50%, a coin flip.</p>
+<div class=hbars>{bars}</div>
+<details class=nums><summary>Show the numbers</summary>
+<div class=tablewrap><table><tr><th>Gap when flagged</th><th class=n>Bets</th><th class=n>Looked like when flagged</th><th class=n>Was worth at kick-off</th><th class=n>Still a good bet at kick-off</th></tr>{hrows}</table></div>
+<p class=note>Gap of 2%+: worth {_pct(r2['edge_vs_close'], 1, False)} per bet at kick-off, 95% range {_pct(r2['lo'], 1, False)} to {_pct(r2['hi'], 1, False)}.</p></details>
+<p class=note>Tested on {len(cs['books'])} European bookmakers, {cs['seasons'][0][:4]} to {cs['seasons'][-1][:4]} ({cs['matches']:,} matches), because old odds
+from American sites aren't available for free. Actual wins and losses over a few hundred bets swing too much to prove anything,
+so the kick-off odds are the fairer test. This is a study of pricing, not betting advice.</p>"""
 
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 {theme.meta("", "Today's Soccer Bets", "Every morning: the soccer bets at FanDuel, DraftKings, BetMGM, Kalshi and Polymarket that pay more than their chance of winning deserves.")}
