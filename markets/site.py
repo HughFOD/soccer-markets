@@ -366,9 +366,9 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 {record_html}
 
 <section class=band><div class=wrap>
-<h2>Which site comes closest.</h2>
-<p class=sub>Listed by US market share. The cut is each site's built-in margin (lower is better). "Best price" is how often it has the top odds. "Expected return" is the average result of betting $100 on every result it prices.</p>
-<div class=tablewrap><table><tr><th>Site</th><th class=n>Matches</th><th class=n>Cut</th><th class=n>Best price</th><th class=n>Expected return per $100</th></tr>{brows}</table></div>
+<h2>Which site pays the most.</h2>
+<p class=sub>This week's odds at each site, biggest site first. A smaller cut and a higher average return both mean better odds for you.</p>
+<div class=tablewrap><table><tr><th>Site</th><th class=n>Matches priced</th><th class=n>Site's cut</th><th class=n>Has the best odds</th><th class=n>Average return per $100 bet</th></tr>{brows}</table></div>
 </div></section>
 
 <section class=section><div class=wrap>
