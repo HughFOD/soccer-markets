@@ -9,7 +9,8 @@ Every morning (markets.weekly):
                because by then more news is in.
   3. grade   - after the match, the final score from The Odds API decides results, goals totals,
                handicaps, both-teams-to-score and draw-no-bet bets. Corners, cards and player bets
-               need match statistics the scores don't include, so they are marked "not graded".
+               need match statistics the scores don't include: corners and cards in the six leagues are settled
+               from football-data.co.uk results files (grade_stats); player bets are marked "not graded".
 
 Profit assumes $100 on every bet at the price first shown.
 """
@@ -30,6 +31,15 @@ COLS = ["key", "flagged_at", "kickoff", "league", "id", "home", "away", "match",
 GRADABLE = {"result", "totals", "alternate_totals", "alternate_spreads", "btts", "draw_no_bet"}
 SETTLE_HOURS = 2.5   # a match is treated as finished this long after kick-off
 GIVE_UP_DAYS = 3     # the scores endpoint only looks back 3 days
+
+# Corners and cards are settled from football-data.co.uk results files, which record each game's corners
+# and yellow and red cards for these leagues. The files are updated a few times a week, so these bets wait
+# up to STATS_DAYS for their game to appear.
+STATS_KINDS = {"alternate_totals_corners", "alternate_team_totals_corners", "alternate_spreads_corners",
+               "corners_1x2", "alternate_totals_cards", "alternate_spreads_cards"}
+STATS_LEAGUES = {"Premier League": "E0", "Championship": "E1", "La Liga": "SP1", "Bundesliga": "D1",
+                 "Serie A": "I1", "Ligue 1": "F1"}
+STATS_DAYS = 10
 
 
 def load() -> pd.DataFrame:
@@ -133,6 +143,132 @@ def settle(row, hg: int, ag: int) -> list[tuple[float, int]] | None:
     return None
 
 
+def settle_stats(row, st: dict) -> list[tuple[float, int]] | None:
+    """Corner and card bets from one game's statistics: st has hc, ac (corners) and hcards, acards."""
+    kind, out = row["kind"], str(row["outcome"])
+    point = float(row["point"]) if pd.notna(row["point"]) else 0.0
+    what = "corners" if "corners" in kind else "cards"
+    h, a = st["h" + ("c" if what == "corners" else "cards")], st["a" + ("c" if what == "corners" else "cards")]
+    if kind in ("alternate_totals_corners", "alternate_totals_cards"):
+        total = h + a
+    elif kind == "alternate_team_totals_corners":         # the bet's name starts with the team it's about
+        bet = str(row["bet"])
+        total = h if bet.startswith(str(row["home"])) else a if bet.startswith(str(row["away"])) else None
+        if total is None:
+            return None
+    elif kind in ("alternate_spreads_corners", "alternate_spreads_cards"):
+        if out == row["home"]:
+            return _asian(h - a, point)
+        if out == row["away"]:
+            return _asian(a - h, point)
+        return None
+    elif kind == "corners_1x2":
+        actual = row["home"] if h > a else row["away"] if a > h else "Draw"
+        return [(1.0, 1 if out == actual else -1)]
+    else:
+        return None
+    if out == "Over":
+        return _asian(total, -point)
+    if out == "Under":
+        return _asian(-total, point)
+    return None
+
+
+def _norm(name: str) -> str:
+    """Team name in a form both sources share: lower case, no accents, common short forms spelled out."""
+    import unicodedata
+    s = unicodedata.normalize("NFKD", str(name)).encode("ascii", "ignore").decode().lower()
+    for a, b in (("man united", "manchester united"), ("man city", "manchester city"), ("nott'm", "nottingham"),
+                 ("wolves", "wolverhampton"), ("sheffield weds", "sheffield wednesday"), ("qpr", "queens park rangers"),
+                 ("west brom", "west bromwich"), ("ath madrid", "atletico madrid"), ("ath bilbao", "athletic bilbao"),
+                 ("espanol", "espanyol"), ("sociedad", "real sociedad"), ("betis", "real betis"),
+                 ("m'gladbach", "monchengladbach"), ("ein frankfurt", "eintracht frankfurt"), ("fc koln", "koln"),
+                 ("paris sg", "paris saint germain"), ("st etienne", "saint etienne"), ("inter", "inter milan"),
+                 ("leverkusen", "bayer leverkusen"), ("fortuna dusseldorf", "dusseldorf"), ("vallecano", "rayo vallecano")):
+        if s == a or s.startswith(a + " "):
+            s = b + s[len(a):]
+    for w in (" fc", "fc ", " afc", "afc ", " cf", " sc", "1. ", " 1907", " 1846", " 04", " 05", " bc", "ac ", "as ", "ss ",
+              "ogc ", "rc ", "stade ", "real club de ", "rcd ", "vfb ", "vfl ", "tsg ", "sv ", "fsv ", "&"):
+        s = s.replace(w, " ")
+    return " ".join(s.replace("-", " ").replace(".", " ").split())
+
+
+def _similar(a: str, b: str) -> float:
+    import difflib
+    a, b = _norm(a), _norm(b)
+    if a == b:
+        return 1.0
+    if a in b or b in a:                  # "leverkusen" in "bayer leverkusen": a match, but an exact one wins
+        return 0.9
+    return difflib.SequenceMatcher(None, a, b).ratio()
+
+
+def fetch_stats(needed: set[tuple[str, str]]) -> dict:
+    """{(league code, season code): DataFrame of that season's games} from football-data.co.uk."""
+    import io
+    out = {}
+    for lg, season in sorted(needed):
+        url = f"https://www.football-data.co.uk/mmz4281/{season}/{lg}.csv"
+        try:
+            with urllib.request.urlopen(url, timeout=30) as r:
+                out[(lg, season)] = pd.read_csv(io.BytesIO(r.read()), encoding="latin-1")
+        except Exception as e:
+            print(f"  no stats file {lg} {season}: {e}")
+    return out
+
+
+def _season(ko: pd.Timestamp) -> str:
+    y = ko.year if ko.month >= 7 else ko.year - 1
+    return f"{y % 100:02d}{(y + 1) % 100:02d}"
+
+
+def find_game(files: dict, row) -> dict | None:
+    """The game's corners and cards, matched by league, date (UK time) and the closest team names."""
+    lg = STATS_LEAGUES.get(row["league"])
+    ko = pd.Timestamp(row["kickoff"]).tz_convert("Europe/London")
+    d = files.get((lg, _season(ko)))
+    if d is None or not len(d):
+        return None
+    dates = pd.to_datetime(d["Date"], dayfirst=True, errors="coerce").dt.date
+    day = d[dates == ko.date()]
+    best, score = None, 0.0
+    for _, g in day.iterrows():
+        s = min(_similar(row["home"], g["HomeTeam"]), _similar(row["away"], g["AwayTeam"]))
+        if s > score:
+            best, score = g, s
+    if best is None or score < 0.6:
+        return None
+    try:
+        n = lambda c: int(best[c])
+        return {"hc": n("HC"), "ac": n("AC"), "hcards": n("HY") + n("HR"), "acards": n("AY") + n("AR")}
+    except (KeyError, ValueError):
+        return None
+
+
+def grade_stats(L: pd.DataFrame, now: pd.Timestamp, files: dict | None = None) -> pd.DataFrame:
+    """Settle corner and card bets in the six leagues once their games are in the results files."""
+    if not len(L):
+        return L
+    ko = pd.to_datetime(L["kickoff"], utc=True)
+    todo = (L["kind"].isin(STATS_KINDS) & L["league"].isin(STATS_LEAGUES) & L["result"].isin(["", "not graded"])
+            & (ko < now - pd.Timedelta(hours=SETTLE_HOURS)))
+    if not todo.any():
+        return L
+    if files is None:
+        files = fetch_stats({(STATS_LEAGUES[L.at[i, "league"]], _season(ko[i].tz_convert("Europe/London")))
+                             for i in L.index[todo]})
+    for i in L.index[todo]:
+        st = find_game(files, L.loc[i])
+        parts = settle_stats(L.loc[i], st) if st else None
+        if parts:
+            L.at[i, "profit"], L.at[i, "result"] = profit_and_label(parts, float(L.at[i, "odds"]))
+        elif st or ko[i] < now - pd.Timedelta(days=STATS_DAYS):
+            L.at[i, "result"] = "not graded" if st else "no stats found"
+        else:
+            L.at[i, "result"] = ""                                        # wait for the file to catch up
+    return L
+
+
 def profit_and_label(parts: list[tuple[float, int]], odds: float, stake: float = 100.0) -> tuple[float, str]:
     profit = sum(stake * sh * ((odds - 1) if o == 1 else 0 if o == 0 else -1) for sh, o in parts)
     outs = {o for _, o in parts}
@@ -179,6 +315,8 @@ def grade(L: pd.DataFrame, scores: dict, now: pd.Timestamp) -> pd.DataFrame:
     done = ko < now - pd.Timedelta(hours=SETTLE_HOURS)
     for i in L.index[done & (L["result"] == "")]:
         row = L.loc[i]
+        if row["kind"] in STATS_KINDS and row["league"] in STATS_LEAGUES:
+            continue                                                      # settled by grade_stats
         if row["kind"] not in GRADABLE:
             L.at[i, "result"] = "not graded"
             continue
@@ -250,8 +388,9 @@ def html_section(L: pd.DataFrame) -> str:
         f"<td>{e(str(r['sites']).split(',')[0])}</td><td class=n>{american(float(r['odds']))}</td>"
         f"<td class=n>{e(r['result'])}</td><td class=n>{_usd(float(r['profit']))}</td></tr>"
         for _, r in recent.iterrows())
-    other = int((L["result"] == "not graded").sum())
-    note = (f" {other} corners, cards or player bets aren't counted, because the final score alone can't settle them."
+    other = int(L["result"].isin(["not graded", "no stats found"]).sum())
+    note = (f" {other} bet{' is' if other == 1 else 's are'}n't counted: player bets, and corners or cards outside the six leagues "
+            "(Premier League, Championship, La Liga, Bundesliga, Serie A, Ligue 1), because there's no free record of how they ended."
             if other else "")
     return (f"<section class=section><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>{week}"
             f"<h3 class=tally>All time</h3>{tiles}"

@@ -143,6 +143,7 @@ def run(raw_dir: Path = ROOT / "data" / "raw", fixtures: Path | None = None, out
             L = track.grade(L, track.fetch_scores(key, need), now)
         else:
             L = track.grade(L, {}, now)
+        L = track.grade_stats(L, now) if (key and download) else L
         track.save(L)
         print(f"track record: {len(L)} bets saved, {int(L['result'].isin(['won', 'lost', 'push', 'half won', 'half lost']).sum())} settled")
         page_html = site.build(M, quotes, board, R, stamp, saved.get("remaining"), totals=G, extras=X,

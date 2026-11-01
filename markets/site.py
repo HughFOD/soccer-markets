@@ -365,7 +365,7 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 
 <section class=section id=best><div class=wrap>
 <h2>Ranked by expected return.</h2>
-<p class=sub>Every site's odds hint at how likely each result is. Strip out each site's cut, combine all seven, and you get the best estimate of the real chance. When one site's odds pay more than that chance deserves, the bet is listed here, ranked by how much it overpays. The green number is the expected profit per $100 bet.</p>
+<p class=sub>Odds are each site’s estimate of how likely a result is, with its cut added on. Take the cut off all seven sites and combine them, and you get the best estimate of the real chance. When one site pays more than that chance deserves, the bet is listed here, ranked by how much it overpays. The green number is the expected profit per $100 bet.</p>
 <p class=note>Kalshi and Polymarket odds are shown after their trading fee.</p>
 {picks_html}
 <p class=sub style="margin-top:18px"><b>Looking for a bet that isn't listed?</b> Most bets don't beat what's expected at any site, but one site still pays the most. <a href="best-prices.html">See the best price for every bet&nbsp;›</a></p>
