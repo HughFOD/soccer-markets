@@ -1,9 +1,9 @@
 """This week's soccer odds at American sportsbooks and prediction markets, from The Odds API.
 
 Needs an API key saved in odds_api_key.txt in the project folder (or the
-ODDS_API_KEY environment variable). One refresh of eight competitions uses 16
-credits for match results and 16 for goals over/under (two regions each): about
-1,000 a month of the 20K plan's 20,000, plus the game-day extra markets.
+ODDS_API_KEY environment variable). One refresh of eleven competitions uses up to 22
+credits for match results and 22 for goals over/under (two regions each): about
+1,400 a month of the 20K plan's 20,000, plus the game-day extra markets.
 
 - Sites: FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus the prediction
   markets Kalshi and Polymarket (largest first). Every other site is ignored.
@@ -30,7 +30,8 @@ ROOT = Path(__file__).resolve().parent.parent
 SPORTS = {"soccer_epl": "Premier League", "soccer_efl_champ": "Championship", "soccer_spain_la_liga": "La Liga",
           "soccer_germany_bundesliga": "Bundesliga", "soccer_italy_serie_a": "Serie A",
           "soccer_france_ligue_one": "Ligue 1", "soccer_uefa_champs_league": "Champions League",
-          "soccer_uefa_europa_league": "Europa League"}
+          "soccer_uefa_europa_league": "Europa League", "soccer_fa_cup": "FA Cup",
+          "soccer_germany_dfb_pokal": "DFB-Pokal", "soccer_spain_copa_del_rey": "Copa del Rey"}
 REGIONS = ("us", "us_ex")
 SITES = {  # key -> (display name, kind). Only these sites are used, listed by US market share
     # (sportsbooks: Q3 2026 revenue share; prediction markets: trading volume).

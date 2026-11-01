@@ -44,7 +44,7 @@ Small gaps (under 1%) are mostly noise.
     return f"""# Soccer Odds Compared Across US Sportsbooks and Prediction Markets
 
 Every match this week in six top leagues (Premier League, Championship, La
-Liga, Bundesliga, Serie A, Ligue 1) and the Champions League and Europa League, priced by FanDuel, DraftKings, Fanatics,
+Liga, Bundesliga, Serie A, Ligue 1) plus the Champions League, Europa League, FA Cup, DFB-Pokal and Copa del Rey, priced by FanDuel, DraftKings, Fanatics,
 BetMGM and Caesars, and by the prediction markets Kalshi and Polymarket. Each site's odds are compared with the
 consensus of all of them, and any price clearly better than the consensus is
 flagged.
