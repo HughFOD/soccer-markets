@@ -163,7 +163,7 @@ def footer() -> str:
     return (f'<footer><div class=wrap><p>Odds from The Odds API. Match history from football-data.co.uk. '
             f'Prices move constantly, so check the site before acting.</p>'
             f'<p>A data science project in Python by Hugh O’Donnell. This is a study of pricing, not betting advice. '
-            f'<a href="{REPO_URL}">Code on GitHub</a></p></div></footer>')
+            f'<a href="about.html">About</a> · <a href="{REPO_URL}">Code on GitHub</a></p></div></footer>')
 
 
 HEAD = """<meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">

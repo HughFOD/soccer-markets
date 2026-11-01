@@ -361,14 +361,5 @@ swing too much to prove anything, so the kick-off odds are the fairer test. This
 
 {('<section class=band><div class=wrap>' + hist + '</div></section>') if hist else ''}
 
-<section class=section><div class=wrap>
-<h2>How it works.</h2>
-<p class=sub>Three steps, rerun every morning.</p>
-<div class=cards>
-<div class=card><h3>Collect the odds.</h3><p>From FanDuel, DraftKings, Fanatics, BetMGM and Caesars, plus Kalshi and Polymarket, through The Odds API. Prediction-market prices are converted to what you get after their trading fee (Kalshi 0.07 &times; p &times; (1&minus;p) per $1 contract, Polymarket 0.05 &times; p &times; (1&minus;p)).</p></div>
-<div class=card><h3>Work out what's expected.</h3><p>Each site's odds become chances with its cut removed, then are averaged with equal weight. That gives every result's expected chance.</p></div>
-<div class=card><h3>Find the bets that beat it.</h3><p>A bet makes the list when a site's odds pay more than its chance deserves. Gaps over 25% are left out as likely stale or mistyped prices.</p></div>
-</div>
-</div></section>
 {theme.footer()}
 </body></html>"""
