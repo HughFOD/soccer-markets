@@ -49,6 +49,11 @@ html:not(.js) .finder,html:not(.js) .filters,html:not(.js) .hint{display:none}
 """
 
 
+# Order of matches within each day: these competitions first, in this order, then the rest by kick-off time.
+LEAGUE_ORDER = {name: i for i, name in enumerate(
+    ["Champions League", "Premier League", "La Liga", "Ligue 1", "Bundesliga", "Serie A"])}
+
+
 def _usd(x: float) -> str:
     if x is None or not np.isfinite(x):
         return "—"
@@ -74,7 +79,8 @@ def _row(kind: str, bet: str, odds: float, sites: list[str], edge: float, every:
 
 
 def matches_by_day(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None,
-                   now: pd.Timestamp | None = None, extras: pd.DataFrame | None = None) -> list[tuple[str, list[dict]]]:
+                   now: pd.Timestamp | None = None, extras: pd.DataFrame | None = None,
+                   ranked: bool = False) -> list[tuple[str, list[dict]]]:
     """[(day label, [match, ...])]; each match has its bets with the best odds and sites."""
     if not len(M):
         return []
@@ -123,7 +129,7 @@ def matches_by_day(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame |
     res = []
     for day in sorted(out):
         label = "Today" if day == today else "Tomorrow" if (day - today).days == 1 else pd.Timestamp(day).strftime("%a %b %-d")
-        res.append((label, sorted(out[day], key=lambda m: m["ko"])))
+        res.append((label, sorted(out[day], key=lambda m: (LEAGUE_ORDER.get(m["league"], len(LEAGUE_ORDER)) if ranked else 0, m["ko"]))))
     return res
 
 
@@ -132,7 +138,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None, st
     """The Prices page, or with search=True the Search page: the same matches, found by search and filters."""
     from .extras import GROUPS
     e = html.escape
-    days = matches_by_day(M, quotes, totals, extras=extras)
+    days = matches_by_day(M, quotes, totals, extras=extras, ranked=not search)
     cols = '<colgroup><col><col style="width:30%"><col style="width:26%"></colgroup>'
     tabs = "".join(f'<button class=daytab data-day="{i}"{" aria-selected=true" if i == 0 else ""}>{e(lab)}'
                    f'<span>{len(ms)}</span></button>' for i, (lab, ms) in enumerate(days))
