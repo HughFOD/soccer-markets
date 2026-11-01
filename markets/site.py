@@ -26,7 +26,12 @@ CSS = theme.CSS + """
 .pick .bet b{display:block;font:700 30px/1.1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;color:var(--ink);letter-spacing:-.02em;margin:2px 0}
 .pick .vs{font-size:14px;color:var(--muted)}
 .edge{display:inline-block;background:var(--goodbg);color:var(--good);font-size:13px;font-weight:600;padding:3px 10px;border-radius:980px;margin-left:6px;vertical-align:middle}
-.tally{font-size:19px;margin:26px 0 8px}.bigstat{display:flex;gap:18px;align-items:center;background:var(--tile);border-radius:18px;padding:22px 24px;margin:18px 0}
+.tally{font-size:19px;margin:26px 0 8px}.how{counter-reset:s;list-style:none;padding:0;margin:0 0 6px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.how li{counter-increment:s;background:var(--bg2);border-radius:14px;padding:14px 16px 14px 48px;position:relative;font-size:15px;color:var(--ink2);line-height:1.4}
+.how li::before{content:counter(s);position:absolute;left:14px;top:13px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:grid;place-items:center}
+.how b{color:var(--ink);display:block;margin-bottom:2px}
+@media (max-width:820px){.how{grid-template-columns:1fr}}
+.bigstat{display:flex;gap:18px;align-items:center;background:var(--tile);border-radius:18px;padding:22px 24px;margin:18px 0}
 .bigstat .v{font:700 52px/1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;letter-spacing:-.03em;color:var(--good)}
 .bigstat .l{color:var(--ink2);font-size:16px}.csub{color:var(--muted);font-size:14px;margin:0 0 12px}
 .hbars{display:grid;gap:10px;margin-bottom:16px}.hb{display:grid;grid-template-columns:78px 1fr 44px 80px;gap:12px;align-items:center;font-size:14px}
@@ -359,7 +364,12 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 
 <section class=section id=best><div class=wrap>
 <h2>Ranked by expected return.</h2>
-<p class=sub>Each outcome is assigned an estimated true probability based on odds from multiple sportsbooks, with each sportsbook's built-in margin removed. A bet is flagged when a sportsbook offers better odds than the estimated probability justifies, creating a positive expected value opportunity. The green number represents the projected profit per $100 wagered over the long run. Kalshi and Polymarket charge a trading fee on every bet, so their odds here are what you actually get after that fee.</p>
+<ol class=how>
+<li><b>Remove each site's cut.</b> Every site's odds are turned into chances, then scaled down so they add up to 100%.</li>
+<li><b>Combine the sites.</b> Those chances are averaged, every site counting equally, into one estimated chance for each outcome.</li>
+<li><b>Find the overpay.</b> A bet is listed when a site's odds pay more than that chance deserves. The green number is the expected profit per $100 bet.</li>
+</ol>
+<p class=note>Kalshi and Polymarket odds are shown after their trading fee. Tap "Why this bet" on any pick to see its numbers.</p>
 {picks_html}
 <p class=sub style="margin-top:18px"><b>Looking for a bet that isn't listed?</b> Most bets don't beat what's expected at any site, but one site still pays the most. <a href="best-prices.html">See the best price for every bet&nbsp;›</a></p>
 </div></section>
