@@ -367,7 +367,7 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 <ol class=how>
 <li><b>Remove each site's cut.</b> Every site's odds are turned into chances, then scaled down so they add up to 100%.</li>
 <li><b>Combine the sites.</b> Those chances are averaged, every site counting equally, into one estimated chance for each outcome.</li>
-<li><b>Find the overpay.</b> A bet is listed when a site's odds pay more than that chance deserves. The green number is the expected profit per $100 bet.</li>
+<li><b>Find the overpay.</b> Odds also show the chance a site is paying for: +125 pays as if the bet wins 44% of the time. If the estimated chance is higher, say 46%, the site is paying too much and the bet is listed. The green number is the expected profit per $100 bet: a 46% chance of collecting $225 is worth $103.50, so +$3.50.</li>
 </ol>
 <p class=note>Kalshi and Polymarket odds are shown after their trading fee. Tap "Why this bet" on any pick to see its numbers.</p>
 {picks_html}
