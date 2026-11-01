@@ -151,6 +151,7 @@ def run(raw_dir: Path = ROOT / "data" / "raw", fixtures: Path | None = None, out
             (docs / name).write_text(page_html)
         from . import prices
         (docs / "best-prices.html").write_text(prices.build(M, quotes, G, stamp, extras=X))
+        (docs / "search.html").write_text(prices.build(M, quotes, G, stamp, extras=X, search=True))
         print(f"{len(M)} matches across {board.shape[0]} sites, {int((M['flag'] != '').sum()) if len(M) else 0} flagged -> docs/index.html")
         return M
     print("No Odds API key (odds_api_key.txt), so pricing against European bookmakers from football-data.co.uk instead.")

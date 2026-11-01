@@ -43,6 +43,7 @@ PAGE_CSS = """
 .more[open]>summary::after,.mgrp[open]>summary::after{transform:rotate(90deg)}
 .more>summary span,.mgrp>summary span{color:var(--muted);font-weight:400;font-size:13px;margin-left:4px}
 .mgrp{border-top:1px solid var(--hair)}.mgrp>summary{color:var(--ink);font-size:14px}
+.tw[hidden]{display:none}.search .dayhead{display:block;margin:22px 0 10px}.search .daypane[hidden]{display:none}.empty[hidden]{display:none}
 html:not(.js) .finder,html:not(.js) .filters,html:not(.js) .hint{display:none}
 @media (max-width:520px){.mcard{padding:16px 14px 8px}.mcard table{font-size:14px}.mcard th,.mcard td{padding:8px 4px}}
 """
@@ -127,7 +128,8 @@ def matches_by_day(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame |
 
 
 def build(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None, stamp: str,
-          extras: pd.DataFrame | None = None) -> str:
+          extras: pd.DataFrame | None = None, search: bool = False) -> str:
+    """The Prices page, or with search=True the Search page: the same matches, found by search and filters."""
     from .extras import GROUPS
     e = html.escape
     days = matches_by_day(M, quotes, totals, extras=extras)
@@ -153,56 +155,72 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None, st
                     f'<div class=tw><table>{cols}{"".join(_row(*b) for b in m["more"][gname])}</table></div></details>'
                     for gname in GROUPS if gname in m["more"])
                 more = f'<details class=more><summary>More bets <span>{n}</span></summary>{parts}</details>'
-            cards.append(f"""<div class=mcard data-find="{find}" data-league="{e(m['league'])}"><h3>{e(m['home'])} v {e(m['away'])}</h3>
+            cards.append(f"""<div class=mcard data-ko="{m['ko'].tz_convert('UTC').isoformat()}" data-find="{find}" data-league="{e(m['league'])}"><h3>{e(m['home'])} v {e(m['away'])}</h3>
 <div class=meta>{e(m['league'])} · {m['ko'].strftime('%a %b %-d, %-I:%M %p')} ET</div>
 <div class=tw><table>{cols}<tr><th>Bet</th><th class=n>Best odds</th><th class=n>Expected per $100</th></tr>{body}</table></div>{more}</div>""")
-        panes.append(f'<div class=daypane data-day="{i}"{" hidden" if i else ""}><h3 class=dayhead>{e(lab)}</h3>'
+        d = ms[0]["ko"].date()
+        panes.append(f'<div class=daypane data-day="{i}" data-date="{d.isoformat()}" data-label="{pd.Timestamp(d).strftime("%a %b %-d")}"'
+                     f'{" hidden" if i and not search else ""}><h3 class=dayhead>{e(lab)}</h3>'
                      f'<div class=mlist>{"".join(cards)}</div><div class="empty nomatch">No matches fit your search on this day.</div></div>')
     leagues = sorted({m["league"] for _, ms in days for m in ms})
-    finder = (f'<div class=finder><input type=search id=q placeholder="Search a team or league" aria-label="Search a team or league">'
-              f'<button type=button id=fbtn aria-expanded=false aria-controls=filters>Filters</button></div>'
-              f'<div class=filters id=filters hidden><select id=lg aria-label=League><option value="">All leagues</option>'
+    finder = (f'<div class=finder><input type=search id=q placeholder="Search a team, league or player" aria-label="Search a team, league or player"></div>'
+              f'<div class=filters id=filters><select id=lg aria-label=League><option value="">All leagues</option>'
               + "".join(f"<option>{e(l)}</option>" for l in leagues) +
               '</select><select id=kind aria-label="Bet type"><option value="">All bets</option><option value=Result>Match result</option>'
               '<option value=Goals>Goals</option>' + "".join(f'<option>{g}</option>' for g in GROUPS[2:]) + '</select>'
               '<label><input type=checkbox id=pos> Only green bets</label></div>'
-              '<p class=hint>Tap any bet to compare every site\'s odds.</p>')
-    js = """<script>(function(){
-var tabs=[].slice.call(document.querySelectorAll('.daytab')),panes=[].slice.call(document.querySelectorAll('.daypane')),
-q=document.getElementById('q'),lg=document.getElementById('lg'),kind=document.getElementById('kind'),pos=document.getElementById('pos'),
-fb=document.getElementById('fbtn'),fp=document.getElementById('filters'),day='0';
-function show(){var term=q.value.trim().toLowerCase();
- panes.forEach(function(p,i){var n=0;
-  p.querySelectorAll('.mcard').forEach(function(c){var cm=!term||c.dataset.find.indexOf(term)>=0,ok=!lg.value||c.dataset.league===lg.value,rows=0;
+              '<p class="empty prompt">Type a team, league or player, or pick a filter.</p>'
+              '<p class="empty none" hidden>Nothing matches. Try another name or filter.</p>')
+    hint = '<p class=hint>Tap any bet to compare every site\'s odds.</p>'
+    rows_js = """document.addEventListener('click',function(ev){var r=ev.target.closest('tr.bet');if(!r)return;var o=r.classList.toggle('open');
+ r.setAttribute('aria-expanded',o);r.nextElementSibling.hidden=!o});
+document.addEventListener('keydown',function(ev){if((ev.key==='Enter'||ev.key===' ')&&ev.target.matches('tr.bet')){ev.preventDefault();ev.target.click()}});
+document.documentElement.classList.add('js');"""
+    tabs_js = """<script>(function(){document.querySelectorAll('.daytab').forEach(function(t){t.addEventListener('click',function(){
+document.querySelectorAll('.daytab').forEach(function(x){x.removeAttribute('aria-selected')});t.setAttribute('aria-selected','true');
+document.querySelectorAll('.daypane').forEach(function(p){p.hidden=p.dataset.day!==t.dataset.day})})});
+""" + rows_js + "})();</script>"
+    search_js = """<script>(function(){
+var panes=[].slice.call(document.querySelectorAll('.daypane')),q=document.getElementById('q'),lg=document.getElementById('lg'),
+kind=document.getElementById('kind'),pos=document.getElementById('pos'),prompt=document.querySelector('.prompt'),none=document.querySelector('.none');
+function show(){var term=q.value.trim().toLowerCase(),act=!!(term||lg.value||kind.value||pos.checked),total=0;
+ panes.forEach(function(p){var n=0;
+  p.querySelectorAll('.mcard').forEach(function(c){var cm=!term||c.dataset.find.indexOf(term)>=0,ok=act&&(!lg.value||c.dataset.league===lg.value),rows=0;
    c.querySelectorAll('tr.bet').forEach(function(r){var v=ok&&(cm||r.dataset.t.indexOf(term)>=0)&&(!kind.value||r.dataset.kind===kind.value)&&(!pos.checked||r.dataset.pos==='1');
     r.hidden=!v;if(!v){r.classList.remove('open');r.nextElementSibling.hidden=true}if(v)rows++});
    c.querySelectorAll('tr.grp').forEach(function(g){g.hidden=!!kind.value&&g.dataset.kind!==kind.value||!c.querySelector('tr.bet[data-kind='+g.dataset.kind+']:not([hidden])')});
-   var act=!!(kind.value||pos.checked||(term&&!cm));
+   var deep=!!(kind.value||pos.checked||(term&&!cm));
    c.querySelectorAll('details').forEach(function(d){var has=!!d.querySelector('tr.bet:not([hidden])');d.hidden=!has;
-    if(act){if(has&&!d.open){d.open=true;d.dataset.auto=1}}else if(d.dataset.auto){d.open=false;delete d.dataset.auto}});
+    if(deep){if(has&&!d.open){d.open=true;d.dataset.auto=1}}else if(d.dataset.auto){d.open=false;delete d.dataset.auto}});
+   var mt=c.querySelector(':scope>.tw');if(mt)mt.hidden=!mt.querySelector('tr.bet:not([hidden])');
    c.hidden=!rows;if(rows)n++});
-  tabs[i].querySelector('span').textContent=n;p.querySelector('.nomatch').style.display=n?'none':'block';
-  p.hidden=p.dataset.day!==day});}
-tabs.forEach(function(t){t.addEventListener('click',function(){tabs.forEach(function(x){x.removeAttribute('aria-selected')});
- t.setAttribute('aria-selected','true');day=t.dataset.day;show()})});
+  p.hidden=!n;total+=n});
+ prompt.hidden=act;none.hidden=!act||total>0}
 [q,lg,kind,pos].forEach(function(el){el.addEventListener('input',show);el.addEventListener('change',show)});
-q.addEventListener('input',function(){if(!q.value.trim())return;var cur=panes[+day];if(cur&&cur.querySelector('.mcard:not([hidden])'))return;
- for(var i=0;i<panes.length;i++){if(panes[i].querySelector('.mcard:not([hidden])')){tabs[i].click();break}}});
-fb.addEventListener('click',function(){var o=fp.hidden;fp.hidden=!o;fb.setAttribute('aria-expanded',o)});
-document.addEventListener('click',function(ev){var r=ev.target.closest('tr.bet');if(!r)return;var o=r.classList.toggle('open');
- r.setAttribute('aria-expanded',o);r.nextElementSibling.hidden=!o});
-document.addEventListener('keydown',function(ev){if((ev.key==='Enter'||ev.key===' ')&&ev.target.matches('tr.bet')){ev.preventDefault();ev.target.click()}});
-document.documentElement.classList.add('js');})();</script>"""
-    content = (f'{finder}<div class=daytabs role=tablist>{tabs}</div>{"".join(panes)}{js}' if days else
-               "<div class=empty>No upcoming matches in the latest odds.</div>")
+""" + rows_js + "show();})();</script>"
+    if not days:
+        content = "<div class=empty>No upcoming matches in the latest odds.</div>"
+    elif search:
+        content = f'{finder}{hint}<div class=results>{"".join(panes)}</div>{theme.FRESH_JS}{search_js}'
+    else:
+        content = f'{hint}<div class=daytabs role=tablist>{tabs}</div>{"".join(panes)}{theme.FRESH_JS}{tabs_js}'
+    if search:
+        head = (theme.meta("search.html", "Search every bet · Today's Soccer Bets",
+                           "Find any team, league or player and compare every site's odds on every soccer bet."), "search",
+                "Search", "Search every bet.", "Find any team, league or player and compare every site's odds.")
+    else:
+        head = (theme.meta("best-prices.html", "Compare the Best Betting Odds Across Sportsbooks for Every Upcoming Match | Today's Soccer Bets",
+                           "Where to place each soccer bet: the best odds for every match result and goals line, across US sportsbooks and prediction markets."),
+                "prices", "Best prices", "Compare the Best Betting Odds Across Sportsbooks for Every Upcoming Match.",
+                "Which site pays the most for each bet, and what you can expect to win or lose per $100.")
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
-{theme.meta("best-prices.html", "Compare the Best Betting Odds Across Sportsbooks for Every Upcoming Match | Today's Soccer Bets", "Where to place each soccer bet: the best odds for every match result and goals line, across US sportsbooks and prediction markets.")}
-<style>{CSS}{PAGE_CSS}</style></head><body>
-{theme.nav("prices")}
+{head[0]}
+<style>{CSS}{PAGE_CSS}</style></head><body{" class=search" if search else ""}>
+{theme.nav(head[1])}
 <section class=hero><div class=wrap>
-<p class=eyebrow>Best prices</p>
-<h1>Compare the Best Betting Odds Across Sportsbooks for Every Upcoming Match.</h1>
-<p class=lede>Which site pays the most for each bet, and what you can expect to win or lose per $100.</p>
+<p class=eyebrow>{head[2]}</p>
+<h1>{head[3]}</h1>
+<p class=lede>{head[4]}</p>
 <p class=updated>Last updated {stamp}</p>
 </div></section>
 <section class=section style="padding-top:0"><div class=wrap>

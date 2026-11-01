@@ -199,6 +199,26 @@ def _usd(x: float) -> str:
     return f"{'+' if x >= 0 else '−'}${abs(x):,.0f}"
 
 
+def weekly_html(g: pd.DataFrame, now: pd.Timestamp | None = None) -> str:
+    """Last 7 days of settled bets: totals, then one row per day."""
+    now = now or pd.Timestamp.now(tz="America/New_York")
+    ko = pd.to_datetime(g["kickoff"], utc=True).dt.tz_convert("America/New_York")
+    w = g[ko > now - pd.Timedelta(days=7)].assign(day=ko.dt.date)
+    if not len(w):
+        return "<h3 class=tally>Last 7 days</h3><p class=sub>No bets settled in the last 7 days.</p>"
+    won = lambda d: int(d["result"].isin(["won", "half won"]).sum())
+    lost = lambda d: int(d["result"].isin(["lost", "half lost"]).sum())
+    n, pr = len(w), w["profit"].sum()
+    head = (f"<h3 class=tally>Last 7 days</h3><p class=sub><b>{n} bet{'s' if n != 1 else ''} settled, {won(w)} won and {lost(w)} lost. "
+            f"{_usd(pr)} from $100 on each, a {100 * pr / (100 * n):+.1f}% return.</b></p>")
+    rows = "".join(f"<tr><td>{pd.Timestamp(d):%a %b %-d}</td><td class=n>{len(x)}</td><td class=n>{won(x)}–{lost(x)}</td>"
+                   f"<td class=n>{_usd(x['profit'].sum())}</td></tr>"
+                   for d, x in sorted(w.groupby("day"), key=lambda t: t[0], reverse=True))
+    return (head + "<div class=tablewrap><table><tr><th>Day</th><th class=n>Bets</th><th class=n>Won–lost</th>"
+            f"<th class=n>Profit</th></tr>{rows}<tr><td><b>Total</b></td><td class=n><b>{n}</b></td>"
+            f"<td class=n><b>{won(w)}–{lost(w)}</b></td><td class=n><b>{_usd(pr)}</b></td></tr></table></div>")
+
+
 def html_section(L: pd.DataFrame) -> str:
     e = html.escape
     if not len(L):
@@ -215,6 +235,7 @@ def html_section(L: pd.DataFrame) -> str:
                 f"<p class=sub><b>{len(L)} bets recorded so far.</b> Results appear here once their matches finish."
                 + (f" So far, <b>{still}</b> of the bets re-checked before kick-off were still good value." if len(checked) else "")
                 + "</p></div></section>")
+    week = weekly_html(g)
     n, profit = len(g), g["profit"].sum()
     w, lo = g["result"].isin(["won", "half won"]).sum(), g["result"].isin(["lost", "half lost"]).sum()
     pu = (g["result"] == "push").sum()
@@ -232,7 +253,8 @@ def html_section(L: pd.DataFrame) -> str:
     other = int((L["result"] == "not graded").sum())
     note = (f" {other} corners, cards or player bets aren't counted, because the final score alone can't settle them."
             if other else "")
-    return (f"<section class=section><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>{tiles}"
+    return (f"<section class=section><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>{week}"
+            f"<h3 class=tally>All time</h3>{tiles}"
             f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
             f"several hundred. The \"still good value\" share is the steadier test.{note}</p>"
             f"<div class=tablewrap><table><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th><th class=n>Result</th>"

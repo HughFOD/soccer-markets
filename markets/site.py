@@ -26,6 +26,11 @@ CSS = theme.CSS + """
 .pick .bet b{display:block;font:700 30px/1.1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;color:var(--ink);letter-spacing:-.02em;margin:2px 0}
 .pick .vs{font-size:14px;color:var(--muted)}
 .edge{display:inline-block;background:var(--goodbg);color:var(--good);font-size:13px;font-weight:600;padding:3px 10px;border-radius:980px;margin-left:6px;vertical-align:middle}
+.tally{font-size:19px;margin:26px 0 8px}.why{grid-column:2/-1;margin-top:-6px;font-size:14px;min-width:0}.bet-main{min-width:0}.why summary{cursor:pointer;color:var(--link);font-weight:500;list-style:none}
+.why summary::-webkit-details-marker{display:none}.why summary::after{content:" ›";display:inline-block;transition:transform .15s}
+.why[open] summary::after{transform:rotate(90deg)}.why p{margin:8px 0;color:var(--ink2);line-height:1.45}
+.whygrid{display:grid;grid-template-columns:1fr auto auto;gap:3px 14px;font-size:13px;background:var(--bg2);border-radius:10px;padding:8px 12px}
+.whygrid .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .empty{background:var(--bg2);border-radius:18px;padding:22px;color:var(--muted)}
 .daytabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 18px;scrollbar-width:none}.daytabs::-webkit-scrollbar{display:none}
 .daytab{flex:none;font:inherit;font-size:15px;border:0;border-radius:980px;padding:8px 16px;background:var(--bg2);color:var(--ink);cursor:pointer;letter-spacing:-.01em}
@@ -47,7 +52,7 @@ html:not(.js) .daytabs{display:none}html:not(.js) .daypane{display:block!importa
 .few{font-size:14px;color:var(--muted);margin:12px 4px 0}
 @media (max-width:640px){.bet-row{grid-template-columns:30px 1fr auto;gap:4px 12px;padding:14px 16px}
   .rank{font-size:18px;grid-row:1/3}.bet-where{grid-column:3;grid-row:1}.bet-value{grid-column:2/4;grid-row:2;text-align:left;min-width:0;display:flex;gap:10px;align-items:center}
-  .bet-main{grid-column:2;grid-row:1}.bet-chance{margin:0}.bet-what{font-size:17px}.bet-odds{font-size:20px}}
+  .bet-main{grid-column:2;grid-row:1}.why{grid-column:2/4;grid-row:3;margin-top:4px}.bet-chance{margin:0}.bet-what{font-size:17px}.bet-odds{font-size:20px}}
 .bar{display:inline-block;height:6px;border-radius:3px;background:var(--blue);vertical-align:middle;margin-right:8px}
 .kind{font-size:12px;color:var(--muted)}
 details.league{background:var(--tile);border-radius:18px;margin:12px 0;overflow:hidden}
@@ -111,6 +116,15 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
                      if totals is not None and len(totals) else {})
     nsites_extra = (extras[extras["edge"].notna()].groupby(["id", "market", "line"])["site"].nunique().to_dict()
                     if extras is not None and len(extras) else {})
+    def every_site(df, keys):
+        """{bet key: [(site name, decimal odds), ...]} best price first."""
+        if df is None or not len(df):
+            return {}
+        return {k: [(SITES[s][0], float(o)) for s, o in sorted(zip(g["site"], g["odds"]), key=lambda t: (-t[1], order.get(t[0], 99)))]
+                for k, g in df.groupby(keys, sort=False)}
+    ev_res = every_site(quotes, ["id", "result"]) if len(quotes) else {}
+    ev_tot = every_site(totals, ["id", "point", "side"]) if has_totals else {}
+    ev_ext = every_site(extras, ["id", "market", "line", "outcome"]) if extras is not None and len(extras) else {}
     rows = []
     if len(quotes):
         q = quotes.merge(M[["id", "kickoff", "home", "away", "league", "best_h", "best_d", "best_a",
@@ -131,7 +145,8 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
                          "bet": f"{team} to win" if team else "Draw", "match": f"{r['home']} v {r['away']}",
                          "league": r["league"], "sites": [SITES[x][0] for x in g["site"]],
                          "chance": float(r[f"cons_{res}"]), "n_sites": n,
-                         "id": mid, "dec": float(r["odds"]), "kind": "result", "outcome": res, "point": np.nan})
+                         "id": mid, "dec": float(r["odds"]), "kind": "result", "outcome": res, "point": np.nan,
+                         "every": ev_res.get((mid, res), [])})
     if totals is not None and len(totals):
         g2 = totals.copy()
         g2["ko"] = pd.to_datetime(g2["kickoff"]).dt.tz_convert(ET)
@@ -147,7 +162,8 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
                          "paid": 1 / float(r["odds"]), "bet": f"{side} {point:g} goals",
                          "match": f"{r['home']} v {r['away']}", "league": r["league"],
                          "sites": [SITES[x][0] for x in g["site"]], "chance": float(r["chance"]), "n_sites": n,
-                         "id": mid, "dec": float(r["odds"]), "kind": "totals", "outcome": side, "point": float(point)})
+                         "id": mid, "dec": float(r["odds"]), "kind": "totals", "outcome": side, "point": float(point),
+                         "every": ev_tot.get((mid, point, side), [])})
     if extras is not None and len(extras):
         info = M.set_index("id")[["kickoff", "home", "away", "league"]]
         x = extras[extras["best"] & extras["edge"].notna() & extras["id"].isin(info.index)]
@@ -164,7 +180,8 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
                          "match": f"{info.loc[mid, 'home']} v {info.loc[mid, 'away']}", "league": info.loc[mid, "league"],
                          "sites": [SITES[s][0] for s in g["site"]], "chance": float(r["chance"]), "n_sites": n,
                          "id": mid, "dec": float(r["odds"]), "kind": mk, "outcome": outc,
-                         "point": float(r["point"]) if pd.notna(r["point"]) else np.nan})
+                         "point": float(r["point"]) if pd.notna(r["point"]) else np.nan,
+                         "every": ev_ext.get((mid, mk, line, outc), [])})
     if everything:
         return rows
     out = []
@@ -184,6 +201,24 @@ def chance_pair(expected: float, paid: float) -> tuple[str, str]:
     return (a, b) if a != b else (f"{100 * expected:.1f}%", f"{100 * paid:.1f}%")
 
 
+def why_html(b: dict) -> str:
+    """The reasoning behind one pick: what the sites say together, what the best site pays, and the gap."""
+    e = html.escape
+    fair = american(1 / b["chance"]) if b["chance"] > 0 else ""
+    ev = b.get("every") or []
+    best = ev[0][1] if ev else b["dec"]
+    others = [(s, o) for s, o in ev if o < best - 1e-9]
+    nxt = (f" The next best price is {e(others[0][0])} at {american(others[0][1]).replace('-', '−')}." if others else "")
+    text = (f"{b['n_sites'] or len(ev)} sites price this bet. With each site's cut removed, together they give it a "
+            f"<b>{100 * b['chance']:.1f}%</b> chance (fair odds {fair.replace('-', '−')}). {e(' and '.join(b['sites']))} "
+            f"pay{'s' if len(b['sites']) == 1 else ''} <b>{b['odds'].replace('-', '−')}</b>, as if it had only a "
+            f"<b>{100 * b['paid']:.1f}%</b> chance. That gap is worth <b>+${100 * b['edge']:.2f}</b> per $100 on average.{nxt}")
+    grid = "".join(f"<span>{e(s)}</span><span class=n>{american(o).replace('-', '−')}</span><span class=n>as if {100 / o:.1f}%</span>"
+                   for s, o in ev)
+    return (f"<details class=why><summary>Why this bet</summary><p>{text}</p>"
+            + (f"<div class=whygrid>{grid}</div>" if grid else "") + "</details>")
+
+
 def days_html(days: list[tuple[str, list[dict]]]) -> str:
     e = html.escape
     when = lambda lab: lab.lower() if lab in ("Today", "Tomorrow") else "on " + e(lab)
@@ -195,25 +230,28 @@ def days_html(days: list[tuple[str, list[dict]]]) -> str:
                    f'<span>{len(b)}</span></button>' for i, (lab, b) in enumerate(days))
     panes = []
     for i, (lab, bets) in enumerate(days):
-        items = "".join(f"""<li class=bet-row><span class=rank>{k}</span>
+        items = "".join(f"""<li class=bet-row data-ko="{b['ko'].tz_convert('UTC').isoformat()}"><span class=rank>{k}</span>
 <div class=bet-main><div class=bet-what>{e(b['bet'])}</div>
 <div class=bet-match>{e(b['match'])} · {e(b['league'])} · {b['ko'].strftime('%-I:%M %p')} ET</div>
 <div class=bet-why>Expected to win <b>{chance_pair(b['chance'], b['paid'])[0]}</b> of the time, paid as if <b>{chance_pair(b['chance'], b['paid'])[1]}</b></div></div>
 <div class=bet-where><div class=bet-odds>{b['odds'].replace('-', '−')}</div><div class=bet-site>{e(' or '.join(b['sites']))}</div></div>
-<div class=bet-value><span class=edge>+${100 * b['edge']:.2f}</span><div class=bet-chance>expected per $100</div></div></li>"""
+<div class=bet-value><span class=edge>+${100 * b['edge']:.2f}</span><div class=bet-chance>expected per $100</div></div>
+{why_html(b)}</li>"""
                         for k, b in enumerate(bets, 1))
         note = (f"<div class=empty>No bet beats what's expected {when(lab)}. "
                 "Every site is charging its full cut, so every bet is expected to lose money.</div>" if not bets else
                 "" if len(bets) >= 5 else
                 f"<p class=few>Only {len(bets)} bet{'s' if len(bets) != 1 else ''} beat{'s' if len(bets) == 1 else ''} "
                 f"what's expected {when(lab)}. The rest are expected to lose money, so they're left out.</p>")
-        panes.append(f'<div class=daypane data-day="{i}"{" hidden" if i != first else ""}><h3 class=dayhead>{e(lab)}</h3>'
+        date = bets[0]["day"] if bets else pd.Timestamp.now(tz=ET).date()
+        panes.append(f'<div class=daypane data-day="{i}" data-date="{date.isoformat()}" data-label="{pd.Timestamp(date).strftime("%a %b %-d")}"'
+                     f'{" hidden" if i != first else ""}><h3 class=dayhead>{e(lab)}</h3>'
                      + (f'<ol class=bets>{items}</ol>' if bets else '') + f'{note}</div>')
     js = ("<script>document.querySelectorAll('.daytab').forEach(t=>t.addEventListener('click',()=>{"
           "document.querySelectorAll('.daytab').forEach(x=>x.removeAttribute('aria-selected'));t.setAttribute('aria-selected','true');"
           "document.querySelectorAll('.daypane').forEach(p=>p.hidden=p.dataset.day!==t.dataset.day)}));"
           "document.documentElement.classList.add('js')</script>")
-    return f'<div class=daytabs role=tablist>{tabs}</div>{"".join(panes)}{js}'
+    return f'<div class=daytabs role=tablist>{tabs}</div>{"".join(panes)}{theme.FRESH_JS}{js}'
 
 
 def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | None, stamp: str, remaining=None,
@@ -282,7 +320,7 @@ American sportsbooks and prediction markets aren't available for free, so this t
 swing too much to prove anything, so the kick-off odds are the fairer test. This is a study of pricing, not betting advice.</p>"""
 
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
-{theme.meta("", "Today's Soccer Bets: bets that beat the odds", "Every morning: the soccer bets at FanDuel, DraftKings, BetMGM, Kalshi and Polymarket that pay more than their chance of winning deserves.")}
+{theme.meta("", "Today's Soccer Bets", "Every morning: the soccer bets at FanDuel, DraftKings, BetMGM, Kalshi and Polymarket that pay more than their chance of winning deserves.")}
 <style>{CSS}</style></head><body>
 {theme.nav("week")}
 <section class=hero><div class=wrap>

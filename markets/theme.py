@@ -54,7 +54,7 @@ h1,h2,h3,h4,.display{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Displa
 .gnav .right{display:flex;align-items:center;gap:18px}
 .gnav a,.gnav nav{white-space:nowrap}
 @media (max-width:420px){.gnav .wrap{padding:0 14px}.gnav .brand{font-size:15px}.gnav nav{gap:12px;font-size:13px}.gnav .right{gap:8px}}
-@media (max-width:440px){.gnav nav a[href^="https"]{display:none}}
+@media (max-width:440px){.gnav nav a[href^="https"]{display:none}.gnav .themebtn{display:none}.gnav .brand{margin-right:10px}}
 .themebtn{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:0;border-radius:50%;background:transparent;
   color:var(--ink2);cursor:pointer;padding:0}
 .themebtn:hover{background:var(--hair);color:var(--ink)}.themebtn svg{width:17px;height:17px;display:none}
@@ -115,7 +115,7 @@ def nav(active: str) -> str:
     def a(href, label, key):
         return f'<a href="{href}"{" class=on" if key == active else ""}>{label}</a>'
     return (f'<header class=gnav><div class=wrap><a class=brand href="index.html">{SITE_NAME}</a><div class=right><nav>'
-            f'{a("index.html", "Bets", "week")}{a("best-prices.html", "Prices", "prices")}{a("research.html", "Research", "research")}'
+            f'{a("index.html", "Bets", "week")}{a("best-prices.html", "Prices", "prices")}{a("search.html", "Search", "search")}{a("research.html", "Research", "research")}'
             f'{a(REPO_URL, "Code", "code")}</nav>{THEME_BUTTON}</div></div></header>{THEME_SCRIPT}')
 
 
@@ -136,6 +136,27 @@ var cur=r.dataset.theme||'auto';label(cur);
 b.addEventListener('click',function(){cur=order[(order.indexOf(cur)+1)%3];
 if(cur==='auto')delete r.dataset.theme;else r.dataset.theme=cur;label(cur);
 try{cur==='auto'?localStorage.removeItem('theme'):localStorage.setItem('theme',cur)}catch(e){}})})();</script>"""
+
+
+# Pages are built once a day. When opened later, this hides games that have kicked off, renames the
+# day tabs (Today / Tomorrow) from the current date, drops past days and updates the counts.
+FRESH_JS = """<script>(function(){var now=Date.now(),f=new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York'}),
+today=f.format(new Date(now)),a=today.split('-'),tom=new Date(Date.UTC(+a[0],a[1]-1,+a[2]+1)).toISOString().slice(0,10);
+[].forEach.call(document.querySelectorAll('[data-ko]'),function(el){if(Date.parse(el.dataset.ko)<=now)el.remove()});
+[].forEach.call(document.querySelectorAll('.daypane[data-date]'),function(p){
+ var t=document.querySelector('.daytab[data-day="'+p.dataset.day+'"]'),d=p.dataset.date,n=p.querySelectorAll('[data-ko]').length;
+ if(d<today||(!n&&!p.querySelector('ol.bets,.empty:not(.nomatch)'))){p.remove();if(t)t.remove();return}
+ var lab=d===today?'Today':d===tom?'Tomorrow':p.dataset.label;
+ if(t){t.firstChild.nodeValue=lab;var s=t.querySelector('span');if(s)s.textContent=n}
+ var h=p.querySelector('.dayhead');if(h)h.textContent=lab;
+ var k=0;[].forEach.call(p.querySelectorAll('.rank'),function(r){r.textContent=++k});
+ var few=p.querySelector('.few'),ol=p.querySelector('ol.bets');
+ if(ol&&!n){ol.remove();if(few)few.remove();var e=document.createElement('div');e.className='empty';
+  e.textContent='Every bet listed for this day has kicked off.';p.appendChild(e)}
+ else if(few){if(n>=5)few.remove();else few.textContent='Only '+n+' bet'+(n===1?' beats':'s beat')+" what's expected. The rest are expected to lose money, so they're left out."}});
+if(!document.querySelector('.daytab[aria-selected=true]')){var t=document.querySelector('.daytab');
+ if(t){t.setAttribute('aria-selected','true');[].forEach.call(document.querySelectorAll('.daypane'),function(p){p.hidden=p.dataset.day!==t.dataset.day})}}
+})();</script>"""
 
 
 def footer() -> str:
