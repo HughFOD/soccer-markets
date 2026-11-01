@@ -17,7 +17,7 @@ from .website import LG, facts, p
 ROOT = Path(__file__).resolve().parent.parent
 
 EXTRA_CSS = """
-.toc{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 28px;padding:0;list-style:none;margin:0}
+.toc{columns:2;column-gap:28px;padding:0;list-style:none;margin:0}.toc li{break-inside:avoid;margin-bottom:10px}
 .toc a{color:var(--ink);font-size:17px;display:flex;gap:12px;align-items:baseline}.toc a:hover{color:var(--link);text-decoration:none}
 .toc a b{color:var(--muted);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
 .finding{background:var(--bg2);border-radius:28px;padding:40px 40px 30px;margin:0 0 22px}
@@ -32,7 +32,7 @@ EXTRA_CSS = """
 .section ul.plain{color:var(--muted);padding-left:20px;max-width:760px}.section ul.plain li{margin:8px 0}
 .section ul.plain b{color:var(--ink)}
 .callout{max-width:760px;margin:26px auto 0;font-size:19px;line-height:1.45;color:var(--ink2)}
-@media (max-width:720px){.toc{grid-template-columns:1fr}.finding{padding:26px 18px 18px;border-radius:22px}.finding .chart{padding:16px 12px 10px}}
+@media (max-width:720px){.toc{columns:1}.finding{padding:26px 18px 18px;border-radius:22px}.finding .chart{padding:16px 12px 10px}}
 """
 
 
