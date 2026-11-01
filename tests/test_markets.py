@@ -376,3 +376,12 @@ def test_track_record_saves_once_rechecks_and_grades(tmp_path, monkeypatch):
     track.save(L)
     L2 = track.load()
     assert len(L2) == 2 and "How the picks have done" in track.html_section(L2)
+
+
+def test_weekly_tally_counts_only_the_last_7_days():
+    from markets import track
+    now = pd.Timestamp("2026-11-08T12:00", tz="America/New_York")
+    g = pd.DataFrame({"kickoff": ["2026-11-07T15:00:00Z", "2026-11-06T15:00:00Z", "2026-10-20T15:00:00Z"],
+                      "result": ["won", "lost", "won"], "profit": [120.0, -100.0, 90.0]})
+    h = track.weekly_html(g, now)
+    assert "2 bets settled, 1 won and 1 lost" in h and "+$20" in h and "Oct" not in h
