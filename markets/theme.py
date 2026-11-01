@@ -53,8 +53,9 @@ h1,h2,h3,h4,.display{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Displa
 .gnav nav a:hover{color:var(--ink);text-decoration:none}
 .gnav .right{display:flex;align-items:center;gap:18px}
 .gnav a,.gnav nav{white-space:nowrap}
-@media (max-width:420px){.gnav .wrap{padding:0 14px}.gnav .brand{font-size:15px}.gnav nav{gap:12px;font-size:13px}.gnav .right{gap:8px}}
-@media (max-width:440px){.gnav nav a[href^="https"]{display:none}.gnav .themebtn{display:none}.gnav .brand{margin-right:10px}}
+@media (max-width:500px){.gnav .wrap{padding:0 14px}.gnav .brand{font-size:15px}.gnav nav{gap:12px;font-size:13px}.gnav .right{gap:8px}}
+@media (max-width:620px){.gnav nav a[href^="https"],.gnav nav a[href="about.html"]{display:none}}
+@media (max-width:500px){.gnav .themebtn{display:none}.gnav .brand{margin-right:10px}}
 .themebtn{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:0;border-radius:50%;background:transparent;
   color:var(--ink2);cursor:pointer;padding:0}
 .themebtn:hover{background:var(--hair);color:var(--ink)}.themebtn svg{width:17px;height:17px;display:none}
@@ -115,7 +116,7 @@ def nav(active: str) -> str:
     def a(href, label, key):
         return f'<a href="{href}"{" class=on" if key == active else ""}>{label}</a>'
     return (f'<header class=gnav><div class=wrap><a class=brand href="index.html">{SITE_NAME}</a><div class=right><nav>'
-            f'{a("index.html", "Bets", "week")}{a("best-prices.html", "Prices", "prices")}{a("search.html", "Search", "search")}{a("research.html", "Research", "research")}'
+            f'{a("index.html", "Bets", "week")}{a("best-prices.html", "Prices", "prices")}{a("search.html", "Search", "search")}{a("research.html", "Research", "research")}{a("about.html", "About", "about")}'
             f'{a(REPO_URL, "Code", "code")}</nav>{THEME_BUTTON}</div></div></header>{THEME_SCRIPT}')
 
 
