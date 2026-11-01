@@ -99,7 +99,7 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
     bl = {r["league"]: r for r in R.get("by_league", [])}
     if {"E0", "E1"} <= set(bl):
         e0, e1 = bl["E0"], bl["E1"]
-        items.append(("leagues", "The second division is priced as accurately as the first",
+        items.append(("leagues", "England’s second division is priced as accurately as the first",
                       f"Calibration slope (1.00 is perfect): {e0['slope']:.2f} in the Premier League, {e1['slope']:.2f} in the Championship.",
                       f"<div class=tw><table><tr><th>League</th><th class=num>Matches</th><th class=num>Margin</th><th class=num>Slope</th><th class=num>Betting $100 on everything</th></tr>"
                       f"<tr><td>Premier League</td><td class=num>{e0['matches']:,}</td><td class=num>{p(e0['margin'], 1, False)}</td><td class=num>{e0['slope']:.2f}</td><td class=num>{dollars(e0['bet_everything'], True)}</td></tr>"
