@@ -452,4 +452,4 @@ def headline(L: pd.DataFrame) -> tuple[str, str] | None:
     if not len(g):
         return None
     w, lo = int(g["result"].isin(["won", "half won"]).sum()), int(g["result"].isin(["lost", "half lost"]).sum())
-    return f"{w}–{lo}", f"picks won–lost so far · {_usd(g['profit'].sum())} from $100 on each"
+    return f"{w}–{lo}", f"picks won–lost so far\n{_usd(g['profit'].sum())} from $100 on each"

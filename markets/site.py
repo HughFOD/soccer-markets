@@ -282,7 +282,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
     # ---- today's best bets: per day, up to TOP_N results whose best price beats the fair price
     days = daily_picks(M, quotes, totals=totals, extras=extras)
     record_tile_html = (f'<a class=stat href="results.html" style="color:inherit;text-decoration:none"><div class=v>{e(record_tile[0])}</div>'
-                        f'<div class=l>{e(record_tile[1])}</div></a>' if record_tile else
+                        f'<div class=l>{e(record_tile[1]).replace(chr(10), "<br>")}</div></a>' if record_tile else
                         f"<div class=stat><div class=v>{sum(len(b) for _, b in days)}</div><div class=l>bets that beat what's expected</div></div>")
     picks_html = days_html(days)
 
