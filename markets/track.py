@@ -372,7 +372,7 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
         f"<td>{e(site1(r))}</td><td class=n>{american(float(r['odds']))}</td>"
         f"<td class=n>{e(r['result'])}</td><td class=n>{_usd(float(r['profit']))}</td></tr>"
         for _, r in allbets.iterrows())
-    recent = "".join(re.sub(r"^<tr [^>]*>", "<tr>", x) for x in re.findall(r"<tr data-r.*?</tr>", rows)[:15])
+    recent = "".join(re.sub(r"^<tr [^>]*>", "<tr>", x) for x in re.findall(r"<tr data-r.*?</tr>", rows)[:10])
     counts = {"all": len(allbets), "won": int(w), "lost": int(lo), "push": int(pu)}
     buttons = "".join(f'<button class=rfilt data-f={k}{" aria-pressed=true" if k == "all" else ""}>{lab}<span>{counts[k]}</span></button>'
                       for k, lab in (("all", "All"), ("won", "Won"), ("lost", "Lost"), ("push", "Push")) if k != "push" or pu)
