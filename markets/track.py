@@ -359,9 +359,13 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
     n, profit = len(g), g["profit"].sum()
     w, lo = g["result"].isin(["won", "half won"]).sum(), g["result"].isin(["lost", "half lost"]).sum()
     pu = (g["result"] == "push").sum()
+    pbar = float((1 / g["odds"].astype(float)).mean())
     tiles = (f"<div class=stats><div class=stat><div class=v>{w}–{lo}{f'–{pu}' if pu else ''}</div><div class=l>won–lost{'–push' if pu else ''}</div></div>"
              f"<div class=stat><div class=v>{_usd(profit)}</div><div class=l>profit from $100 on each ({100 * profit / (100 * n):+.1f}%)</div></div>"
-             f"<div class=stat><div class=v>{100 * g['edge'].mean():+.1f}%</div><div class=l>expected return when listed</div></div></div>")
+             f"<div class=stat><div class=v>{100 * g['edge'].mean():+.1f}%</div><div class=l>expected return when listed</div></div>"
+             # average odds via the average chance they imply (averaging American odds directly is meaningless)
+             f"<div class=stat><div class=v>{american(1 / pbar).replace('-', '−')}</div><div class=l>average odds, "
+             f"{'mostly favorites' if pbar > 0.5 else 'mostly underdogs'} ({100 * pbar:.0f}% chance on average)</div></div></div>")
     # every settled bet, newest first, with buttons to show only won, lost or push
     allbets = g.sort_values("kickoff", ascending=False).head(MAX_ROWS)
     simple = lambda res: "won" if res in ("won", "half won") else "lost" if res in ("lost", "half lost") else "push"
