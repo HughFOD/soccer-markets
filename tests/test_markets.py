@@ -378,15 +378,6 @@ def test_track_record_saves_once_rechecks_and_grades(tmp_path, monkeypatch):
     assert len(L2) == 2 and "How the picks have done" in track.html_section(L2)
 
 
-def test_weekly_tally_counts_only_the_last_7_days():
-    from markets import track
-    now = pd.Timestamp("2026-11-08T12:00", tz="America/New_York")
-    g = pd.DataFrame({"kickoff": ["2026-11-07T15:00:00Z", "2026-11-06T15:00:00Z", "2026-10-20T15:00:00Z"],
-                      "result": ["won", "lost", "won"], "profit": [120.0, -100.0, 90.0]})
-    h = track.weekly_html(g, now)
-    assert "2 bets settled, 1 won and 1 lost" in h and "+$20" in h and "Oct" not in h
-
-
 def test_corner_and_card_bets_are_settled_from_match_stats():
     import pandas as pd
     from markets import track
@@ -408,3 +399,20 @@ def test_corner_and_card_bets_are_settled_from_match_stats():
     L = track.grade_stats(L, pd.Timestamp("2026-10-28T12:00", tz="UTC"), files=files)
     assert list(L["result"]) == ["won", "won", "lost", "won", "lost", ""]
     assert abs(L["profit"].iloc[0] - 90) < 1e-9 and L["profit"].iloc[2] == -100
+
+
+def test_results_page_lists_every_settled_bet_with_filters():
+    import pandas as pd
+    from markets import track
+    rows = []
+    for i, (res, profit) in enumerate([("won", 90.0), ("lost", -100.0), ("push", 0.0), ("half won", 45.0)]):
+        rows.append({"key": f"m{i}|result|h|", "flagged_at": "2026-11-01T10:00:00+00:00", "kickoff": f"2026-11-0{i + 1}T15:00:00+00:00",
+                     "league": "Premier League", "id": f"m{i}", "home": "A", "away": "B", "match": "A v B", "bet": "A to win",
+                     "kind": "result", "outcome": "h", "point": float("nan"), "sites": "FanDuel", "n_sites": 5, "odds": 1.9,
+                     "chance": 0.55, "edge": 0.045, "last_checked": "2026-11-01T10:00:00+00:00", "last_chance": 0.55,
+                     "last_value": 0.045, "result": res, "profit": profit})
+    L = pd.DataFrame(rows)
+    home, page = track.html_section(L), track.results_page(L, "Mon 2 Nov 2026, 6:17 AM ET")
+    assert "results.html" in home and "data-r=" not in home            # homepage: summary and a link only
+    assert page.count("data-r=") == 4 and page.count("data-r=won") == 2  # half won counts as won
+    assert "data-f=lost" in page and "data-f=push" in page and 'href="results.html" class=on' in page
