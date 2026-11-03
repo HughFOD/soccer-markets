@@ -250,7 +250,7 @@ function show(){var term=q.value.trim().toLowerCase(),act=!!(term||lg.value||kin
 <p class=lede>{head[4]}</p>
 <p class=updated>Last updated {stamp}</p>
 </div></section>
-<section class=section style="padding-top:0"><div class=wrap>
+<section class=section style="padding-top:26px"><div class=wrap>
 <p class=sub>Green marks a good bet: the odds pay more than its chance of winning deserves.</p>
 {content}
 </div></section>
