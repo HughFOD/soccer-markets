@@ -377,7 +377,7 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 
 <section class=section id=best><div class=wrap>
 <h2>Ranked by expected return.</h2>
-<p class=sub>Odds are each site’s estimate of how likely a result is, plus its cut. Remove each site’s cut, average all {nw}, and you get an accurate estimate of each result’s true chance. When one site pays more than that chance deserves, the bet is listed here, ranked by how much it overpays. The green number is the expected profit per $100 bet.</p>
+<p class=sub>Odds reflect each sportsbook's implied probability plus their house edge. By removing this edge and averaging the data across all {nw} sites, we calculate the true probability of an outcome. When a specific sportsbook offers higher payouts than this true probability warrants, the wager appears below, ranked by value. The green figure represents your expected return per $100 wagered.</p>
 <p class=note style="margin:-22px 0 22px">Kalshi and Polymarket odds are shown after their trading fee.</p>
 {picks_html}
 <p class=sub style="margin-top:18px"><b>Looking for a bet that isn't listed?</b> Most bets don't beat what's expected at any site, but one site still pays the most. <a href="best-prices.html">See the best price for every bet&nbsp;›</a></p>
