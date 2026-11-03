@@ -76,7 +76,7 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
 
 
     if R.get("closing"):
-        items.append(("line-moves", "When odds change before kick-off, they're usually right to",
+        items.append(("line-moves", "When odds change before kick-off, they're usually right to do so",
                       f"Sometimes a team's chance goes up before the match (its odds get shorter, by at least 3 percentage "
                       f"points). Betting $100 on it at the earlier odds made {dollars(float(f['short_ret'].rstrip('%')) / 100, True)} "
                       f"on average. When a team's chance went down instead, the same early bet lost "
