@@ -81,7 +81,7 @@ details.league>summary span{color:var(--muted);font-weight:400;font-size:15px;ma
 .match .tablewrap{background:var(--bg2);border-radius:var(--r)}
 .match th,.match td{padding:9px 12px}
 .best{color:var(--good);font-weight:700}
-td.best{background:var(--goodbg)}
+.match table tr td.good{background:var(--goodbg)}
 .cons td{color:var(--muted)}
 .note{font-size:14px;color:var(--muted);margin-top:14px}
 """
@@ -315,7 +315,9 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
                 cells = ""
                 for o in "hda":
                     v = q.get((r["id"], s, o), np.nan)
-                    cls = " class='n best'" if np.isfinite(v) and v >= r[f"best_{o}"] - 1e-9 else " class=n"
+                    best = np.isfinite(v) and v >= r[f"best_{o}"] - 1e-9            # best price among the sites: green text
+                    good = np.isfinite(v) and v * r[f"cons_{o}"] > 1 + 1e-9         # pays more than Expected: green box
+                    cls = " class='n" + (" best" if best else "") + (" good" if good else "") + "'"
                     cells += f"<td{cls}>{american(v)}</td>"
                 body += f"<tr><td>{e(SITES[s][0])}</td>{cells}</tr>"
             body += ("<tr class=cons><td>Expected</td>" + "".join(
@@ -392,7 +394,7 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 
 <section class=section><div class=wrap>
 <h2>Every match.</h2>
-<p class=sub>+150 means a $100 bet wins $150; −200 means you bet $200 to win $100. The best price for each result is in green. Kalshi and Polymarket odds are shown after their trading fees, so they look slightly worse than on those apps. The "Expected" row shows each result's expected chance and the odds that would exactly match it.</p>
+<p class=sub>+150 means a $100 bet wins $150; −200 means you bet $200 to win $100. Green text is the best price for each result. A green box means that price beats Expected, so it’s a good bet. Kalshi and Polymarket odds are shown after their trading fees, so they look slightly worse than on those apps. The "Expected" row shows each result's expected chance and the odds that would exactly match it.</p>
 {''.join(leagues)}
 </div></section>
 
