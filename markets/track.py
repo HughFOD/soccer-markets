@@ -358,11 +358,9 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
     n, profit = len(g), g["profit"].sum()
     w, lo = g["result"].isin(["won", "half won"]).sum(), g["result"].isin(["lost", "half lost"]).sum()
     pu = (g["result"] == "push").sum()
-    tiles = (f"<div class=stats><div class=stat><div class=v>{n}</div><div class=l>bets settled</div></div>"
-             f"<div class=stat><div class=v>{w}–{lo}{f'–{pu}' if pu else ''}</div><div class=l>won–lost{'–push' if pu else ''}</div></div>"
+    tiles = (f"<div class=stats><div class=stat><div class=v>{w}–{lo}{f'–{pu}' if pu else ''}</div><div class=l>won–lost{'–push' if pu else ''}</div></div>"
              f"<div class=stat><div class=v>{_usd(profit)}</div><div class=l>profit from $100 on each ({100 * profit / (100 * n):+.1f}%)</div></div>"
-             f"<div class=stat><div class=v>{100 * g['edge'].mean():+.1f}%</div><div class=l>expected return when listed</div></div>"
-             f"<div class=stat><div class=v>{still}</div><div class=l>still good value at the last check before kick-off</div></div></div>")
+             f"<div class=stat><div class=v>{100 * g['edge'].mean():+.1f}%</div><div class=l>expected return when listed</div></div></div>")
     # every settled bet, newest first, with buttons to show only won, lost or push
     allbets = g.sort_values("kickoff", ascending=False).head(MAX_ROWS)
     simple = lambda res: "won" if res in ("won", "half won") else "lost" if res in ("lost", "half lost") else "push"
@@ -408,7 +406,7 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
     return (f"<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>"
             f"{tiles}"
             f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
-            f"several hundred. The \"still good value\" share is the steadier test.{note}</p>"
+            f"several hundred.{note}</p>"
             + (f"<h3 class=tally>Every settled bet</h3>{filt}"
                f"<div class=tablewrap><table><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th><th class=n>Result</th>"
                f"<th class=n>Profit on $100</th></tr>{rows}</table></div>"
