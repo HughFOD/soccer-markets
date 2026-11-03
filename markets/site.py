@@ -274,6 +274,10 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
     e = html.escape
     present = [s for s in SITES if len(quotes) and s in set(quotes["site"])]
     n_flags = int(sum(1 for f in M["flag"] if f)) if len(M) else 0
+    nw = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight"}.get(len(present), str(len(present)))
+    missing = [SITES[s][0] for s in SITES if s not in present]
+    sites_label = ("sportsbooks and prediction markets" if not missing else
+                   f"of {len(SITES)} sites had odds this time ({e(', '.join(missing))} had none)")
 
     # ---- today's best bets: per day, up to TOP_N results whose best price beats the fair price
     days = daily_picks(M, quotes, totals=totals, extras=extras)
@@ -333,7 +337,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
             f"<span class=hv>{100 * r['beat_close']:.0f}%</span><span class=hn>{r['bets']:,} bets</span></div>"
             for r in cs["rules"])
         hist = f"""<h2>Are the flagged bets real?</h2>
-<p class=sub><b>What's a flagged bet?</b> One where a site's odds pay more than the bet's chance of winning deserves, judged against all seven sites combined. It can still lose, and often does. The price is in your favor, so over many flagged bets you should come out ahead.</p>
+<p class=sub><b>What's a flagged bet?</b> One where a site's odds pay more than the bet's chance of winning deserves, judged against all {nw} sites combined. It can still lose, and often does. The price is in your favor, so over many flagged bets you should come out ahead.</p>
 <p class=sub>The test: is a flagged bet still a good bet at kick-off, when the odds are at their most accurate?</p>
 <div class=bigstat><div class=v>{100 * r2['beat_close']:.0f}%</div><div class=l>of bets flagged with a gap of 2% or more were still good bets at kick-off,
 worth {_pct(r2['edge_vs_close'], 1, False)} per bet on average.</div></div>
@@ -362,14 +366,14 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 <section class=band><div class=wrap>
 <div class=stats>
 <div class=stat><div class=v>{len(M)}</div><div class=l>matches this week</div></div>
-<div class=stat><div class=v>{len(present)}</div><div class=l>sportsbooks and prediction markets</div></div>
+<div class=stat><div class=v>{len(present)}</div><div class=l>{sites_label}</div></div>
 {record_tile_html}
 <div class=stat><div class=v>{e(best_site)}</div><div class=l>best odds on average</div></div>
 </div></div></section>
 
 <section class=section id=best><div class=wrap>
 <h2>Ranked by expected return.</h2>
-<p class=sub>Odds are each site’s estimate of how likely a result is, plus its profit margin. Remove each site’s margin, average all seven, and you get the most accurate estimate of each result’s true chance. When one site pays more than that chance deserves, the bet is listed here, ranked by how much it overpays. The green number is the expected profit per $100 bet.</p>
+<p class=sub>Odds are each site’s estimate of how likely a result is, plus its profit margin. Remove each site’s margin, average all {nw}, and you get the most accurate estimate of each result’s true chance. When one site pays more than that chance deserves, the bet is listed here, ranked by how much it overpays. The green number is the expected profit per $100 bet.</p>
 <p class=note style="margin:-22px 0 22px">Kalshi and Polymarket odds are shown after their trading fee.</p>
 {picks_html}
 <p class=sub style="margin-top:18px"><b>Looking for a bet that isn't listed?</b> Most bets don't beat what's expected at any site, but one site still pays the most. <a href="best-prices.html">See the best price for every bet&nbsp;›</a></p>
