@@ -348,7 +348,7 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
     g = L[L["result"].isin(["won", "lost", "push", "half won", "half lost"])].copy()
     checked = L[pd.to_datetime(L["last_checked"], utc=True) > pd.to_datetime(L["flagged_at"], utc=True)]
     still = f"{100 * (checked['last_value'] > 0).mean():.0f}%" if len(checked) else "–"
-    intro = (f"Every bet listed on this page since {start:%B %-d, %Y} is saved at the price first shown. "
+    intro = (f"Every bet listed on this page since {start:%B %-d, %Y}, is saved at the price first shown. "
              "Before kick-off it's checked again against the latest odds, and after the match it's settled "
              "from the final score. Profit assumes $100 on each bet.")
     if not len(g):
@@ -402,9 +402,9 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
           "lg.addEventListener('change',function(){shown=PAGE;apply()});st.addEventListener('change',function(){shown=PAGE;apply()});"
           "more.addEventListener('click',function(){shown=1e9;apply()});apply()})()</script>")
     other = int(L["result"].isin(["not graded", "no stats found"]).sum())
-    note = (f" {other} bet{' is' if other == 1 else 's are'}n't counted: player bets, and corners or cards outside the six leagues "
-            "(Premier League, Championship, La Liga, Bundesliga, Serie A, Ligue 1), because there's no free record of how they ended."
-            if other else "")
+    note = (" Player bets, and corner or card bets outside the six leagues (Premier League, Championship, La Liga, "
+            "Bundesliga, Serie A, Ligue 1), aren't counted, because there's no free record of how they ended "
+            f"({other} bet{'' if other == 1 else 's'} so far)." if other else "")
     return (f"<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>"
             f"{tiles}"
             f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "

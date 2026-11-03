@@ -5,6 +5,7 @@ Built by markets.weekly from the saved Odds API responses and output/results.jso
 from __future__ import annotations
 
 import html
+import re
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -223,10 +224,13 @@ def why_html(b: dict) -> str:
     best = ev[0][1] if ev else b["dec"]
     others = [(s, o) for s, o in ev if o < best - 1e-9]
     nxt = (f" The next best price is {e(others[0][0])} at {american(others[0][1]).replace('-', '−')}." if others else "")
-    text = (f"{b['n_sites'] or len(ev)} sites price this bet. With each site's cut removed, together they give it a "
-            f"<b>{100 * b['chance']:.1f}%</b> chance (fair odds {fair.replace('-', '−')}). {e(' and '.join(b['sites']))} "
-            f"pay{'s' if len(b['sites']) == 1 else ''} <b>{b['odds'].replace('-', '−')}</b>, as if it had only a "
-            f"<b>{100 * b['paid']:.1f}%</b> chance. That gap is worth <b>+${100 * b['edge']:.2f}</b> per $100 on average.{nxt}")
+    # "a 79.7% chance" but "an 81.5% chance" / "an 11% chance" (said "eighty", "eleven", "eighteen")
+    an = lambda s: "an" if s.startswith("8") or re.match(r"1[18](\D|$)", s) else "a"
+    ch, pd_ = f"{100 * b['chance']:.1f}%", f"{100 * b['paid']:.1f}%"
+    text = (f"{b['n_sites'] or len(ev)} sites price this bet. With each site's cut removed, together they give it {an(ch)} "
+            f"<b>{ch}</b> chance (fair odds {fair.replace('-', '−')}). {e(' and '.join(b['sites']))} "
+            f"pay{'s' if len(b['sites']) == 1 else ''} <b>{b['odds'].replace('-', '−')}</b>, as if it had only {an(pd_)} "
+            f"<b>{pd_}</b> chance. That gap is worth <b>+${100 * b['edge']:.2f}</b> per $100 on average.{nxt}")
     grid = "".join(f"<span>{e(s)}</span><span class=n>{american(o).replace('-', '−')}</span><span class=n>as if {100 / o:.1f}%</span>"
                    for s, o in ev)
     return (f"<details class=why><summary>Why this bet</summary><p>{text}</p>"
@@ -277,7 +281,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
     nw = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight"}.get(len(present), str(len(present)))
     missing = [SITES[s][0] for s in SITES if s not in present]
     sites_label = ("sportsbooks and prediction markets" if not missing else
-                   f"of {len(SITES)} sites had odds this time ({e(', '.join(missing))} had none)")
+                   f"of {len(SITES)} sites had odds this time ({e(', '.join(missing[:-1]) + ' and ' + missing[-1] if len(missing) > 1 else missing[0])} had none)")
 
     # ---- today's best bets: per day, up to TOP_N results whose best price beats the fair price
     days = daily_picks(M, quotes, totals=totals, extras=extras)

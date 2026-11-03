@@ -6,6 +6,7 @@ Run: python -m markets.research
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -42,6 +43,12 @@ def dollars(x: float, signed: bool = False) -> str:
     return f"−${-v:.0f}" if v <= -0.5 else (f"+${v:.0f}" if v >= 0.5 else "$0")
 
 
+def an(s: str) -> str:
+    """'a' or 'an' before a percentage: an 80%, an 11%, an 18%, a 70%."""
+    s = str(s).lstrip()
+    return "an" if s.startswith("8") or re.match(r"1[18](\D|$)", s) else "a"
+
+
 def _finding(n: int, slug: str, title: str, take: str, body: str, pic: str = "") -> tuple[str, str]:
     return (f'<li><a href="#{slug}"><b>{n:02d}</b>{title}</a></li>',
             f'<div class=finding id="{slug}"><div class=n>FINDING {n}</div><h3>{title}</h3>'
@@ -58,8 +65,8 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
 
     c = R["calibration"]["pooled"]
     items.append(("accurate", "The odds are accurate",
-                  f"Strong favorites that the odds gave a {f['top_priced']} chance of winning actually won "
-                  f"{f['top_happened']} of the time. Long shots given a {f['low_priced']} chance won "
+                  f"Strong favorites that the odds gave {an(f['top_priced'])} {f['top_priced']} chance of winning actually won "
+                  f"{f['top_happened']} of the time. Long shots given {an(f['low_priced'])} {f['low_priced']} chance won "
                   f"{f['low_happened']} of the time. So the odds are close to the truth.",
                   "<p>They're slightly off in one consistent way: favorites win a little more often than their odds "
                   "suggest, and long shots a little less. (Technically, a calibration slope of "
@@ -119,8 +126,8 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
         items.append(("half-time", "After half-time, the team that's behind scores more than expected",
                       f"Teams losing by 2+ at half-time scored {P(se[-2]['ratio'] - 1)} more in the second half than the odds "
                       f"predicted. Teams winning by 2+ scored {P(1 - se[2]['ratio'])} fewer.",
-                      f"<p>Slight favorites leading 1–0 at half-time were given a {P(lead['model_win'])} chance to win and won {P(lead['actual_win'])} "
-                      f"of the time ({lead['matches']:,} matches). Games level at half-time were given a {P(lvl['model_draw'])} chance of a draw "
+                      f"<p>Slight favorites leading 1–0 at half-time were given {an(P(lead['model_win']))} {P(lead['model_win'])} chance to win and won {P(lead['actual_win'])} "
+                      f"of the time ({lead['matches']:,} matches). Games level at half-time were given {an(P(lvl['model_draw']))} {P(lvl['model_draw'])} chance of a draw "
                       f"and ended level {P(lvl['actual_draw'])} of the time.</p>"
                       + checks,
                       viz.score_effects(lv["score_effects"])))
@@ -154,7 +161,7 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
 <h2>How it's built.</h2>
 <ul class=plain>
 <li><b>Data.</b> Results and odds from every bookmaker recorded for each match, from <a href="https://www.football-data.co.uk">football-data.co.uk</a>.</li>
-<li><b>Removing the margin.</b> Three methods compared: proportional, power and Shin's 1993 model.</li>
+<li><b>Removing the cut.</b> Three methods compared: proportional, power and Shin's 1993 model.</li>
 <li><b>Uncertainty.</b> 95% ranges from resampling whole matches (the bootstrap).</li>
 <li><b>Tests.</b> Automated checks on every calculation.</li>
 <li><b>Odds.</b> Snapshots from European bookmakers collected by football-data.co.uk.</li>

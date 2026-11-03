@@ -312,7 +312,7 @@ def score_effects(se: list) -> str:
     names = {-2: "down 2+", -1: "down 1", 0: "level", 1: "up 1", 2: "up 2+"}
     labels = [names.get(int(m), str(m)).replace(" ", "\n", 1) for m in t["margin"]]
     vals = [round(100 * (r - 1), 1) for r in t["ratio"]]
-    return chart("half-time", "At half-time, teams that are behind score more than expected",
+    return chart("half-time", "In the second half, teams that are behind score more than expected",
                  "Second-half goals compared with what the pre-match odds predicted, by the team's score at half-time",
                  {"type": "vbar", "labels": labels, "values": vals, "colors": ["b" if v > 0 else "a" for v in vals],
                   "fmt": "pctS", "unit": "goals vs expected"},

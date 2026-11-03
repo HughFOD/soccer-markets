@@ -57,8 +57,8 @@ deserves. Gaps over 25% are left out as likely stale or mistyped prices.</p></di
 <li><b>Sportsbooks:</b> {e(', '.join(books))}.</li>
 <li><b>Prediction markets:</b> {e(' and '.join(markets))}.</li>
 <li><b>Competitions:</b> {e(', '.join(leagues))}.</li>
-<li><b>Bets:</b> match results and total goals for every match; corners, cards, player bets and more on game day.</li>
-<li><b>Updates:</b> every morning, New York time. Games that have kicked off drop off the pages on their own.</li>
+<li><b>Bets:</b> the match result and total goals for every match. On match day, corners, cards, player bets and more are added.</li>
+<li><b>Updates:</b> the odds are refreshed every morning, New York time. Once a match kicks off, it disappears from the lists.</li>
 </ul>
 </div></section>
 
