@@ -17,6 +17,7 @@ Profit assumes $100 on every bet at the price first shown.
 from __future__ import annotations
 
 import html
+import re
 import json
 import urllib.request
 
@@ -371,6 +372,7 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
         f"<td>{e(site1(r))}</td><td class=n>{american(float(r['odds']))}</td>"
         f"<td class=n>{e(r['result'])}</td><td class=n>{_usd(float(r['profit']))}</td></tr>"
         for _, r in allbets.iterrows())
+    recent = "".join(re.sub(r"^<tr [^>]*>", "<tr>", x) for x in re.findall(r"<tr data-r.*?</tr>", rows)[:15])
     counts = {"all": len(allbets), "won": int(w), "lost": int(lo), "push": int(pu)}
     buttons = "".join(f'<button class=rfilt data-f={k}{" aria-pressed=true" if k == "all" else ""}>{lab}<span>{counts[k]}</span></button>'
                       for k, lab in (("all", "All"), ("won", "Won"), ("lost", "Lost"), ("push", "Push")) if k != "push" or pu)
@@ -392,13 +394,13 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
           "lg=document.getElementById('rlg'),st=document.getElementById('rst'),more=document.getElementById('rmore'),cnt=document.getElementById('rcount');"
           "function apply(){var n=0;rows.forEach(function(t){var ok=(f==='all'||t.dataset.r===f)&&(!lg.value||t.dataset.lg===lg.value)"
           "&&(!st.value||t.dataset.st===st.value);if(ok)n++;t.hidden=!ok||n>shown});"
-          "more.hidden=n<=shown;more.textContent='Show more ('+(n-shown)+' more)';"
+          "more.hidden=n<=shown;more.textContent='Show all '+n+' bets';"
           "cnt.textContent=n?'Showing '+Math.min(n,shown)+' of '+n+' bets':'No bets match these filters.'}"
           "document.querySelectorAll('.rfilt').forEach(function(b){b.addEventListener('click',function(){"
           "document.querySelectorAll('.rfilt').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});"
           "f=b.dataset.f;shown=PAGE;apply()})});"
           "lg.addEventListener('change',function(){shown=PAGE;apply()});st.addEventListener('change',function(){shown=PAGE;apply()});"
-          "more.addEventListener('click',function(){shown+=PAGE;apply()});apply()})()</script>")
+          "more.addEventListener('click',function(){shown=1e9;apply()});apply()})()</script>")
     other = int(L["result"].isin(["not graded", "no stats found"]).sum())
     note = (f" {other} bet{' is' if other == 1 else 's are'}n't counted: player bets, and corners or cards outside the six leagues "
             "(Premier League, Championship, La Liga, Bundesliga, Serie A, Ligue 1), because there's no free record of how they ended."
@@ -411,7 +413,9 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
                f"<div class=tablewrap><table><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th><th class=n>Result</th>"
                f"<th class=n>Profit on $100</th></tr>{rows}</table></div>"
                f"<p class=rcount id=rcount></p><button class=rmore id=rmore hidden>Show more</button>{js}" if full else
-               f"<p class=sub style='margin-top:18px'><a href=\"results.html\">See every bet, and filter by won or lost&nbsp;›</a></p>")
+               f"<h3 class=tally>Latest results</h3><div class=tablewrap><table><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th>"
+               f"<th class=n>Result</th><th class=n>Profit on $100</th></tr>{recent}</table></div>"
+               f"<p class=sub style='margin-top:18px'><a href=\"results.html\">See all {len(allbets)} bets, and filter by won or lost&nbsp;›</a></p>")
             + "</div></section>")
 
 
