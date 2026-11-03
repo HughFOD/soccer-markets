@@ -269,6 +269,8 @@ def scoreboard(quotes: pd.DataFrame, t: pd.DataFrame) -> pd.DataFrame:
     q = quotes.groupby("site").agg(matches=("id", "nunique"), avg_edge=("edge", "mean"), best_share=("best", "mean"),
                                    flagged=("edge", lambda e: int(((e > THRESHOLD) & (e <= MAX_EDGE)).sum())))
     q["margin"] = margins.reindex(q.index)
+    lg = t.groupby("site")["league"].agg(lambda s: s.iloc[0] if s.nunique() == 1 else "")
+    q["only"] = lg.reindex(q.index).fillna("")
     q["name"] = [SITES[s][0] for s in q.index]
     q["kind"] = [SITES[s][1] for s in q.index]
     order = {k: i for i, k in enumerate(SITES)}  # market-share order

@@ -5,6 +5,7 @@ Run: python -m markets.research
 """
 from __future__ import annotations
 
+import html
 import json
 import re
 from pathlib import Path
@@ -55,7 +56,32 @@ def _finding(n: int, slug: str, title: str, take: str, body: str, pic: str = "")
             f'<p class=take>{take}</p>{pic}{body}</div>')
 
 
-def build(R: dict, curve: pd.DataFrame | None = None) -> str:
+def sites_html(board: pd.DataFrame | None) -> str:
+    """Which site pays the most: match-result odds at each site, best first. Sites pricing under a quarter of the
+    matches go below a line, since a handful of matches says little."""
+    if board is None or not len(board):
+        return ""
+    e = html.escape
+    b = board.copy()
+    b["few"] = b["matches"] < 0.25 * b["matches"].max()
+    b = b.sort_values(["few", "best_share"], ascending=[True, False])
+    top = max(b["best_share"].max(), 1e-9)
+    row = lambda r: (f"<tr><td><b>{e(r['name'])}</b><br><span class=kind>{e(r['kind'])}"
+                     f"{' · ' + e(r['only']) + ' only' if r.get('only') else ''}</span></td>"
+                     f"<td class=n><span class=bar style='width:{60 * r['best_share'] / top:.0f}px'></span>{100 * r['best_share']:.0f}%</td>"
+                     f"<td class=n>{100 * r['margin']:.1f}%</td><td class=n>{int(r['matches'])}</td></tr>")
+    ranked = "".join(row(r) for _, r in b[~b["few"]].iterrows())
+    few = b[b["few"]]
+    rest = (f"<tr><td colspan=4 class=kind style='padding-top:14px'>Too few matches to rank</td></tr>"
+            + "".join(row(r) for _, r in few.iterrows())) if len(few) else ""
+    return (f"<section class=section id=sites><div class=wrap><h2>Which site pays the most today.</h2>"
+            f"<p class=sub>Unlike the findings above, this updates every morning from the US sites' match-result odds. \"Best odds\" is how often a site paid the most on a result it offered "
+            f"(ties count for every site, so the column adds up to more than 100%). The cut is the site's typical built-in margin; "
+            f"smaller is better.</p><div class=tablewrap><table><tr><th>Site</th><th class=n>Best odds</th><th class=n>Site's cut</th>"
+            f"<th class=n>Matches priced</th></tr>{ranked}{rest}</table></div></div></section>")
+
+
+def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None = None) -> str:
     f = facts(R)
     avg = R["longshot"]["average"]
     fav_band = viz.band_label(avg[0]["odds"])
@@ -100,6 +126,21 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
                       f"Based on {f['cl_matches']} matches, {f['cl_years']}.</p>",
                       viz.line_moves(cl["moves"], every)))
 
+    cs = R.get("consensus")
+    if cs and cs.get("rules"):
+        r2 = next((x for x in cs["rules"] if abs(x["threshold"] - 0.02) < 1e-9), cs["rules"][0])
+        items.append(("flagged", "This site's flagged bets usually hold up at kick-off",
+                      f"A flagged bet is one where a site pays more than the bet's chance of winning deserves. Of bets flagged "
+                      f"with a gap of {100 * r2['threshold']:.0f}% or more, {100 * r2['beat_close']:.0f}% were still good bets at "
+                      f"kick-off, when the odds are at their most accurate, worth {100 * r2['edge_vs_close']:.1f}% per bet on average. "
+                      "The bigger the gap, the more often it held up.",
+                      f"<p>Gap of {100 * r2['threshold']:.0f}%+: worth {100 * r2['edge_vs_close']:.1f}% per bet at kick-off, "
+                      f"95% range {100 * r2['lo']:.1f}% to {100 * r2['hi']:.1f}%. Tested on {len(cs['books'])} European bookmakers, "
+                      f"{cs['seasons'][0][:4]} to {cs['seasons'][-1][:4]} ({cs['matches']:,} matches), because old odds from "
+                      "American sites aren't available for free. Actual wins and losses over a few hundred bets swing too much "
+                      "to prove anything, so the kick-off odds are the fairer test.</p>",
+                      viz.flagged(cs["rules"])))
+
     bl = {r["league"]: r for r in R.get("by_league", [])}
     if {"E0", "E1"} <= set(bl):
         e0, e1 = bl["E0"], bl["E1"]
@@ -132,7 +173,7 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
                       + checks,
                       viz.score_effects(lv["score_effects"])))
 
-    order = ["accurate", "longshots", "half-time", "line-moves", "leagues"]
+    order = ["accurate", "longshots", "half-time", "line-moves", "flagged", "leagues"]
     items.sort(key=lambda it: order.index(it[0]) if it[0] in order else len(order))
     toc, body = [], []
     for i, it in enumerate(items, 1):
@@ -156,6 +197,7 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
 <ul class=toc>{''.join(toc)}</ul>
 </div></section>
 <div class=wrap>{''.join(body)}</div>
+{sites_html(board)}
 
 <section class=band><div class=wrap>
 <h2>How it's built.</h2>
@@ -176,7 +218,9 @@ def main(out_dir: Path = ROOT / "output", docs: Path = ROOT / "docs"):
     R = json.loads((out_dir / "results.json").read_text())
     cf = out_dir / "value_bet_curve.csv"
     curve = pd.read_csv(cf) if cf.exists() else None
-    (docs / "research.html").write_text(build(R, curve))
+    sb = out_dir / "site_scoreboard.csv"     # written by the daily update (markets.weekly)
+    board = pd.read_csv(sb).fillna({"only": ""}) if sb.exists() else None
+    (docs / "research.html").write_text(build(R, curve, board))
     print(f"wrote {docs / 'research.html'}")
 
 

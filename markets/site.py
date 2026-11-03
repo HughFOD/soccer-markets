@@ -279,9 +279,6 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
     present = [s for s in SITES if len(quotes) and s in set(quotes["site"])]
     n_flags = int(sum(1 for f in M["flag"] if f)) if len(M) else 0
     nw = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight"}.get(len(present), str(len(present)))
-    missing = [SITES[s][0] for s in SITES if s not in present]
-    sites_label = ("sportsbooks and prediction markets" if not missing else
-                   f"of {len(SITES)} sites had odds this time ({e(', '.join(missing[:-1]) + ' and ' + missing[-1] if len(missing) > 1 else missing[0])} had none)")
 
     # ---- today's best bets: per day, up to TOP_N results whose best price beats the fair price
     days = daily_picks(M, quotes, totals=totals, extras=extras)
@@ -289,19 +286,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
                         f'<div class=l>{e(record_tile[1]).replace(chr(10), "<br>")}</div></a>' if record_tile else
                         f"<div class=stat><div class=v>{sum(len(b) for _, b in days)}</div><div class=l>bets that beat what's expected</div></div>")
     picks_html = days_html(days)
-
-    # ---- which site pays the most
-    brows = ""
-    if len(board):
-        top = max(board["best_share"].max(), 1e-9)
-        for _, b in board.iterrows():
-            brows += (f"<tr><td><b>{e(b['name'])}</b><br><span class=kind>{e(b['kind'])}</span></td><td class=n>{b['matches']}</td>"
-                      f"<td class=n>{_pct(b['margin'], 1, False)}</td>"
-                      f"<td class=n><span class=bar style='width:{60 * b['best_share'] / top:.0f}px'></span>{100 * b['best_share']:.0f}%</td>"
-                      f"<td class=n>{usd(b['avg_edge'])}</td></tr>")
-    # best average price among sites quoting at least a quarter of the matches (so a site with a handful of prices can't win)
-    big = board[board["matches"] >= 0.25 * board["matches"].max()] if len(board) else board
-    best_site = big.loc[big["avg_edge"].idxmax(), "name"] if len(big) else "–"
+    n_value = sum(len(b) for _, b in days)
 
     # ---- all matches, by league
     q = quotes.set_index(["id", "site", "result"])["odds"] if len(quotes) else pd.Series(dtype=float)
@@ -328,35 +313,6 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
         leagues.append(f"<details class=league><summary>{e(lg)} <span>· {len(G)} matches"
                        f"</span></summary>{''.join(blocks)}</details>")
 
-    # ---- does it work (history)
-    hist = ""
-    cs = (R or {}).get("consensus")
-    if cs:
-        rr = {x["threshold"]: x for x in cs["rules"]}
-        r2 = rr.get(0.02)
-        hrows = "".join(f"<tr><td>Over {100 * x['threshold']:.0f}%</td><td class=n>{x['bets']:,}</td>"
-                        f"<td class=n>{_pct(x['expected'])}</td><td class=n>{_pct(x['edge_vs_close'])}</td><td class=n>{100 * x['beat_close']:.0f}%</td></tr>"
-                        for x in cs["rules"])
-        bars = "".join(
-            f"<div class=hb><span class=hl>{100 * r['threshold']:.0f}%+ gap</span>"
-            f"<span class=ht><span class=hf style='width:{100 * r['beat_close']:.0f}%'></span><span class=h50></span></span>"
-            f"<span class=hv>{100 * r['beat_close']:.0f}%</span><span class=hn>{r['bets']:,} bets</span></div>"
-            for r in cs["rules"])
-        hist = f"""<h2>Are the flagged bets real?</h2>
-<p class=sub><b>What's a flagged bet?</b> One where a site's odds pay more than the bet's chance of winning deserves, judged against all {nw} sites combined. It can still lose, and often does. The price is in your favor, so over many flagged bets you should come out ahead.</p>
-<p class=sub>The test: is a flagged bet still a good bet at kick-off, when the odds are at their most accurate?</p>
-<div class=bigstat><div class=v>{100 * r2['beat_close']:.0f}%</div><div class=l>of bets flagged with a gap of 2% or more were still good bets at kick-off,
-worth {_pct(r2['edge_vs_close'], 1, False)} per bet on average.</div></div>
-<h3 class=tally>The bigger the gap, the more often it holds up</h3>
-<p class=csub>How often a flagged bet was still a good bet at kick-off, grouped by how much it beat the expected price when first flagged. Anything above the 50% line is better than a coin flip.</p>
-<div class=hbars>{bars}</div>
-<details class=nums><summary>Show the numbers</summary>
-<div class=tablewrap><table><tr><th>Gap when flagged</th><th class=n>Bets</th><th class=n>Looked like when flagged</th><th class=n>Was worth at kick-off</th><th class=n>Still a good bet at kick-off</th></tr>{hrows}</table></div>
-<p class=note>Gap of 2%+: worth {_pct(r2['edge_vs_close'], 1, False)} per bet at kick-off, 95% range {_pct(r2['lo'], 1, False)} to {_pct(r2['hi'], 1, False)}.</p></details>
-<p class=note>Tested on {len(cs['books'])} European bookmakers, {cs['seasons'][0][:4]} to {cs['seasons'][-1][:4]} ({cs['matches']:,} matches), because old odds
-from American sites aren't available for free. Actual wins and losses over a few hundred bets swing too much to prove anything,
-so the kick-off odds are the fairer test. This is a study of pricing, not betting advice.</p>"""
-
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 {theme.meta("", "Today's Soccer Bets", "Every morning: the soccer bets at FanDuel, DraftKings, BetMGM, Kalshi and Polymarket that pay more than their chance of winning deserves.")}
 <style>{CSS}</style></head><body>
@@ -372,9 +328,9 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 <section class=band><div class=wrap>
 <div class=stats>
 <a class=stat href="best-prices.html" style="color:inherit;text-decoration:none"><div class=v>{len(M)}</div><div class=l>upcoming matches</div></a>
-<a class=stat href="about.html#covered" style="color:inherit;text-decoration:none"><div class=v>{len(present)}</div><div class=l>{sites_label}</div></a>
+<a class=stat href="about.html#covered" style="color:inherit;text-decoration:none"><div class=v>{len(SITES)}</div><div class=l>sportsbooks and prediction markets</div></a>
+<a class=stat href="#best" style="color:inherit;text-decoration:none"><div class=v id=nbets>{n_value}</div><div class=l id=nbets-l>upcoming bet{'' if n_value == 1 else 's'} paying more than {'it' if n_value == 1 else 'they'} should</div></a>
 {record_tile_html}
-<div class=stat><div class=v>{e(best_site)}</div><div class=l>best odds on average</div></div>
 </div></div></section>
 
 <section class=section id=best><div class=wrap>
@@ -386,19 +342,14 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 </div></section>
 {record_html}
 
-<section class=band><div class=wrap>
-<h2>Which site pays the most.</h2>
-<p class=sub>Current odds at each site. A smaller cut and a higher average return both mean better odds.</p>
-<div class=tablewrap><table><tr><th>Site</th><th class=n>Matches priced</th><th class=n>Site's cut</th><th class=n>Has the best odds</th><th class=n>Average return per $100 bet</th></tr>{brows}</table></div>
-</div></section>
-
 <section class=section><div class=wrap>
 <h2>Every match.</h2>
 <p class=sub>+150 means a $100 bet wins $150; −200 means you bet $200 to win $100. Green text is the best price for each result. A green box means that price beats Expected, so it’s a good bet. Kalshi and Polymarket odds are shown after their trading fees, so they look slightly worse than on those apps. The "Expected" row shows each result's expected chance and the odds that would exactly match it.</p>
 {''.join(leagues)}
 </div></section>
 
-{('<section class=band><div class=wrap>' + hist + '</div></section>') if hist else ''}
 
 {theme.footer()}
+<script>(function(){{var n=document.querySelectorAll('li.bet-row').length,v=document.getElementById('nbets'),l=document.getElementById('nbets-l');
+if(v){{v.textContent=n;l.textContent=n===1?'upcoming bet paying more than it should':'upcoming bets paying more than they should'}}}})()</script>
 </body></html>"""

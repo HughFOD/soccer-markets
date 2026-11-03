@@ -292,6 +292,20 @@ def line_moves(moves: list, every: dict | None = None) -> str:
                         [[l, _sd(v), n.split()[0]] for l, v, n in zip(labels, vals, notes)]))
 
 
+def flagged(rules: list) -> str:
+    """How often a flagged bet was still a good bet at kick-off, by how much it beat the expected price when flagged."""
+    labels = [f"Beat it by {100 * r['threshold']:.0f}%+" for r in rules]
+    vals = [round(100 * r["beat_close"], 1) for r in rules]
+    notes = [f"{r['bets']:,} bets" for r in rules]
+    return chart("flagged", "The bigger the gap, the more often it holds up",
+                 "How often a flagged bet was still a good bet at kick-off, grouped by how much it beat the expected price "
+                 "when first flagged. Anything above 50% is better than a coin flip.",
+                 {"type": "hbar", "labels": labels, "values": vals, "fmt": "pct", "unit": "still a good bet", "notes": notes},
+                 _table(["When flagged", "Bets", "Looked like", "Worth at kick-off", "Still a good bet"],
+                        [[l, f"{r['bets']:,}", f"{100 * r['expected']:+.1f}%", f"{100 * r['edge_vs_close']:+.1f}%",
+                          f"{100 * r['beat_close']:.0f}%"] for l, r in zip(labels, rules)]))
+
+
 def value_bets(curve: pd.DataFrame) -> str:
     c = curve.copy()
     c["date"] = pd.to_datetime(c["date"])
