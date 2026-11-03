@@ -56,11 +56,11 @@ def _finding(n: int, slug: str, title: str, take: str, body: str, pic: str = "")
             f'<p class=take>{take}</p>{pic}{body}</div>')
 
 
-def sites_html(board: pd.DataFrame | None) -> str:
+def sites_html(board: pd.DataFrame | None) -> tuple[str, str] | None:
     """Which site pays the most: match-result odds at each site, best first. Sites pricing under a quarter of the
     matches go below a line, since a handful of matches says little."""
     if board is None or not len(board):
-        return ""
+        return None
     e = html.escape
     b = board.copy()
     b["few"] = b["matches"] < 0.25 * b["matches"].max()
@@ -68,17 +68,21 @@ def sites_html(board: pd.DataFrame | None) -> str:
     top = max(b["best_share"].max(), 1e-9)
     row = lambda r: (f"<tr><td><b>{e(r['name'])}</b><br><span class=kind>{e(r['kind'])}"
                      f"{' · ' + e(r['only']) + ' only' if r.get('only') else ''}</span></td>"
-                     f"<td class=n><span class=bar style='width:{60 * r['best_share'] / top:.0f}px'></span>{100 * r['best_share']:.0f}%</td>"
-                     f"<td class=n>{100 * r['margin']:.1f}%</td><td class=n>{int(r['matches'])}</td></tr>")
+                     f"<td class=num><span class=bar style='width:{60 * r['best_share'] / top:.0f}px'></span>{100 * r['best_share']:.0f}%</td>"
+                     f"<td class=num>{100 * r['margin']:.1f}%</td><td class=num>{int(r['matches'])}</td></tr>")
     ranked = "".join(row(r) for _, r in b[~b["few"]].iterrows())
     few = b[b["few"]]
     rest = (f"<tr><td colspan=4 class=kind style='padding-top:14px'>Too few matches to rank</td></tr>"
             + "".join(row(r) for _, r in few.iterrows())) if len(few) else ""
-    return (f"<section class=section id=sites><div class=wrap><h2>Which site pays the most today.</h2>"
-            f"<p class=sub>Unlike the findings above, this updates every morning from the US sites' match-result odds. \"Best odds\" is how often a site paid the most on a result it offered "
-            f"(ties count for every site, so the column adds up to more than 100%). The cut is the site's typical built-in margin; "
-            f"smaller is better.</p><div class=tablewrap><table><tr><th>Site</th><th class=n>Best odds</th><th class=n>Site's cut</th>"
-            f"<th class=n>Matches priced</th></tr>{ranked}{rest}</table></div>{vs_html(b)}</div></section>")
+    lead = b[~b["few"]].iloc[0] if (~b["few"]).any() else b.iloc[0]
+    take = (f"No single site is always best. Today the site with the best odds most often, {e(lead['name'])}, "
+            f"still had the best price on only {100 * lead['best_share']:.0f}% of results, so it pays to check every bet.")
+    body = (f"<p>Unlike the findings above, this updates every morning from the US sites' match-result odds. \"Best odds\" is how "
+            f"often a site paid the most on a result it offered (ties count for every site, so the column adds up to more than "
+            f"100%). The cut is the site's typical built-in margin; smaller is better.</p><div class=tw><table><tr><th>Site</th>"
+            f"<th class=num>Best odds</th><th class=num>Site's cut</th><th class=num>Matches priced</th></tr>{ranked}{rest}</table></div>"
+            f"{vs_html(b)}")
+    return take, body
 
 
 def vs_html(b: pd.DataFrame) -> str:
@@ -88,7 +92,7 @@ def vs_html(b: pd.DataFrame) -> str:
         return ""
     s, p = k.loc["Sportsbook"], k.loc["Prediction market"]
     cheaper = "prediction markets" if p["cut"] < s["cut"] else "sportsbooks"
-    return (f"<h3 style='margin-top:26px'>Sportsbooks against prediction markets</h3><p class=sub>After their trading fees, "
+    return (f"<h4 style='margin:22px 0 6px;font-size:16px'>Sportsbooks against prediction markets</h4><p>After their trading fees, "
             f"the prediction markets take a typical cut of <b>{100 * p['cut']:.1f}%</b>, against <b>{100 * s['cut']:.1f}%</b> for "
             f"the sportsbooks, so {cheaper} are cheaper today. A prediction market has the best odds on "
             f"<b>{100 * p['best']:.0f}%</b> of results, a sportsbook on <b>{100 * s['best']:.0f}%</b> (average per site). "
@@ -188,7 +192,11 @@ def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None
                       + checks,
                       viz.score_effects(lv["score_effects"])))
 
-    order = ["accurate", "longshots", "half-time", "line-moves", "flagged", "leagues"]
+    st = sites_html(board)
+    if st:
+        items.append(("sites", "Which site pays the most today", st[0], st[1]))
+
+    order = ["accurate", "longshots", "half-time", "line-moves", "flagged", "leagues", "sites"]
     items.sort(key=lambda it: order.index(it[0]) if it[0] in order else len(order))
     toc, body = [], []
     for i, it in enumerate(items, 1):
@@ -212,7 +220,6 @@ def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None
 <ul class=toc>{''.join(toc)}</ul>
 </div></section>
 <div class=wrap>{''.join(body)}</div>
-{sites_html(board)}
 
 <section class=band><div class=wrap>
 <h2>How it's built.</h2>
