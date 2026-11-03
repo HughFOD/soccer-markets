@@ -78,7 +78,22 @@ def sites_html(board: pd.DataFrame | None) -> str:
             f"<p class=sub>Unlike the findings above, this updates every morning from the US sites' match-result odds. \"Best odds\" is how often a site paid the most on a result it offered "
             f"(ties count for every site, so the column adds up to more than 100%). The cut is the site's typical built-in margin; "
             f"smaller is better.</p><div class=tablewrap><table><tr><th>Site</th><th class=n>Best odds</th><th class=n>Site's cut</th>"
-            f"<th class=n>Matches priced</th></tr>{ranked}{rest}</table></div></div></section>")
+            f"<th class=n>Matches priced</th></tr>{ranked}{rest}</table></div>{vs_html(b)}</div></section>")
+
+
+def vs_html(b: pd.DataFrame) -> str:
+    """Sportsbooks against prediction markets: typical cut and how often each kind has the best odds."""
+    k = b[~b["few"]].groupby("kind").agg(cut=("margin", "median"), best=("best_share", "mean"), n=("name", "count"))
+    if not {"Sportsbook", "Prediction market"} <= set(k.index):
+        return ""
+    s, p = k.loc["Sportsbook"], k.loc["Prediction market"]
+    cheaper = "prediction markets" if p["cut"] < s["cut"] else "sportsbooks"
+    return (f"<h3 style='margin-top:26px'>Sportsbooks against prediction markets</h3><p class=sub>After their trading fees, "
+            f"the prediction markets take a typical cut of <b>{100 * p['cut']:.1f}%</b>, against <b>{100 * s['cut']:.1f}%</b> for "
+            f"the sportsbooks, so {cheaper} are cheaper today. A prediction market has the best odds on "
+            f"<b>{100 * p['best']:.0f}%</b> of results, a sportsbook on <b>{100 * s['best']:.0f}%</b> (average per site). "
+            "The bigger question, whose odds are more accurate, needs a few hundred finished matches: every match is "
+            "saved each day, so that test runs as soon as there are enough.</p>")
 
 
 def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None = None) -> str:

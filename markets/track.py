@@ -413,7 +413,8 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
             f"{tiles}"
             f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
             f"several hundred.{note}</p>"
-            + (f"<h3 class=tally>Every settled bet</h3>{filt}"
+            + (("<div class=chart-wrap style='margin:22px 0 6px'>" + profit_chart(g) + "</div>" if full else "")
+               + f"<h3 class=tally>Every settled bet</h3>{filt}"
                f"<div class=tablewrap><table><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th><th class=n>Result</th>"
                f"<th class=n>Profit on $100</th></tr>{rows}</table></div>"
                f"<p class=rcount id=rcount></p><button class=rmore id=rmore hidden>Show more</button>{js}" if full else
@@ -423,9 +424,31 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
             + "</div></section>")
 
 
+def profit_chart(g: pd.DataFrame) -> str:
+    """Running profit from $100 on every settled bet, against the profit the odds said to expect when listed."""
+    from . import viz
+    g = g.sort_values("kickoff")
+    if len(g) < 5:
+        return ""
+    ko = pd.to_datetime(g["kickoff"], utc=True).dt.tz_convert("America/New_York")
+    actual = g["profit"].astype(float).cumsum().round(2).tolist()
+    expected = (100 * g["edge"].astype(float)).cumsum().round(2).tolist()
+    days = [f"{d:%b %-d}" for d in ko]
+    ticks = [d if i == 0 or d != days[i - 1] else "" for i, d in enumerate(days)]
+    n = len(g)
+    return viz.chart("profit", "Running profit, bet by bet",
+                     "Profit from $100 on every settled bet, in the order they kicked off, next to what the odds said to "
+                     "expect when each bet was listed. Over a few dozen bets, luck moves the real line far more than the expected one.",
+                     {"type": "line", "x": [str(i + 1) for i in range(n)], "ticks": ticks, "fmt": "usd", "zero": True,
+                      "series": [{"name": f"actual {actual[-1]:+,.0f}".replace("+", "+$").replace("-", "−$"), "values": actual, "color": "a"},
+                                 {"name": f"expected {expected[-1]:+,.0f}".replace("+", "+$").replace("-", "−$"), "values": expected, "color": "b"}]},
+                     viz._table(["After bet", "Actual profit", "Expected profit"],
+                                [[f"{i + 1} ({days[i]})", f"{actual[i]:+,.0f}", f"{expected[i]:+,.0f}"] for i in range(n)][::-1]))
+
+
 def results_page(L: pd.DataFrame, stamp: str) -> str:
     """docs/results.html: the full track record."""
-    from . import theme
+    from . import theme, viz
     from .site import CSS
     body = html_section(L, full=True) or ("<section class=section style=padding-top:0><div class=wrap>"
                                           "<p class=sub>No bets recorded yet.</p></div></section>")
@@ -435,7 +458,7 @@ def results_page(L: pd.DataFrame, stamp: str) -> str:
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 {theme.meta("results.html", "Results: how every pick has done · Today's Soccer Bets",
             "Every bet listed on Today's Soccer Bets, saved at the price shown and settled from the final score.")}
-<style>{CSS}</style></head><body>
+<style>{CSS}{viz.CSS}</style></head><body>
 {theme.nav("results")}
 <section class=hero><div class=wrap>
 <p class=eyebrow>Track record</p>
@@ -445,6 +468,7 @@ def results_page(L: pd.DataFrame, stamp: str) -> str:
 </div></section>
 {body}
 {theme.footer()}
+<script>{viz.JS}</script>
 </body></html>"""
 
 
