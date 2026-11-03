@@ -19,20 +19,20 @@ REPO_URL = "https://github.com/HughFOD/soccer-markets"
 
 CSS = theme.CSS + """
 .picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
-.pick{background:var(--bg2);border-radius:18px;padding:22px 22px 20px;display:flex;flex-direction:column;gap:4px}
+.pick{background:var(--bg2);border-radius:var(--r);padding:22px 22px 20px;display:flex;flex-direction:column;gap:4px}
 .pick .meta{font-size:13px;color:var(--muted)}
 .pick .m{font-size:19px;font-weight:600;line-height:1.25;letter-spacing:-.015em}
 .pick .bet{margin-top:10px;font-size:15px;color:var(--ink2)}
-.pick .bet b{display:block;font:700 30px/1.1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;color:var(--ink);letter-spacing:-.02em;margin:2px 0}
+.pick .bet b{display:block;font:700 26px/1.15 var(--sans);color:var(--ink);letter-spacing:-.02em;margin:2px 0}
 .pick .vs{font-size:14px;color:var(--muted)}
-.edge{display:inline-block;background:var(--goodbg);color:var(--good);font-size:13px;font-weight:600;padding:3px 10px;border-radius:980px;margin-left:6px;vertical-align:middle}
+.edge{display:inline-block;background:var(--goodbg);color:var(--good);font-size:13px;font-weight:600;padding:3px 10px;border-radius:var(--r);margin-left:6px;vertical-align:middle}
 .tally{font-size:19px;margin:26px 0 8px}.how{counter-reset:s;list-style:none;padding:0;margin:0 0 6px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.how li{counter-increment:s;background:var(--bg2);border-radius:14px;padding:14px 16px 14px 48px;position:relative;font-size:15px;color:var(--ink2);line-height:1.4}
+.how li{counter-increment:s;background:var(--bg2);border-radius:var(--r);padding:14px 16px 14px 48px;position:relative;font-size:15px;color:var(--ink2);line-height:1.4}
 .how li::before{content:counter(s);position:absolute;left:14px;top:13px;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:grid;place-items:center}
 .how b{color:var(--ink);display:block;margin-bottom:2px}
 @media (max-width:820px){.how{grid-template-columns:1fr}}
-.bigstat{display:flex;gap:18px;align-items:center;background:var(--tile);border-radius:18px;padding:22px 24px;margin:18px 0}
-.bigstat .v{font:700 52px/1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;letter-spacing:-.03em;color:var(--good)}
+.bigstat{display:flex;gap:18px;align-items:center;background:var(--tile);border-radius:var(--r);padding:22px 24px;margin:18px 0}
+.bigstat .v{font:600 44px/1 var(--mono);letter-spacing:-.03em;color:var(--good)}
 .bigstat .l{color:var(--ink2);font-size:16px}.csub{color:var(--muted);font-size:14px;margin:0 0 12px}
 .hbars{display:grid;gap:10px;margin-bottom:16px}.hb{display:grid;grid-template-columns:78px 1fr 44px 80px;gap:12px;align-items:center;font-size:14px}
 .hl{color:var(--ink2)}.hv{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}.hn{color:var(--muted);font-size:12px;text-align:right}
@@ -43,24 +43,24 @@ CSS = theme.CSS + """
 .why{grid-column:2/-1;margin-top:-6px;font-size:14px;min-width:0}.bet-main{min-width:0}.why summary{cursor:pointer;color:var(--link);font-weight:500;list-style:none}
 .why summary::-webkit-details-marker{display:none}.why summary::after{content:" ›";display:inline-block;transition:transform .15s}
 .why[open] summary::after{transform:rotate(90deg)}.why p{margin:8px 0;color:var(--ink2);line-height:1.45}
-.whygrid{display:grid;grid-template-columns:1fr auto auto;gap:3px 14px;font-size:13px;background:var(--bg2);border-radius:10px;padding:8px 12px}
+.whygrid{display:grid;grid-template-columns:1fr auto auto;gap:3px 14px;font-size:13px;background:var(--bg2);border-radius:var(--r);padding:8px 12px}
 .whygrid .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.empty{background:var(--bg2);border-radius:18px;padding:22px;color:var(--muted)}
+.empty{background:var(--bg2);border-radius:var(--r);padding:22px;color:var(--muted)}
 .daytabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 18px;scrollbar-width:none}.daytabs::-webkit-scrollbar{display:none}
-.daytab{flex:none;font:inherit;font-size:15px;border:0;border-radius:980px;padding:8px 16px;background:var(--bg2);color:var(--ink);cursor:pointer;letter-spacing:-.01em}
+.daytab{flex:none;font:inherit;font-size:15px;border:0;border-radius:var(--r);padding:8px 16px;background:var(--bg2);color:var(--ink);cursor:pointer;letter-spacing:-.01em}
 .daytab span{margin-left:7px;color:var(--muted);font-size:13px}
 .daytab[aria-selected=true]{background:var(--ink);color:var(--bg)}.daytab[aria-selected=true] span{color:inherit;opacity:.7}
 html:not(.js) .daytabs{display:none}html:not(.js) .daypane{display:block!important;margin-bottom:28px}
 .dayhead{display:none}html:not(.js) .dayhead{display:block}
-.bets{list-style:none;margin:0;padding:0;background:var(--bg2);border-radius:18px;overflow:hidden}
+.bets{list-style:none;margin:0;padding:0;background:var(--bg2);border-radius:var(--r);overflow:hidden}
 .bet-row{display:grid;grid-template-columns:44px 1fr auto auto;gap:18px;align-items:center;padding:16px 22px;border-top:1px solid var(--hair)}
 .bet-row:first-child{border-top:0}
-.rank{font:700 22px -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;color:var(--muted);text-align:center}
+.rank{font:600 18px var(--mono);color:var(--muted);text-align:center}
 .bet-row:first-child .rank{color:var(--blue)}
 .bet-what{font-size:19px;font-weight:600;letter-spacing:-.015em;line-height:1.25}
 .bet-match{font-size:14px;color:var(--muted);margin-top:2px}
 .bet-why{font-size:14px;color:var(--ink2);margin-top:6px}.bet-why b{font-weight:600;color:var(--ink)}
-.bet-where{text-align:right}.bet-odds{font:700 24px/1.1 -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.bet-where{text-align:right}.bet-odds{font:600 22px/1.1 var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .bet-site{font-size:14px;color:var(--link);font-weight:500}
 .bet-value{text-align:right;min-width:116px}.bet-value .edge{margin:0}.bet-chance{font-size:13px;color:var(--muted);margin-top:4px}
 .few{font-size:14px;color:var(--muted);margin:12px 4px 0}
@@ -69,7 +69,7 @@ html:not(.js) .daytabs{display:none}html:not(.js) .daypane{display:block!importa
   .bet-main{grid-column:2;grid-row:1}.why{grid-column:2/4;grid-row:3;margin-top:4px}.bet-chance{margin:0}.bet-what{font-size:17px}.bet-odds{font-size:20px}}
 .bar{display:inline-block;height:6px;border-radius:3px;background:var(--blue);vertical-align:middle;margin-right:8px}
 .kind{font-size:12px;color:var(--muted)}
-details.league{background:var(--tile);border-radius:18px;margin:12px 0;overflow:hidden}
+details.league{background:var(--tile);border-radius:var(--r);margin:12px 0;overflow:hidden}
 details.league>summary{cursor:pointer;padding:18px 56px 18px 22px;font-size:19px;font-weight:600;list-style:none;position:relative;letter-spacing:-.015em}
 details.league>summary::-webkit-details-marker{display:none}
 details.league>summary:after{content:"+";position:absolute;right:22px;top:50%;transform:translateY(-52%);font-weight:300;font-size:26px;color:var(--muted);line-height:1}
@@ -77,7 +77,7 @@ details.league[open]>summary:after{content:"−"}
 details.league>summary span{color:var(--muted);font-weight:400;font-size:15px;margin-left:8px}
 .match{padding:6px 22px 18px}
 .match h4{margin:10px 0 8px;font-size:16px;font-weight:600}.match h4 small{color:var(--muted);font-weight:400;font-size:13px}
-.match .tablewrap{background:var(--bg2);border-radius:12px}
+.match .tablewrap{background:var(--bg2);border-radius:var(--r)}
 .match th,.match td{padding:9px 12px}
 .best{color:var(--good);font-weight:700}
 td.best{background:var(--goodbg)}

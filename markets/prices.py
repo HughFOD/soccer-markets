@@ -17,7 +17,7 @@ from .usbooks import SITES, american
 
 PAGE_CSS = """
 .mlist{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
-.mcard{background:var(--bg2);border-radius:18px;padding:18px 22px 10px}
+.mcard{background:var(--bg2);border-radius:var(--r);padding:18px 22px 10px}
 .mcard h3{font-size:19px;margin:0}.mcard .meta{font-size:13px;color:var(--muted);margin:2px 0 10px}
 .mcard table{font-size:15px;table-layout:fixed;width:100%}.mcard td{overflow-wrap:anywhere}.mcard th,.mcard td{padding:9px 6px}.mcard td.n{white-space:nowrap}.mcard th.n{white-space:normal}
 .mcard .odds{font-weight:700;font-variant-numeric:tabular-nums}
@@ -27,14 +27,14 @@ PAGE_CSS = """
 .mcard tr.bet{cursor:pointer}.mcard tr.bet td:first-child::after{content:"›";display:inline-block;margin-left:6px;color:var(--muted);font-weight:600;transition:transform .15s}
 .mcard tr.bet.open td:first-child::after{transform:rotate(90deg)}.mcard tr.bet:hover td{background:var(--hair)}
 .mcard tr.all td{padding:0 6px 10px;border-bottom:1px solid var(--hair);max-width:0}
-.allsites{display:grid;grid-template-columns:1fr auto auto;gap:4px 14px;font-size:13px;background:var(--tile);border-radius:12px;padding:10px 12px}
+.allsites{display:grid;grid-template-columns:1fr auto auto;gap:4px 14px;font-size:13px;background:var(--tile);border-radius:var(--r);padding:10px 12px}
 .allsites b{font-weight:600}.allsites .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .finder{display:flex;gap:8px;margin:0 0 10px}
-.finder input[type=search]{flex:1;min-width:0;font:inherit;font-size:16px;padding:10px 16px;border-radius:980px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
-.finder button{flex:none;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:980px;padding:8px 16px;background:var(--bg);color:var(--ink);cursor:pointer}
+.finder input[type=search]{flex:1;min-width:0;font:inherit;font-size:16px;padding:10px 16px;border-radius:var(--r);border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.finder button{flex:none;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:var(--r);padding:8px 16px;background:var(--bg);color:var(--ink);cursor:pointer}
 .finder button[aria-expanded=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.filters{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;background:var(--bg2);border-radius:14px;padding:12px 14px;margin:0 0 10px;font-size:15px}
-.filters select{font:inherit;font-size:15px;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.filters{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;background:var(--bg2);border-radius:var(--r);padding:12px 14px;margin:0 0 10px;font-size:15px}
+.filters select{font:inherit;font-size:15px;padding:6px 10px;border-radius:var(--r);border:1px solid var(--line);background:var(--bg);color:var(--ink)}
 .filters label{display:flex;gap:6px;align-items:center;cursor:pointer}
 .filters[hidden]{display:none}.hint{font-size:13px;color:var(--muted);margin:0 0 16px}.nomatch{display:none}
 .more{margin:6px 0 8px}.more>summary,.mgrp>summary{cursor:pointer;list-style:none;font-weight:600;font-size:15px;padding:10px 6px;color:var(--link)}

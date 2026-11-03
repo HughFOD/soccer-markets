@@ -21,9 +21,9 @@ CSS = """
 .chart .csub{font-size:14px;color:var(--muted);margin:0 0 12px;line-height:1.4}
 .chart .plot{position:relative;width:100%;touch-action:pan-y}
 .chart svg{display:block;overflow:visible}
-.chart svg text{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif}
+.chart svg text{font-family:var(--sans)}
 .chart .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:13px;line-height:1.35;
-  padding:7px 11px;border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.18);white-space:nowrap;opacity:0;transition:opacity .1s;z-index:2}
+  padding:7px 11px;border-radius:var(--r);box-shadow:0 4px 18px rgba(0,0,0,.18);white-space:nowrap;opacity:0;transition:opacity .1s;z-index:2}
 .chart .tip b{font-weight:700}
 .chart details{margin-top:8px}.chart summary{font-size:14px;color:var(--link);cursor:pointer}
 .chart details table{font-size:.86rem}

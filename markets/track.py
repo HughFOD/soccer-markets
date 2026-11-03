@@ -380,12 +380,12 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
     leagues = sorted(allbets["league"].dropna().unique())
     sites = sorted({site1(r) for _, r in allbets.iterrows()})
     filt = (f"<style>.rfilts{{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0 10px}}"
-            ".rfilt{font:inherit;font-size:15px;border:0;border-radius:980px;padding:8px 16px;background:var(--bg2);color:var(--ink);cursor:pointer}"
+            ".rfilt{font:inherit;font-size:15px;border:0;border-radius:var(--r);padding:8px 16px;background:var(--bg2);color:var(--ink);cursor:pointer}"
             ".rfilt span{margin-left:7px;color:var(--muted);font-size:13px}.rfilt[aria-pressed=true]{background:var(--ink);color:var(--bg)}"
             ".rfilt[aria-pressed=true] span{color:inherit;opacity:.7}"
-            ".rsel{font:inherit;font-size:15px;padding:7px 12px;border-radius:980px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}"
+            ".rsel{font:inherit;font-size:15px;padding:7px 12px;border-radius:var(--r);border:1px solid var(--line);background:var(--bg);color:var(--ink)}"
             ".rcount{font-size:13px;color:var(--muted);margin:6px 0 0}.rmore{font:inherit;font-size:15px;margin:12px 0 0;border:1px solid var(--line);"
-            "border-radius:980px;padding:8px 18px;background:var(--bg);color:var(--ink);cursor:pointer}"
+            "border-radius:var(--r);padding:8px 18px;background:var(--bg);color:var(--ink);cursor:pointer}"
             "html:not(.js) .rfilts,html:not(.js) .rmore,html:not(.js) .rcount{display:none}</style>"
             f"<div class=rfilts role=group aria-label='Filter bets'>{buttons}"
             f"<select class=rsel id=rlg aria-label=League>{opts(leagues, 'All leagues')}</select>"
@@ -426,6 +426,7 @@ def results_page(L: pd.DataFrame, stamp: str) -> str:
     body = html_section(L, full=True) or ("<section class=section style=padding-top:0><div class=wrap>"
                                           "<p class=sub>No bets recorded yet.</p></div></section>")
     body = body.replace("<h2>How the picks have done.</h2>", "", 1)
+    body = body.replace("<section class=section style=padding-top:0>", "<section class=section style=padding-top:26px>", 1)
     body = body.replace("Every bet listed on this page since", "Every bet listed on the homepage since", 1)
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 {theme.meta("results.html", "Results: how every pick has done · Today's Soccer Bets",

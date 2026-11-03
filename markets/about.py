@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 PAGE_CSS = """
 .about h2{margin-top:0}.about .section+.section{padding-top:0}
 .facts{color:var(--ink2);padding-left:20px;margin:0}.facts li{margin:8px 0}.facts b{color:var(--ink)}
-.help{background:var(--bg2);border-radius:18px;padding:22px 24px}
+.help{background:var(--bg2);border-radius:var(--r);padding:22px 24px}
 .help p{margin:0 0 8px}.help p:last-child{margin:0}
 """
 

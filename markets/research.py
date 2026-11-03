@@ -18,21 +18,19 @@ ROOT = Path(__file__).resolve().parent.parent
 
 EXTRA_CSS = """
 .toc{columns:2;column-gap:28px;padding:0;list-style:none;margin:0}.toc li{break-inside:avoid;margin-bottom:10px}
-.toc a{color:var(--ink);font-size:17px;display:flex;gap:12px;align-items:baseline}.toc a:hover{color:var(--link);text-decoration:none}
-.toc a b{color:var(--muted);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
-.finding{background:var(--bg2);border-radius:28px;padding:40px 40px 30px;margin:0 0 22px}
-.finding .n{font-size:14px;font-weight:600;color:#bf4800;margin-bottom:6px}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .finding .n{color:#ff9f0a}}
-:root[data-theme="dark"] .finding .n{color:#ff9f0a}
-.finding h3{font-size:clamp(26px,3.4vw,34px);line-height:1.12;font-weight:700;letter-spacing:-.012em;margin:0 0 12px}
-.finding .take{font-size:19px;line-height:1.42;color:var(--ink2);margin:0 0 22px}
-.finding p{color:var(--muted);font-size:17px;line-height:1.5}
-.finding .chart{background:var(--tile);border-radius:18px;padding:22px 22px 14px;margin:0 0 18px}
+.toc a{color:var(--ink);font-size:16px;display:flex;gap:12px;align-items:baseline}.toc a:hover{color:var(--link);text-decoration:none}
+.toc a b{color:var(--muted);font-size:13px;font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums}
+.finding{background:var(--tile);border:1px solid var(--line);border-top:3px solid var(--ink);border-radius:var(--r);padding:26px 28px 20px;margin:0 0 22px}
+.finding .n{font:600 12px var(--mono);color:var(--link);margin-bottom:6px;letter-spacing:.06em}
+.finding h3{font-size:clamp(21px,2.6vw,26px);line-height:1.2;font-weight:700;margin:0 0 10px}
+.finding .take{font-size:17px;line-height:1.5;color:var(--ink2);margin:0 0 22px}
+.finding p{color:var(--muted);font-size:15px;line-height:1.55}
+.finding .chart{background:var(--tile);border:1px solid var(--hair);border-radius:var(--r);padding:22px 22px 14px;margin:0 0 18px}
 .finding table{min-width:0}.finding .tw{margin:12px 0}
 .section ul.plain{color:var(--muted);padding-left:20px}.section ul.plain li{margin:8px 0}
 .section ul.plain b{color:var(--ink)}
 .callout{max-width:760px;margin:26px auto 0;font-size:19px;line-height:1.45;color:var(--ink2)}
-@media (max-width:720px){.toc{columns:1}.finding{padding:26px 18px 18px;border-radius:22px}.finding .chart{padding:16px 12px 10px}}
+@media (max-width:720px){.toc{columns:1}.finding{padding:26px 18px 18px;border-radius:var(--r)}.finding .chart{padding:16px 12px 10px}}
 """
 
 
@@ -121,6 +119,8 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
                       + checks,
                       viz.score_effects(lv["score_effects"])))
 
+    order = ["accurate", "longshots", "half-time", "line-moves", "leagues"]
+    items.sort(key=lambda it: order.index(it[0]) if it[0] in order else len(order))
     toc, body = [], []
     for i, it in enumerate(items, 1):
         a, b = _finding(i, *it)
