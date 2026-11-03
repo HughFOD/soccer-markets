@@ -77,7 +77,7 @@ def sites_html(board: pd.DataFrame | None) -> tuple[str, str] | None:
     lead = b[~b["few"]].iloc[0] if (~b["few"]).any() else b.iloc[0]
     take = (f"No single site is always best. Today the site with the best odds most often, {e(lead['name'])}, "
             f"still had the best price on only {100 * lead['best_share']:.0f}% of results, so it pays to check every bet.")
-    body = (f"<p>Unlike the findings above, this updates every morning from the US sites' match-result odds. \"Best odds\" is how "
+    body = (f"<p>This updates every morning from the US sites' match-result odds. \"Best odds\" is how "
             f"often a site paid the most on a result it offered (ties count for every site, so the column adds up to more than "
             f"100%). The cut is the site's typical built-in margin; smaller is better.</p><div class=tw><table><tr><th>Site</th>"
             f"<th class=num>Best odds</th><th class=num>Site's cut</th><th class=num>Matches priced</th></tr>{ranked}{rest}</table></div>"
