@@ -51,7 +51,7 @@ deserves. Gaps over 25% are left out as likely stale or mistyped prices.</p></di
 </div>
 </div></section>
 
-<section class=section><div class=wrap>
+<section class=section id=covered><div class=wrap>
 <h2>What's covered.</h2>
 <ul class=facts>
 <li><b>Sportsbooks:</b> {e(', '.join(books))}.</li>

@@ -365,8 +365,8 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 
 <section class=band><div class=wrap>
 <div class=stats>
-<div class=stat><div class=v>{len(M)}</div><div class=l>upcoming matches</div></div>
-<div class=stat><div class=v>{len(present)}</div><div class=l>{sites_label}</div></div>
+<a class=stat href="best-prices.html" style="color:inherit;text-decoration:none"><div class=v>{len(M)}</div><div class=l>upcoming matches</div></a>
+<a class=stat href="about.html#covered" style="color:inherit;text-decoration:none"><div class=v>{len(present)}</div><div class=l>{sites_label}</div></a>
 {record_tile_html}
 <div class=stat><div class=v>{e(best_site)}</div><div class=l>best odds on average</div></div>
 </div></div></section>
