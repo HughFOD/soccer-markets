@@ -197,11 +197,12 @@ def _usd(x: float) -> float:
     return round(100 * x, 2)
 
 
-def _table(head: list[str], rows: list[list[str]]) -> str:
+def _table(head: list[str], rows: list[list[str]], note: str = "") -> str:
     h = "".join(f"<th{' class=num' if i else ''}>{html.escape(c)}</th>" for i, c in enumerate(head))
     b = "".join("<tr>" + "".join(f"<td{' class=num' if i else ''}>{html.escape(str(c))}</td>" for i, c in enumerate(r)) + "</tr>"
                 for r in rows)
-    return f"<details><summary>Show the numbers</summary><div class=tw><table><tr>{h}</tr>{b}</table></div></details>"
+    note = f"<p class=csub style='margin:10px 0 0'>{html.escape(note)}</p>" if note else ""
+    return f"<details><summary>Show the numbers</summary>{note}<div class=tw><table><tr>{h}</tr>{b}</table></div></details>"
 
 
 def chart(cid: str, title: str, sub: str, spec: dict, table: str = "") -> str:
@@ -223,12 +224,15 @@ def calibration(table: list) -> str:
     pts = [[round(100 * a, 1), round(100 * b, 1), int(n)] for a, b, n in
            zip(t["priced"], t["happened"], t.get("n", pd.Series([0] * len(t))))]
     mx = 10 * (int(max(max(p[0], p[1]) for p in pts) // 10) + 1)
-    rows = [[f"{p[0]:.0f}%", f"{p[1]:.0f}%", f"{p[2]:,}"] for p in pts]
+    rows = [[f"{p[0]:.0f}%", f"{p[1]:.0f}%"] for p in pts]
+    total, k = sum(p[2] for p in pts), len(pts)
+    note = (f"All {total:,} results (every home win, draw and away win) sorted by the chance the odds gave them, "
+            f"then split into {k} equal groups of about {round(total / k):,} each.")
     return chart("calibration", "When the odds say 40%, it happens about 40% of the time",
                  "Each dot is a group of results with similar odds. Dots on the dashed line mean the odds were exactly right.",
                  {"type": "scatter", "points": pts, "max": mx, "xlab": "chance the odds gave it", "ylab": "how often it happened",
                   "diag": "odds exactly right", "tip": "Odds said <b>{x}</b><br>Happened <b>{y}</b> of the time<br>{n} results"},
-                 _table(["Odds said", "Happened", "Results"], rows))
+                 _table(["Chance the odds gave", "How often it happened"], rows, note))
 
 
 def longshot(avg: list) -> str:
