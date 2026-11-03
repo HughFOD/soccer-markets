@@ -437,8 +437,8 @@ def profit_chart(g: pd.DataFrame) -> str:
     ticks = [d if i == 0 or d != days[i - 1] else "" for i, d in enumerate(days)]
     n = len(g)
     return viz.chart("profit", "Running profit, bet by bet",
-                     "Profit from $100 on every settled bet, in the order they kicked off, next to what the odds said to "
-                     "expect when each bet was listed. Over a few dozen bets, luck moves the real line far more than the expected one.",
+                     "Blue: actual profit from $100 on each settled bet, in kick-off order. "
+                     "Orange: expected profit, based on the odds when each bet was listed.",
                      {"type": "line", "x": [str(i + 1) for i in range(n)], "ticks": ticks, "fmt": "usd", "zero": True,
                       "series": [{"name": f"actual {actual[-1]:+,.0f}".replace("+", "+$").replace("-", "−$"), "values": actual, "color": "a"},
                                  {"name": f"expected {expected[-1]:+,.0f}".replace("+", "+$").replace("-", "−$"), "values": expected, "color": "b"}]},
