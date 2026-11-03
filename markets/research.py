@@ -128,14 +128,14 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
         body.append(b)
 
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
-{theme.meta("research.html", "How accurate are betting odds? · Today's Soccer Bets", "What 20 years of soccer betting odds show about how accurate the odds are and how much each bookmaker charges.")}
+{theme.meta("research.html", "How accurate are betting odds? · Today's Soccer Bets", f"What {int(R['seasons'][-1][:4]) - int(R['seasons'][0][:4])} years of soccer betting odds show about how accurate the odds are.")}
 <style>{theme.CSS}{EXTRA_CSS}{viz.CSS}</style></head><body>
 {theme.nav("research")}
 <section class=hero><div class=wrap>
 <p class=eyebrow>Research</p>
 <h1>How accurate are betting odds?</h1>
 <p class=lede>{f['matches']} matches from six top European leagues since {R['seasons'][0][:4]}, checked against their betting odds.</p>
-<div class=ctas><a class=btn href="#found">See the findings</a><a class="btn ghost" href="index.html">This week's best bets</a></div>
+<div class=ctas><a class=btn href="#found">See the findings</a><a class="btn ghost" href="index.html">Today's best bets</a></div>
 </div></section>
 
 <section class=section id=found><div class=wrap>
@@ -147,7 +147,7 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
 <section class=band><div class=wrap>
 <h2>How it's built.</h2>
 <ul class=plain>
-<li><b>Data.</b> Results and odds from up to ten bookmakers per match, from <a href="https://www.football-data.co.uk">football-data.co.uk</a>.</li>
+<li><b>Data.</b> Results and odds from every bookmaker recorded for each match, from <a href="https://www.football-data.co.uk">football-data.co.uk</a>.</li>
 <li><b>Removing the margin.</b> Three methods compared: proportional, power and Shin's 1993 model.</li>
 <li><b>Uncertainty.</b> 95% ranges from resampling whole matches (the bootstrap).</li>
 <li><b>Tests.</b> Automated checks on every calculation.</li>

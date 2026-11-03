@@ -365,7 +365,7 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 
 <section class=band><div class=wrap>
 <div class=stats>
-<div class=stat><div class=v>{len(M)}</div><div class=l>matches this week</div></div>
+<div class=stat><div class=v>{len(M)}</div><div class=l>upcoming matches</div></div>
 <div class=stat><div class=v>{len(present)}</div><div class=l>{sites_label}</div></div>
 {record_tile_html}
 <div class=stat><div class=v>{e(best_site)}</div><div class=l>best odds on average</div></div>
@@ -382,7 +382,7 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 
 <section class=band><div class=wrap>
 <h2>Which site pays the most.</h2>
-<p class=sub>This week's odds at each site. A smaller cut and a higher average return both mean better odds.</p>
+<p class=sub>Current odds at each site. A smaller cut and a higher average return both mean better odds.</p>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>Matches priced</th><th class=n>Site's cut</th><th class=n>Has the best odds</th><th class=n>Average return per $100 bet</th></tr>{brows}</table></div>
 </div></section>
 
