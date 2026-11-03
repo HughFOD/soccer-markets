@@ -346,7 +346,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
 <div class=bigstat><div class=v>{100 * r2['beat_close']:.0f}%</div><div class=l>of bets flagged with a gap of 2% or more were still good bets at kick-off,
 worth {_pct(r2['edge_vs_close'], 1, False)} per bet on average.</div></div>
 <h3 class=tally>The bigger the gap, the more often it holds up</h3>
-<p class=csub>Share still a good bet at kick-off, by the gap when flagged. The line marks 50%, a coin flip.</p>
+<p class=csub>How often a flagged bet was still a good bet at kick-off, grouped by how much it beat the expected price when first flagged. Anything above the 50% line is better than a coin flip.</p>
 <div class=hbars>{bars}</div>
 <details class=nums><summary>Show the numbers</summary>
 <div class=tablewrap><table><tr><th>Gap when flagged</th><th class=n>Bets</th><th class=n>Looked like when flagged</th><th class=n>Was worth at kick-off</th><th class=n>Still a good bet at kick-off</th></tr>{hrows}</table></div>
