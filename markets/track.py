@@ -413,11 +413,11 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
             f"{tiles}"
             f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
             f"several hundred.{note}</p>"
-            + (("<div class=chart-wrap style='margin:22px 0 6px'>" + profit_chart(g) + "</div>" if full else "")
-               + f"<h3 class=tally>Every settled bet</h3>{filt}"
+            + (f"<h3 class=tally>Every settled bet</h3>{filt}"
                f"<div class=tablewrap><table><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th><th class=n>Result</th>"
                f"<th class=n>Profit on $100</th></tr>{rows}</table></div>"
-               f"<p class=rcount id=rcount></p><button class=rmore id=rmore hidden>Show more</button>{js}" if full else
+               f"<p class=rcount id=rcount></p><button class=rmore id=rmore hidden>Show more</button>{js}"
+               + "<div class=chart-wrap style='margin:34px 0 6px'>" + profit_chart(g) + "</div>" if full else
                f"<h3 class=tally>Latest results</h3><div class=tablewrap><table><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th>"
                f"<th class=n>Result</th><th class=n>Profit on $100</th></tr>{recent}</table></div>"
                f"<p class=sub style='margin-top:18px'><a href=\"results.html\">See all {len(allbets)} bets, and filter by won or lost&nbsp;›</a></p>")
