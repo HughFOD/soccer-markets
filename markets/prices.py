@@ -238,7 +238,7 @@ function show(){var term=q.value.trim().toLowerCase(),act=!!(term||lg.value||kin
     else:
         head = (theme.meta("best-prices.html", "Compare the Best Betting Odds Across Sportsbooks for Every Upcoming Match | Today's Soccer Bets",
                            "Where to place each soccer bet: the best odds for every match result and goals line, across US sportsbooks and prediction markets."),
-                "prices", "Best prices", "Compare the Best Betting Odds Across Sportsbooks for Every Upcoming Match.",
+                "prices", "Best odds", "Compare the Best Betting Odds Across Sportsbooks for Every Upcoming Match.",
                 "Which site pays the most for each bet, and what you can expect to win or lose per $100.")
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 {head[0]}

@@ -119,7 +119,7 @@ def nav(active: str) -> str:
     def a(href, label, key):
         return f'<a href="{href}"{" class=on" if key == active else ""}>{label}</a>'
     return (f'<header class=gnav><div class=wrap><a class=brand href="index.html">{SITE_NAME}</a><div class=right><nav>'
-            f'{a("index.html", "Bets", "week")}{a("results.html", "Results", "results")}{a("best-prices.html", "Prices", "prices")}{a("search.html", "Search", "search")}{a("research.html", "Research", "research")}{a("about.html", "About", "about")}'
+            f'{a("index.html", "Bets", "week")}{a("results.html", "Results", "results")}{a("best-prices.html", "Odds", "prices")}{a("search.html", "Search", "search")}{a("research.html", "Research", "research")}{a("about.html", "About", "about")}'
             f'{a(REPO_URL, "Code", "code")}</nav>{THEME_BUTTON}</div></div></header>{THEME_SCRIPT}')
 
 
