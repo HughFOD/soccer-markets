@@ -30,6 +30,7 @@ COLS = ["key", "flagged_at", "kickoff", "league", "id", "home", "away", "match",
         "sites", "n_sites", "odds", "chance", "edge", "last_checked", "last_chance", "last_value", "result", "profit"]
 GRADABLE = {"result", "totals", "alternate_totals", "alternate_spreads", "btts", "draw_no_bet"}
 SETTLE_HOURS = 2.5   # a match is treated as finished this long after kick-off
+MAX_ROWS = 500       # settled bets listed on the homepage (newest first)
 GIVE_UP_DAYS = 3     # the scores endpoint only looks back 3 days
 
 # Corners and cards are settled from football-data.co.uk results files, which record each game's corners
@@ -337,27 +338,8 @@ def _usd(x: float) -> str:
     return f"{'+' if x >= 0 else '−'}${abs(x):,.0f}"
 
 
-def weekly_html(g: pd.DataFrame, now: pd.Timestamp | None = None) -> str:
-    """Last 7 days of settled bets: totals, then one row per day."""
-    now = now or pd.Timestamp.now(tz="America/New_York")
-    ko = pd.to_datetime(g["kickoff"], utc=True).dt.tz_convert("America/New_York")
-    w = g[ko > now - pd.Timedelta(days=7)].assign(day=ko.dt.date)
-    if not len(w):
-        return "<h3 class=tally>Last 7 days</h3><p class=sub>No bets settled in the last 7 days.</p>"
-    won = lambda d: int(d["result"].isin(["won", "half won"]).sum())
-    lost = lambda d: int(d["result"].isin(["lost", "half lost"]).sum())
-    n, pr = len(w), w["profit"].sum()
-    head = (f"<h3 class=tally>Last 7 days</h3><p class=sub><b>{n} bet{'s' if n != 1 else ''} settled, {won(w)} won and {lost(w)} lost. "
-            f"{_usd(pr)} from $100 on each, a {100 * pr / (100 * n):+.1f}% return.</b></p>")
-    rows = "".join(f"<tr><td>{pd.Timestamp(d):%a %b %-d}</td><td class=n>{len(x)}</td><td class=n>{won(x)}–{lost(x)}</td>"
-                   f"<td class=n>{_usd(x['profit'].sum())}</td></tr>"
-                   for d, x in sorted(w.groupby("day"), key=lambda t: t[0], reverse=True))
-    return (head + "<div class=tablewrap><table><tr><th>Day</th><th class=n>Bets</th><th class=n>Won–lost</th>"
-            f"<th class=n>Profit</th></tr>{rows}<tr><td><b>Total</b></td><td class=n><b>{n}</b></td>"
-            f"<td class=n><b>{won(w)}–{lost(w)}</b></td><td class=n><b>{_usd(pr)}</b></td></tr></table></div>")
-
-
-def html_section(L: pd.DataFrame) -> str:
+def html_section(L: pd.DataFrame, full: bool = False) -> str:
+    """Homepage: the summary and a link. full=True (the Results page): also every settled bet, filterable."""
     e = html.escape
     if not len(L):
         return ""
@@ -373,7 +355,6 @@ def html_section(L: pd.DataFrame) -> str:
                 f"<p class=sub><b>{len(L)} bets recorded so far.</b> Results appear here once their matches finish."
                 + (f" So far, <b>{still}</b> of the bets re-checked before kick-off were still good value." if len(checked) else "")
                 + "</p></div></section>")
-    week = weekly_html(g)
     n, profit = len(g), g["profit"].sum()
     w, lo = g["result"].isin(["won", "half won"]).sum(), g["result"].isin(["lost", "half lost"]).sum()
     pu = (g["result"] == "push").sum()
@@ -382,19 +363,90 @@ def html_section(L: pd.DataFrame) -> str:
              f"<div class=stat><div class=v>{_usd(profit)}</div><div class=l>profit from $100 on each ({100 * profit / (100 * n):+.1f}%)</div></div>"
              f"<div class=stat><div class=v>{100 * g['edge'].mean():+.1f}%</div><div class=l>expected return when listed</div></div>"
              f"<div class=stat><div class=v>{still}</div><div class=l>still good value at the last check before kick-off</div></div></div>")
-    recent = g.sort_values("kickoff", ascending=False).head(15)
+    # every settled bet, newest first, with buttons to show only won, lost or push
+    allbets = g.sort_values("kickoff", ascending=False).head(MAX_ROWS)
+    simple = lambda res: "won" if res in ("won", "half won") else "lost" if res in ("lost", "half lost") else "push"
+    site1 = lambda r: str(r["sites"]).split(",")[0].strip()
     rows = "".join(
-        f"<tr><td>{pd.Timestamp(r['kickoff']).tz_convert('America/New_York'):%b %-d}</td><td>{e(r['bet'])}<br><span class=kind>{e(r['match'])}</span></td>"
-        f"<td>{e(str(r['sites']).split(',')[0])}</td><td class=n>{american(float(r['odds']))}</td>"
+        f"<tr data-r={simple(r['result'])} data-lg=\"{e(r['league'])}\" data-st=\"{e(site1(r))}\">"
+        f"<td>{pd.Timestamp(r['kickoff']).tz_convert('America/New_York'):%b %-d}</td><td>{e(r['bet'])}<br><span class=kind>{e(r['match'])}</span></td>"
+        f"<td>{e(site1(r))}</td><td class=n>{american(float(r['odds']))}</td>"
         f"<td class=n>{e(r['result'])}</td><td class=n>{_usd(float(r['profit']))}</td></tr>"
-        for _, r in recent.iterrows())
+        for _, r in allbets.iterrows())
+    counts = {"all": len(allbets), "won": int(w), "lost": int(lo), "push": int(pu)}
+    buttons = "".join(f'<button class=rfilt data-f={k}{" aria-pressed=true" if k == "all" else ""}>{lab}<span>{counts[k]}</span></button>'
+                      for k, lab in (("all", "All"), ("won", "Won"), ("lost", "Lost"), ("push", "Push")) if k != "push" or pu)
+    opts = lambda vals, label: f"<option value=''>{label}</option>" + "".join(f"<option>{e(v)}</option>" for v in vals)
+    leagues = sorted(allbets["league"].dropna().unique())
+    sites = sorted({site1(r) for _, r in allbets.iterrows()})
+    filt = (f"<style>.rfilts{{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0 10px}}"
+            ".rfilt{font:inherit;font-size:15px;border:0;border-radius:980px;padding:8px 16px;background:var(--bg2);color:var(--ink);cursor:pointer}"
+            ".rfilt span{margin-left:7px;color:var(--muted);font-size:13px}.rfilt[aria-pressed=true]{background:var(--ink);color:var(--bg)}"
+            ".rfilt[aria-pressed=true] span{color:inherit;opacity:.7}"
+            ".rsel{font:inherit;font-size:15px;padding:7px 12px;border-radius:980px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}"
+            ".rcount{font-size:13px;color:var(--muted);margin:6px 0 0}.rmore{font:inherit;font-size:15px;margin:12px 0 0;border:1px solid var(--line);"
+            "border-radius:980px;padding:8px 18px;background:var(--bg);color:var(--ink);cursor:pointer}"
+            "html:not(.js) .rfilts,html:not(.js) .rmore,html:not(.js) .rcount{display:none}</style>"
+            f"<div class=rfilts role=group aria-label='Filter bets'>{buttons}"
+            f"<select class=rsel id=rlg aria-label=League>{opts(leagues, 'All leagues')}</select>"
+            f"<select class=rsel id=rst aria-label=Site>{opts(sites, 'All sites')}</select></div>")
+    js = ("<script>document.documentElement.classList.add('js');(function(){var PAGE=15,shown=PAGE,f='all',rows=[].slice.call(document.querySelectorAll('tr[data-r]')),"
+          "lg=document.getElementById('rlg'),st=document.getElementById('rst'),more=document.getElementById('rmore'),cnt=document.getElementById('rcount');"
+          "function apply(){var n=0;rows.forEach(function(t){var ok=(f==='all'||t.dataset.r===f)&&(!lg.value||t.dataset.lg===lg.value)"
+          "&&(!st.value||t.dataset.st===st.value);if(ok)n++;t.hidden=!ok||n>shown});"
+          "more.hidden=n<=shown;more.textContent='Show more ('+(n-shown)+' more)';"
+          "cnt.textContent=n?'Showing '+Math.min(n,shown)+' of '+n+' bets':'No bets match these filters.'}"
+          "document.querySelectorAll('.rfilt').forEach(function(b){b.addEventListener('click',function(){"
+          "document.querySelectorAll('.rfilt').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});"
+          "f=b.dataset.f;shown=PAGE;apply()})});"
+          "lg.addEventListener('change',function(){shown=PAGE;apply()});st.addEventListener('change',function(){shown=PAGE;apply()});"
+          "more.addEventListener('click',function(){shown+=PAGE;apply()});apply()})()</script>")
     other = int(L["result"].isin(["not graded", "no stats found"]).sum())
     note = (f" {other} bet{' is' if other == 1 else 's are'}n't counted: player bets, and corners or cards outside the six leagues "
             "(Premier League, Championship, La Liga, Bundesliga, Serie A, Ligue 1), because there's no free record of how they ended."
             if other else "")
-    return (f"<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>{week}"
-            f"<h3 class=tally>All time</h3>{tiles}"
+    return (f"<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>"
+            f"{tiles}"
             f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
             f"several hundred. The \"still good value\" share is the steadier test.{note}</p>"
-            f"<div class=tablewrap><table><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th><th class=n>Result</th>"
-            f"<th class=n>Profit on $100</th></tr>{rows}</table></div></div></section>")
+            + (f"<h3 class=tally>Every settled bet</h3>{filt}"
+               f"<div class=tablewrap><table><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th><th class=n>Result</th>"
+               f"<th class=n>Profit on $100</th></tr>{rows}</table></div>"
+               f"<p class=rcount id=rcount></p><button class=rmore id=rmore hidden>Show more</button>{js}" if full else
+               f"<p class=sub style='margin-top:18px'><a href=\"results.html\">See every bet, and filter by won or lost&nbsp;›</a></p>")
+            + "</div></section>")
+
+
+def results_page(L: pd.DataFrame, stamp: str) -> str:
+    """docs/results.html: the full track record."""
+    from . import theme
+    from .site import CSS
+    body = html_section(L, full=True) or ("<section class=section style=padding-top:0><div class=wrap>"
+                                          "<p class=sub>No bets recorded yet.</p></div></section>")
+    body = body.replace("<h2>How the picks have done.</h2>", "", 1)
+    body = body.replace("Every bet listed on this page since", "Every bet listed on the homepage since", 1)
+    return f"""<!doctype html><html lang=en><head>{theme.HEAD}
+{theme.meta("results.html", "Results: how every pick has done · Today's Soccer Bets",
+            "Every bet listed on Today's Soccer Bets, saved at the price shown and settled from the final score.")}
+<style>{CSS}</style></head><body>
+{theme.nav("results")}
+<section class=hero><div class=wrap>
+<p class=eyebrow>Track record</p>
+<h1>How every pick has done.</h1>
+<p class=lede>Every bet this site has listed, and whether it won.</p>
+<p class=updated>Last updated {stamp}</p>
+</div></section>
+{body}
+{theme.footer()}
+</body></html>"""
+
+
+def headline(L: pd.DataFrame) -> tuple[str, str] | None:
+    """Homepage tile: the record so far, e.g. ("22–4", "won–lost so far · +$149 from $100 on each")."""
+    if not len(L):
+        return None
+    g = L[L["result"].isin(["won", "lost", "push", "half won", "half lost"])]
+    if not len(g):
+        return None
+    w, lo = int(g["result"].isin(["won", "half won"]).sum()), int(g["result"].isin(["lost", "half lost"]).sum())
+    return f"{w}–{lo}", f"picks won–lost so far · {_usd(g['profit'].sum())} from $100 on each"

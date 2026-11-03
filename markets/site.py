@@ -269,13 +269,17 @@ def days_html(days: list[tuple[str, list[dict]]]) -> str:
 
 
 def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | None, stamp: str, remaining=None,
-          totals: pd.DataFrame | None = None, extras: pd.DataFrame | None = None, record_html: str = "") -> str:
+          totals: pd.DataFrame | None = None, extras: pd.DataFrame | None = None, record_html: str = "",
+          record_tile: tuple[str, str] | None = None) -> str:
     e = html.escape
     present = [s for s in SITES if len(quotes) and s in set(quotes["site"])]
     n_flags = int(sum(1 for f in M["flag"] if f)) if len(M) else 0
 
     # ---- today's best bets: per day, up to TOP_N results whose best price beats the fair price
     days = daily_picks(M, quotes, totals=totals, extras=extras)
+    record_tile_html = (f'<a class=stat href="results.html" style="color:inherit;text-decoration:none"><div class=v>{e(record_tile[0])}</div>'
+                        f'<div class=l>{e(record_tile[1])}</div></a>' if record_tile else
+                        f"<div class=stat><div class=v>{sum(len(b) for _, b in days)}</div><div class=l>bets that beat what's expected</div></div>")
     picks_html = days_html(days)
 
     # ---- which site pays the most
@@ -311,7 +315,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
             blocks.append(f"""<div class=match><h4>{e(r['home'])} v {e(r['away'])} <small>· {_ko(r['kickoff'])}</small></h4>
 <div class=tablewrap><table><tr><th>Site</th><th class=n>{e(r['home'])}</th><th class=n>Draw</th><th class=n>{e(r['away'])}</th></tr>{body}</table></div></div>""")
         nflag = int((G["flag"] != "").sum())
-        leagues.append(f"<details class=league{' open' if not leagues else ''}><summary>{e(lg)} <span>· {len(G)} matches"
+        leagues.append(f"<details class=league><summary>{e(lg)} <span>· {len(G)} matches"
                        f"</span></summary>{''.join(blocks)}</details>")
 
     # ---- does it work (history)
@@ -359,7 +363,7 @@ so the kick-off odds are the fairer test. This is a study of pricing, not bettin
 <div class=stats>
 <div class=stat><div class=v>{len(M)}</div><div class=l>matches this week</div></div>
 <div class=stat><div class=v>{len(present)}</div><div class=l>sportsbooks and prediction markets</div></div>
-<div class=stat><div class=v>{sum(len(b) for _, b in days)}</div><div class=l>bets that beat what's expected</div></div>
+{record_tile_html}
 <div class=stat><div class=v>{e(best_site)}</div><div class=l>best odds on average</div></div>
 </div></div></section>
 

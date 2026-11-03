@@ -169,14 +169,15 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, totals: pd.DataFrame | None, st
                      f'{" hidden" if i and not search else ""}><h3 class=dayhead>{e(lab)}</h3>'
                      f'<div class=mlist>{"".join(cards)}</div><div class="empty nomatch">No matches fit your search on this day.</div></div>')
     leagues = sorted({m["league"] for _, ms in days for m in ms})
-    finder = (f'<div class=finder><input type=search id=q placeholder="Search a team, league or player" aria-label="Search a team, league or player"></div>'
+    finder = (f'<div class=finder><input type=search id=q placeholder="Search a team or league" aria-label="Search a team or league"></div>'
               f'<div class=filters id=filters><select id=lg aria-label=League><option value="">All leagues</option>'
               + "".join(f"<option>{e(l)}</option>" for l in leagues) +
               '</select><select id=kind aria-label="Bet type"><option value="">All bets</option><option value=Result>Match result</option>'
               '<option value=Goals>Goals</option>' + "".join(f'<option>{g}</option>' for g in GROUPS[2:]) + '</select>'
               '<label><input type=checkbox id=pos> Only green bets</label></div>'
-              '<p class="empty prompt">Type a team, league or player, or pick a filter.</p>'
+              '<p class="empty prompt">Type a team or league, or pick a filter.</p>'
               '<p class="empty none" hidden>Nothing matches. Try another name or filter.</p>')
+    bar = finder.split('<p class="empty prompt">')[0]     # the Prices page: same search and filters, no prompt
     hint = '<p class=hint>Tap any bet to compare every site\'s odds.</p>'
     rows_js = """document.addEventListener('click',function(ev){var r=ev.target.closest('tr.bet');if(!r)return;var o=r.classList.toggle('open');
  r.setAttribute('aria-expanded',o);r.nextElementSibling.hidden=!o});
@@ -204,16 +205,36 @@ function show(){var term=q.value.trim().toLowerCase(),act=!!(term||lg.value||kin
  prompt.hidden=act;none.hidden=!act||total>0}
 [q,lg,kind,pos].forEach(function(el){el.addEventListener('input',show);el.addEventListener('change',show)});
 """ + rows_js + "show();})();</script>"
+    prices_js = """<script>(function(){
+var q=document.getElementById('q'),lg=document.getElementById('lg'),kind=document.getElementById('kind'),pos=document.getElementById('pos');
+function show(){var term=q.value.trim().toLowerCase(),act=!!(term||lg.value||kind.value||pos.checked),counts={};
+ document.querySelectorAll('.daypane').forEach(function(p){var n=0;
+  p.querySelectorAll('.mcard').forEach(function(c){var cm=!term||c.dataset.find.indexOf(term)>=0,ok=!lg.value||c.dataset.league===lg.value,rows=0;
+   c.querySelectorAll('tr.bet').forEach(function(r){var v=ok&&(cm||r.dataset.t.indexOf(term)>=0)&&(!kind.value||r.dataset.kind===kind.value)&&(!pos.checked||r.dataset.pos==='1');
+    r.hidden=!v;if(!v){r.classList.remove('open');r.nextElementSibling.hidden=true}if(v)rows++});
+   c.querySelectorAll('tr.grp').forEach(function(g){g.hidden=!!kind.value&&g.dataset.kind!==kind.value||!c.querySelector('tr.bet[data-kind='+g.dataset.kind+']:not([hidden])')});
+   var deep=!!(kind.value||pos.checked||(term&&!cm));
+   c.querySelectorAll('details').forEach(function(d){var has=!!d.querySelector('tr.bet:not([hidden])');d.hidden=!has;
+    if(deep){if(has&&!d.open){d.open=true;d.dataset.auto=1}}else if(d.dataset.auto){d.open=false;delete d.dataset.auto}});
+   var mt=c.querySelector(':scope>.tw');if(mt)mt.hidden=!mt.querySelector('tr.bet:not([hidden])');
+   c.hidden=!rows;if(rows)n++});
+  var nm=p.querySelector('.nomatch');if(nm)nm.style.display=act&&!n?'block':'none';
+  var t=document.querySelector('.daytab[data-day="'+p.dataset.day+'"]'),sp=t&&t.querySelector('span');
+  if(sp){if(!sp.dataset.all)sp.dataset.all=sp.textContent;sp.textContent=act?n:sp.dataset.all}
+  counts[p.dataset.day]=n});
+ if(act){var cur=document.querySelector('.daypane:not([hidden])');if(cur&&!counts[cur.dataset.day]){
+  for(var d in counts){if(counts[d]){var t2=document.querySelector('.daytab[data-day="'+d+'"]');if(t2)t2.click();break}}}}}
+[q,lg,kind,pos].forEach(function(el){el.addEventListener('input',show);el.addEventListener('change',show)});show()})();</script>"""
     if not days:
         content = "<div class=empty>No upcoming matches in the latest odds.</div>"
     elif search:
         content = f'{finder}{hint}<div class=results>{"".join(panes)}</div>{theme.FRESH_JS}{search_js}'
     else:
-        content = f'{hint}<div class=daytabs role=tablist>{tabs}</div>{"".join(panes)}{theme.FRESH_JS}{tabs_js}'
+        content = f'{bar}{hint}<div class=daytabs role=tablist>{tabs}</div>{"".join(panes)}{theme.FRESH_JS}{tabs_js}{prices_js}'
     if search:
         head = (theme.meta("search.html", "Search every bet · Today's Soccer Bets",
-                           "Find any team, league or player and compare every site's odds on every soccer bet."), "search",
-                "Search", "Search every bet.", "Find any team, league or player and compare every site's odds.")
+                           "Find any team or league and compare every site's odds on every soccer bet."), "search",
+                "Search", "Search every bet.", "Find any team or league and compare every site's odds.")
     else:
         head = (theme.meta("best-prices.html", "Compare the Best Betting Odds Across Sportsbooks for Every Upcoming Match | Today's Soccer Bets",
                            "Where to place each soccer bet: the best odds for every match result and goals line, across US sportsbooks and prediction markets."),

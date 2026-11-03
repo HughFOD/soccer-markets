@@ -300,7 +300,7 @@ def build(R: dict) -> str:
 
 <div class=finding><div class=n>FINDING 1</div>
 <h3>The odds are accurate</h3>
-<p>I grouped every outcome by the chance the odds gave it, then checked how often it happened. Outcomes given a {f['top_priced']} chance happened {f['top_happened']} of the time. Outcomes given a {f['low_priced']} chance happened {f['low_happened']} of the time. Perfect predictions would sit on the diagonal line, and these are close. They're slightly too steep: favourites win a little more often than the odds say, and long shots a little less.</p>
+<p>I grouped every result (a home win, a draw or an away win) by the chance the odds gave it, then checked how often it really happened. Strong favorites that the odds gave a {f['top_priced']} chance of winning actually won {f['top_happened']} of the time. Long shots given a {f['low_priced']} chance won {f['low_happened']} of the time. Perfect predictions would sit on the diagonal line, and these are close. They're slightly too steep: favourites win a little more often than the odds say, and long shots a little less.</p>
 <img src="images/calibration.png" alt="How often outcomes happened, against the chance the odds gave them"></div>
 
 <div class=finding><div class=n>FINDING 2</div>

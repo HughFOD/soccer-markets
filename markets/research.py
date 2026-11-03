@@ -60,10 +60,12 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
 
     c = R["calibration"]["pooled"]
     items.append(("accurate", "The odds are accurate",
-                  f"When the odds said {f['top_priced']}, it happened {f['top_happened']} of the time. "
-                  f"When they said {f['low_priced']}, it happened {f['low_happened']} of the time.",
-                  "<p>Favorites won slightly more often than their odds said, and long shots slightly less "
-                  f"(calibration slope {c['slope']:.2f}, 95% range {c['slope_lo']:.2f} to {c['slope_hi']:.2f}; 1.00 is perfect).</p>",
+                  f"Strong favorites that the odds gave a {f['top_priced']} chance of winning actually won "
+                  f"{f['top_happened']} of the time. Long shots given a {f['low_priced']} chance won "
+                  f"{f['low_happened']} of the time. So the odds are close to the truth.",
+                  "<p>They're slightly off in one consistent way: favorites win a little more often than their odds "
+                  "suggest, and long shots a little less. (Technically, a calibration slope of "
+                  f"{c['slope']:.2f}, 95% range {c['slope_lo']:.2f} to {c['slope_hi']:.2f}, where 1.00 would be perfect.)</p>",
                   viz.calibration(R["calibration"]["table"])))
 
     best = R["longshot"].get("best") or []
@@ -74,26 +76,17 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
                    f"and long shots {dollars(best[-1]['return'], True)}.</p>" if best else ""),
                   viz.longshot(avg)))
 
-    items.append(("margins", "Bookmakers take a smaller cut than they used to",
-                  f"The average bookmaker's margin fell from {f['margin_first']} in {R['seasons'][0][:4]} "
-                  f"to {f['margin_last']} this season.", "",
-                  viz.margins(R["margins"])))
-
-    bs = R.get("by_season")
-    if bs:
-        t = bs["table"]
-        worse = sum(r["longshot_return"] < r["fav_return"] for r in t)
-        items.append(("still-longshots", "Long shots stayed the worse bet as margins fell",
-                      f"Long shots lost more than favorites in {worse} of {len(t)} seasons.", "",
-                      viz.longshot_by_season(t)))
 
     if R.get("closing"):
-        items.append(("line-moves", "Prices that move before kick-off move the right way",
-                      f"When the odds shortened before kick-off (chance up 3+ points), a $100 bet at the opening odds made "
-                      f"{dollars(float(f['short_ret'].rstrip('%')) / 100, True)} on average. When they drifted, it lost "
+        items.append(("line-moves", "When odds change before kick-off, they're usually right to",
+                      f"Sometimes a team's chance goes up before the match (its odds get shorter, by at least 3 percentage "
+                      f"points). Betting $100 on it at the earlier odds made {dollars(float(f['short_ret'].rstrip('%')) / 100, True)} "
+                      f"on average. When a team's chance went down instead, the same early bet lost "
                       f"{dollars(float(f['drift_ret'].rstrip('%')) / 100)}.",
-                      f"<p>{f['cl_matches']} matches, {f['cl_years']}. Closing odds were more accurate than opening odds: "
-                      f"error score {f['ll_close']} against {f['ll_open']} (lower is better).</p>",
+                      f"<p>So late news, like injuries and team sheets, moves the odds in the right direction. "
+                      f"The odds at kick-off were also more accurate than the first odds offered "
+                      f"(error score {f['ll_close']} against {f['ll_open']}; lower is better). "
+                      f"Based on {f['cl_matches']} matches, {f['cl_years']}.</p>",
                       viz.line_moves(R["closing"]["moves"])))
 
     bl = {r["league"]: r for r in R.get("by_league", [])}
