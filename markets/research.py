@@ -76,16 +76,22 @@ def build(R: dict, curve: pd.DataFrame | None = None) -> str:
 
 
     if R.get("closing"):
+        cl = R["closing"]
+        top = max(m["threshold"] for m in cl["moves"])
+        mv = {m["direction"]: m for m in cl["moves"] if abs(m["threshold"] - top) < 1e-9}
+        every = cl.get("bet_all_open")
         items.append(("line-moves", "When odds change before kick-off, they're usually right to do so",
-                      f"Sometimes a team's chance goes up before the match (its odds get shorter, by at least 3 percentage "
-                      f"points). Betting $100 on it at the earlier odds made {dollars(float(f['short_ret'].rstrip('%')) / 100, True)} "
-                      f"on average. When a team's chance went down instead, the same early bet lost "
-                      f"{dollars(float(f['drift_ret'].rstrip('%')) / 100)}.",
-                      f"<p>So late news, like injuries and team sheets, moves the odds in the right direction. "
+                      f"Odds move as news comes in. The bigger the move, the more it mattered: when a team's chance rose by "
+                      f"{100 * top:.0f} or more percentage points before the match (say, from 40% to {40 + 100 * top:.0f}%), "
+                      f"an early $100 bet on it made {dollars(mv['shortened']['return'], True)}. When its chance fell by "
+                      f"{100 * top:.0f} or more, the same bet lost {dollars(mv['drifted']['return'])}."
+                      + (f" Betting every result at the first odds lost {dollars(every['return'])}." if every else "")
+                      + " That's why every pick on this site is checked again at kick-off.",
+                      f"<p>Late news, like injuries and team sheets, moves the odds in the right direction. "
                       f"The odds at kick-off were also more accurate than the first odds offered "
                       f"(error score {f['ll_close']} against {f['ll_open']}; lower is better). "
                       f"Based on {f['cl_matches']} matches, {f['cl_years']}.</p>",
-                      viz.line_moves(R["closing"]["moves"])))
+                      viz.line_moves(cl["moves"], every)))
 
     bl = {r["league"]: r for r in R.get("by_league", [])}
     if {"E0", "E1"} <= set(bl):

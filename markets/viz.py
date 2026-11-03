@@ -48,7 +48,7 @@ function tf(f){return f==='pct1'?'pct':f}
 function axis(lo,hi,n){if(lo===hi){hi=lo+1}const span=hi-lo;let st=Math.pow(10,Math.floor(Math.log10(span/Math.max(n,1))));
   const e=span/Math.max(n,1)/st;if(e>=7.5)st*=10;else if(e>=3.5)st*=5;else if(e>=1.5)st*=2;
   const L=Math.floor(lo/st+1e-9)*st,H=Math.ceil(hi/st-1e-9)*st,t=[];for(let v=L;v<=H+st*1e-6;v+=st)t.push(+v.toFixed(8));return {lo:L,hi:H,t}}
-function col(c){return c==='b'?'var(--c2)':'var(--c1)'}
+function col(c){return c==='b'?'var(--c2)':c==='g'?'var(--axis)':'var(--c1)'}
 const AX=13, VAL=14, PAD=6;
 function tipper(box){const tip=document.createElement('div');tip.className='tip';box.appendChild(tip);
   return {show(h,x,y){tip.innerHTML=h;tip.style.opacity=1;const W=box.clientWidth,w=tip.offsetWidth,ht=tip.offsetHeight;
@@ -271,17 +271,25 @@ def longshot_by_season(table: list) -> str:
                         [[s, _sd(100 * a), _sd(100 * b)] for s, a, b in zip(seasons, t["fav_return"], t["longshot_return"])]))
 
 
-def line_moves(moves: list, threshold: float = 0.03) -> str:
+def line_moves(moves: list, every: dict | None = None) -> str:
+    """Result of an early $100 bet, by how far the chance moved before kick-off: biggest rise at the top, biggest fall at the bottom."""
     t = pd.DataFrame(moves)
-    t = t[(t["threshold"] - threshold).abs() < 1e-9].set_index("direction")
-    labels = ["Chance rose", "Chance fell"]
-    vals = [_usd(t.loc["shortened", "return"]), _usd(t.loc["drifted", "return"])]
-    notes = [f"{int(t.loc[d, 'bets']):,} bets" for d in ("shortened", "drifted")] if "bets" in t else None
-    return chart("line-moves", "Betting early pays off when the price later moves your way",
-                 f"Result of a $100 bet at the opening price, split by whether the chance moved {100 * threshold:.0f}+ points before kick-off",
-                 {"type": "hbar", "labels": labels, "values": vals, "colors": ["a", "b"], "fmt": "usd",
+    ths = sorted(t["threshold"].unique())
+    pick = lambda d, th: t[(t["direction"] == d) & ((t["threshold"] - th).abs() < 1e-9)].iloc[0]
+    rows = [(f"Rose {100 * th:.0f}+ points", pick("shortened", th), "a") for th in reversed(ths)]
+    if every:
+        rows.append(("Every bet", every, "g"))
+    rows += [(f"Fell {100 * th:.0f}+ points", pick("drifted", th), "b") for th in ths]
+    labels = [r[0] for r in rows]
+    vals = [_usd(r[1]["return"]) for r in rows]
+    notes = [f"{int(r[1]['bets']):,} bets" for r in rows]
+    return chart("line-moves", "Early bets, by how much the chance moved before kick-off",
+                 "Result of a $100 bet at the first odds. Moves are in percentage points; "
+                 "a 5+ point move also counts in the 1+, 2+ and 3+ rows.",
+                 {"type": "hbar", "labels": labels, "values": vals, "colors": [r[2] for r in rows], "fmt": "usd",
                   "unit": "per $100 bet", "notes": notes},
-                 _table(["Before kick-off", "Won or lost per $100"], [[l, _sd(v)] for l, v in zip(labels, vals)]))
+                 _table(["Chance before kick-off", "Won or lost per $100", "Bets"],
+                        [[l, _sd(v), n.split()[0]] for l, v, n in zip(labels, vals, notes)]))
 
 
 def value_bets(curve: pd.DataFrame) -> str:
