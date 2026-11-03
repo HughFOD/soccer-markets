@@ -30,7 +30,7 @@ EXTRA_CSS = """
 .finding table{min-width:0}.finding .tw{margin:12px 0}
 .section ul.plain{color:var(--muted);padding-left:20px}.section ul.plain li{margin:8px 0}
 .section ul.plain b{color:var(--ink)}
-.callout{max-width:760px;margin:26px auto 0;font-size:19px;line-height:1.45;color:var(--ink2)}
+.callout{margin:26px 0 0;font-size:19px;line-height:1.45;color:var(--ink2)}
 @media (max-width:720px){.toc{columns:1}.finding{padding:26px 18px 18px;border-radius:var(--r)}.finding .chart{padding:16px 12px 10px}}
 """
 

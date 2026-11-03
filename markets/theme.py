@@ -67,8 +67,8 @@ h1,h2,h3,h4,.display{font-family:var(--sans)}
 /* hero */
 .hero{padding:40px 0 22px;border-bottom:1px solid var(--line)}
 .eyebrow{font-size:13px;font-weight:600;color:var(--link);margin:0 0 6px;text-transform:uppercase;letter-spacing:.06em}
-.hero h1{font-size:clamp(28px,4.4vw,38px);line-height:1.15;font-weight:700;letter-spacing:-.01em;margin:0 0 10px;max-width:860px}
-.hero .lede{font-size:clamp(16px,2vw,18px);line-height:1.45;color:var(--muted);font-weight:500;max-width:760px;margin:0}
+.hero h1{font-size:clamp(28px,4.4vw,38px);line-height:1.15;font-weight:700;letter-spacing:-.01em;margin:0 0 10px}
+.hero .lede{font-size:clamp(16px,2vw,18px);line-height:1.45;color:var(--muted);font-weight:500;margin:0}
 .ctas{display:flex;gap:14px;flex-wrap:wrap;margin-top:20px}
 .btn{display:inline-block;background:var(--blue);color:#fff;font-size:15px;font-weight:500;padding:9px 18px;border-radius:var(--r)}
 .btn:hover{text-decoration:none;filter:brightness(1.08)}
@@ -79,7 +79,7 @@ h1,h2,h3,h4,.display{font-family:var(--sans)}
 .band{background:var(--bg);padding:22px 0}
 .section{padding:40px 0}
 h2{font-size:clamp(20px,2.6vw,24px);line-height:1.2;font-weight:700;margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid var(--ink)}
-.sub{font-size:16px;line-height:1.55;color:var(--ink2);margin:0 0 22px;max-width:760px}
+.sub{font-size:16px;line-height:1.55;color:var(--ink2);margin:0 0 22px}
 h3{font-size:17px;line-height:1.3;font-weight:600;margin:0 0 6px}
 
 /* big numbers */
