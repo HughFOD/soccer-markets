@@ -21,7 +21,7 @@ PAGE_CSS = """
 .mcard h3{font-size:19px;margin:0}.mcard .meta{font-size:13px;color:var(--muted);margin:2px 0 10px}
 .mcard table{font-size:15px;table-layout:fixed;width:100%}.mcard td{overflow-wrap:anywhere}.mcard th,.mcard td{padding:9px 6px}.mcard td.n{white-space:nowrap}.mcard th.n{white-space:normal}
 .mcard .odds{font-weight:700;font-variant-numeric:tabular-nums}
-.mcard .site{display:block;color:var(--link);font-weight:500;font-size:13px}
+.mcard .site{display:block;color:var(--link);font-weight:500;font-size:13px;font-family:var(--sans)}
 .mcard .pos{color:var(--good);font-weight:700}.mcard .neg{color:var(--muted)}
 .mcard .grp td{color:var(--muted);font-size:12px;font-weight:600;padding-top:14px;border-bottom:0;text-transform:uppercase;letter-spacing:.04em}
 .mcard tr.bet{cursor:pointer}.mcard tr.bet td:first-child::after{content:"›";display:inline-block;margin-left:6px;color:var(--muted);font-weight:600;transition:transform .15s}
