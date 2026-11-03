@@ -100,7 +100,7 @@ def vs_html(b: pd.DataFrame) -> str:
             "saved each day, so that test runs as soon as there are enough.</p>")
 
 
-def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None = None) -> str:
+def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None = None, studies: dict | None = None) -> str:
     f = facts(R)
     avg = R["longshot"]["average"]
     fav_band = viz.band_label(avg[0]["odds"])
@@ -192,11 +192,71 @@ def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None
                       + checks,
                       viz.score_effects(lv["score_effects"])))
 
+    S = studies or {}
+    cw = S.get("crowds")
+    if cw:
+        b, em, af = cw["before"], cw["empty"], cw["after"]
+        mo = cw.get("monthly", [])
+        months = [pd.Period(r["month"]).strftime("%b %y") for r in mo]
+        pic = viz.chart("crowds", "Home wins in empty stadiums, month by month",
+                        "Blue: how often the home team actually won. Orange: how often the odds expected it to.",
+                        {"type": "line", "x": months, "ticks": months, "fmt": "pct", "from0": False,
+                         "series": [{"name": "actual", "values": [round(100 * r["happened"], 1) for r in mo], "color": "a"},
+                                    {"name": "odds expected", "values": [round(100 * r["priced"], 1) for r in mo], "color": "b"}]},
+                        viz._table(["Month", "Home wins", "Odds expected", "Matches"],
+                                   [[m_, f"{100 * r['happened']:.0f}%", f"{100 * r['priced']:.0f}%", r["matches"]] for m_, r in zip(months, mo)]))
+        items.append(("crowds", "Home advantage matters",
+                      f"Playing at home is a real edge: in the five seasons before COVID, home teams won {P(b['happened'])} of "
+                      f"matches and scored {b['goal_diff']:+.2f} goals a game more than their opponents. When stadiums were empty "
+                      f"(June 2020 to May 2021), that edge roughly halved: home teams won {P(em['happened'])} and the goal margin "
+                      f"fell to {em['goal_diff']:+.2f}. The odds were slow to notice, so for the first months home teams were overrated.",
+                      f"<p>The gap was widest in autumn 2020 and had closed by January 2021. Since fans returned, home teams have won "
+                      f"{P(af['happened'])} of matches, with the odds expecting {P(af['priced'])}. Based on {b['matches']:,} matches "
+                      f"before, {em['matches']:,} in empty stadiums and {af['matches']:,} after.</p>", pic))
+    dr = S.get("draws")
+    if dr and dr.get("draw_same"):
+        ds, ws = dr["draw_same"], dr["win_same"]
+        pic = viz.chart("draws", "Same chance, different result",
+                        "Average result of a $100 bet on outcomes the odds gave a 20–35% chance",
+                        {"type": "hbar", "labels": ["Bet on the draw", "Bet on a team to win"],
+                         "values": [round(100 * ds["ret"]["est"]), round(100 * ws["ret"]["est"])], "colors": ["a", "b"],
+                         "fmt": "usd", "unit": "per $100 bet", "notes": [f"{ds['ret']['n']:,} bets", f"{ws['ret']['n']:,} bets"]},
+                        viz._table(["Bet (20–35% chance)", "Odds expected", "Happened", "Per $100"],
+                                   [["Draw", f"{100 * ds['priced']:.1f}%", f"{100 * ds['happened']:.1f}%", dollars(ds['ret']['est'], True)],
+                                    ["Team to win", f"{100 * ws['priced']:.1f}%", f"{100 * ws['happened']:.1f}%", dollars(ws['ret']['est'], True)]]))
+        items.append(("draws", "Draws are a better bet than wins at the same odds",
+                      f"Take every bet the odds gave a 20–35% chance. Betting $100 on the draw lost {dollars(ds['ret']['est'])} on average. "
+                      f"Betting $100 on a team to win lost {dollars(ws['ret']['est'])}. Both lose, because of the cut, but draws lose less.",
+                      f"<p>That's because draws happen about as often as the odds say ({P(ds['priced'])} expected, {P(ds['happened'])} "
+                      f"happened), while teams given the same chance win a little less often than expected ({P(ws['priced'])} expected, "
+                      f"{P(ws['happened'])} happened).</p>", pic))
+    pp = S.get("popular")
+    if pp and pp.get("others_matched") is not None:
+        rows = [r for r in pp["bands"] if r["popular"]]
+        pic = viz.chart("popular", "Big clubs only look better because they're usually favorites",
+                        "Average result of a $100 bet on a team to win",
+                        {"type": "hbar", "labels": ["Big clubs", "Other teams, all bets", "Other teams, at the same odds as big clubs"],
+                         "values": [round(100 * pp["popular"]["est"]), round(100 * pp["others"]["est"]), round(100 * pp["others_matched"])],
+                         "colors": ["a", "b", "b"], "fmt": "usd", "unit": "per $100 bet",
+                         "notes": [f"{pp['popular']['n']:,} bets", f"{pp['others']['n']:,} bets", "weighted to match the big clubs' odds"]},
+                        viz._table(["Chance the odds gave", "Big clubs, per $100", "Bets", "Other teams, per $100", "Bets"],
+                                   [[r["band"], dollars(r["popular"]["est"], True), f"{r['popular']['n']:,}",
+                                     dollars(r["others"]["est"], True), f"{r['others']['n']:,}"] for r in rows]))
+        items.append(("popular", "Big clubs aren't overpriced",
+                      "Fans back big clubs no matter what, so you might expect their odds to be worse. At first glance it's the "
+                      f"opposite: betting $100 on a big club to win lost {dollars(pp['popular']['est'])} on average, against "
+                      f"{dollars(pp['others']['est'])} for other teams. But big clubs are usually favorites (a "
+                      f"{P(pp['pop_chance'])} chance on average), and favorites lose less (Finding 2). Compare other teams at the "
+                      f"same odds and they lost {dollars(pp['others_matched'])} too. So big clubs are priced just like everyone else.",
+                      f"<p>Betting against the big clubs was the worst of all: backing their opponents lost "
+                      f"{dollars(pp['against']['est'])} per $100, mostly because those opponents are usually long shots. "
+                      "Big clubs here: " + ", ".join(pp["teams"]) + ".</p>", pic))
+
     st = sites_html(board)
     if st:
         items.append(("sites", "Which site pays the most today", st[0], st[1]))
 
-    order = ["accurate", "longshots", "half-time", "line-moves", "flagged", "leagues", "sites"]
+    order = ["accurate", "longshots", "half-time", "line-moves", "flagged", "leagues", "crowds", "draws", "popular", "sites"]
     items.sort(key=lambda it: order.index(it[0]) if it[0] in order else len(order))
     toc, body = [], []
     for i, it in enumerate(items, 1):
@@ -242,7 +302,9 @@ def main(out_dir: Path = ROOT / "output", docs: Path = ROOT / "docs"):
     curve = pd.read_csv(cf) if cf.exists() else None
     sb = out_dir / "site_scoreboard.csv"     # written by the daily update (markets.weekly)
     board = pd.read_csv(sb).fillna({"only": ""}) if sb.exists() else None
-    (docs / "research.html").write_text(build(R, curve, board))
+    sj = out_dir / "studies.json"     # written by python -m markets.studies
+    studies = json.loads(sj.read_text()) if sj.exists() else None
+    (docs / "research.html").write_text(build(R, curve, board, studies))
     print(f"wrote {docs / 'research.html'}")
 
 
