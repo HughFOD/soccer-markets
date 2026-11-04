@@ -325,6 +325,12 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
 <p class=updated>Last updated {stamp}</p>
 </div></section>
 
+<section class=section id=best style="padding-bottom:0"><div class=wrap>
+<h2>Ranked by expected return.</h2>
+<p class=sub>Odds reflect each site’s implied probability plus its cut. By removing this cut and averaging the data across all {nw} sites, we estimate the true probability of an outcome. When a specific site offers higher payouts than this probability warrants, the wager appears below, ranked by value. The green figure represents your expected return per $100 wagered.</p>
+<p class=note style="margin:-22px 0 22px">Kalshi and Polymarket odds are shown after their trading fee.</p>
+</div></section>
+
 <section class=band><div class=wrap>
 <div class=stats>
 <a class=stat href="best-prices.html" style="color:inherit;text-decoration:none"><div class=v>{len(M)}</div><div class=l>upcoming matches</div></a>
@@ -333,10 +339,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
 {record_tile_html}
 </div></div></section>
 
-<section class=section id=best><div class=wrap>
-<h2>Ranked by expected return.</h2>
-<p class=sub>Odds reflect each site’s implied probability plus its cut. By removing this cut and averaging the data across all {nw} sites, we estimate the true probability of an outcome. When a specific site offers higher payouts than this probability warrants, the wager appears below, ranked by value. The green figure represents your expected return per $100 wagered.</p>
-<p class=note style="margin:-22px 0 22px">Kalshi and Polymarket odds are shown after their trading fee.</p>
+<section class=section style="padding-top:18px"><div class=wrap>
 {picks_html}
 <p class=sub style="margin-top:18px"><b>Looking for a bet that isn't listed?</b> Most bets don't beat what's expected at any site, but one site still pays the most. <a href="best-prices.html">See the best price for every bet&nbsp;›</a></p>
 </div></section>
