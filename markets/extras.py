@@ -2,7 +2,8 @@
 
 These markets are only available one match at a time (the event odds endpoint), so each match is
 fetched once, on the morning of game day: matches kicking off in the next 24 hours. A match costs one
-credit per market returned per region, roughly 15 to 40 credits.
+credit per market returned per region, roughly 15 to 40 credits. Only the scheduled morning run fetches
+them: a run started by hand skips them, so rebuilding the site never pays for the same matches twice.
 
 Pricing works like match results wherever a site quotes every outcome of a bet (over and under, yes and
 no, all three results): that site's odds become chances with its cut removed, the chances of every site
@@ -13,6 +14,7 @@ no expected chance; for those the page shows the best odds and every site's pric
 from __future__ import annotations
 
 import json
+import os
 import urllib.request
 
 import numpy as np
@@ -88,6 +90,9 @@ def download(key: str, raw: dict, remaining) -> tuple[dict, object]:
         left = 0
     if left < MIN_CREDITS:
         print(f"  extra markets skipped: {left:.0f} credits left")
+        return out, remaining
+    if os.environ.get("GITHUB_EVENT_NAME") == "workflow_dispatch":
+        print("  extra markets skipped: run started by hand (only the morning run fetches them)")
         return out, remaining
     markets = ",".join(MARKETS)
     for sport, eid in due(raw)[:MAX_EVENTS]:
