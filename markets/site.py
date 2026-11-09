@@ -54,6 +54,21 @@ CSS = theme.CSS + """
 html:not(.js) .daytabs{display:none}html:not(.js) .daypane{display:block!important;margin-bottom:28px}
 .dayhead{display:none}html:not(.js) .dayhead{display:block}
 .bets{list-style:none;margin:0;padding:0;background:var(--bg2);border-radius:var(--r);overflow:hidden}
+@media (max-width:600px){
+  table.rec,table.rec tbody{display:block}table.rec tr:first-child{display:none}
+  table.rec tr{display:grid;grid-template-columns:auto auto 1fr auto;column-gap:6px;row-gap:2px;padding:11px 14px;border-top:1px solid var(--hair)}
+  table.rec tr:nth-child(2){border-top:0}
+  table.rec td{display:block;padding:0;border:0;font-size:13px;color:var(--muted);text-align:left;white-space:nowrap;background:none!important}
+  table.rec tr{background:none!important}
+  table.rec td:nth-child(2){grid-column:1/4;grid-row:1;font-size:15px;color:var(--ink);white-space:normal}
+  table.rec td:nth-child(2) .kind{display:block;font-size:13px}
+  table.rec td:nth-child(6){grid-column:4;grid-row:1;font:600 15px var(--mono);color:var(--ink);text-align:right}
+  table.rec td:nth-child(1){grid-column:1;grid-row:2}table.rec td:nth-child(1)::after,table.rec td:nth-child(3)::after{content:" ·"}
+  table.rec td:nth-child(3){grid-column:2;grid-row:2}table.rec td:nth-child(4){grid-column:3;grid-row:2}
+  table.rec td:nth-child(5){grid-column:4;grid-row:2;text-align:right}}
+@media (max-width:640px){.bet-row{grid-template-columns:20px 1fr auto;gap:4px 10px;padding:14px 14px}.rank{font-size:15px}
+  .bet-why .agree{display:block;width:max-content;margin:6px 0 0}.bet-match{font-size:13px}
+  details.league>summary{padding:13px 48px 13px 16px;font-size:17px}details.league{margin:8px 0}}
 .bet-row{display:grid;grid-template-columns:44px 1fr auto auto;gap:18px;align-items:center;padding:16px 22px;border-top:1px solid var(--hair)}
 .bet-row:first-child{border-top:0}
 .rank{font:600 18px var(--mono);color:var(--muted);text-align:center}

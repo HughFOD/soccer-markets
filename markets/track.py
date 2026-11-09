@@ -427,11 +427,11 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
             f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
             f"several hundred.{note}</p>"
             + (f"<h3 class=tally>Every settled bet</h3>{filt}"
-               f"<div class=tablewrap><table><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th><th class=n>Result</th>"
+               f"<div class=tablewrap><table class=rec><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th><th class=n>Result</th>"
                f"<th class=n>Profit on $100</th></tr>{rows}</table></div>"
                f"<p class=rcount id=rcount></p><button class=rmore id=rmore hidden>Show more</button>{js}"
                + "<div class=chart-wrap style='margin:34px 0 6px'>" + profit_chart(g) + "</div>" if full else
-               f"<h3 class=tally>Latest results</h3><div class=tablewrap><table><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th>"
+               f"<h3 class=tally>Latest results</h3><div class=tablewrap><table class=rec><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th>"
                f"<th class=n>Result</th><th class=n>Profit on $100</th></tr>{recent}</table></div>"
                f"<p class=sub style='margin-top:18px'><a href=\"results.html\">See all {len(allbets)} bets, and filter by won or lost&nbsp;›</a></p>")
             + "</div></section>")
@@ -464,7 +464,9 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
                  ".bt .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}"
                  ".bt th{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink2)}"
                  ".bt .pos{color:var(--good)}.bt .neg{color:var(--bad,#c5221f)}.bt .muted{color:var(--muted)}"
-                 ".bth{margin:16px 0 4px;font-size:16px}.tw{overflow-x:auto}")
+                 ".bth{margin:16px 0 4px;font-size:16px}.tw{overflow-x:auto}"
+                 "@media (max-width:600px){.bt{font-size:13px}.bt th,.bt td{padding:7px 6px}.bt th{font-size:11px;white-space:normal}"
+                 ".bt th:nth-child(3),.bt td:nth-child(3){display:none}.bt td .muted{display:block;font-size:12px}.bt .num{white-space:normal}}")
 SETTLED = ["won", "lost", "push", "half won", "half lost"]
 
 
@@ -509,7 +511,7 @@ def breakdown_html(L: pd.DataFrame, min_n: int = 5) -> str:
             rows.append(f"<tr><td>{html.escape(str(name))}</td><td class=num>{len(x)}</td><td class=num>{w}–{lo}</td>"
                         f"<td class='num {cls}'>{_usd(x['profit'].sum())}</td><td class=num>{ret}</td></tr>")
         return (f"<div class=tw><table class=bt><tr><th>{head}</th><th class=num>Bets</th><th class=num>Won–lost</th>"
-                f"<th class=num>Profit</th><th class=num>Per $100 bet (95% range)</th></tr>{''.join(rows)}</table></div>")
+                f"<th class=num>Profit</th><th class=num>Per $100 (95% range)</th></tr>{''.join(rows)}</table></div>")
 
     return (f"<section class=section><div class=wrap><h2>By site and bet type.</h2>"
             f"<p class=sub>Settled bets grouped by the site that paid the best price, and by kind of bet. The range shows "
@@ -534,7 +536,7 @@ def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
     won = int(w["result"].isin(["won", "half won"]).sum()); lost = int(w["result"].isin(["lost", "half lost"]).sum())
     best = w.loc[w["profit"].idxmax()]
     last = (end - pd.Timedelta(days=1))
-    return (f"<section class=section style=padding-top:26px><div class=wrap><h2>Last week.</h2>"
+    return (f"<section class=section style='padding-top:26px;padding-bottom:0'><div class=wrap><h2>Last week.</h2>"
             f"<p class=sub>{start.strftime('%b %-d')} – {last.strftime('%b %-d')}: <b>{len(w)} bets settled, {won}–{lost}</b>, "
             f"{_usd(w['profit'].sum())} at $100 a bet. Best result: {html.escape(str(best['bet']))} "
             f"({html.escape(str(best['match']))}), {_usd(best['profit'])}.</p></div></section>")
@@ -546,7 +548,7 @@ def results_page(L: pd.DataFrame, stamp: str) -> str:
     from .site import CSS
     body = html_section(L, full=True) or ("<section class=section style=padding-top:0><div class=wrap>"
                                           "<p class=sub>No bets recorded yet.</p></div></section>")
-    body = body.replace("<h2>How the picks have done.</h2>", "", 1)
+    body = body.replace("<h2>How the picks have done.</h2>", "<h2>All time.</h2>", 1)
     body = body.replace("<section class=section style=padding-top:0>", "<section class=section style=padding-top:26px>", 1)
     body = body.replace("Every bet listed on this page since", "Every bet listed on the homepage since", 1)
     body = last_week_html(L, pd.Timestamp.now(tz="America/New_York")) + body + breakdown_html(L)

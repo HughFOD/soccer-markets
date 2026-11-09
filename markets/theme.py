@@ -74,6 +74,7 @@ h1,h2,h3,h4,.display{font-family:var(--sans)}
 .btn:hover{text-decoration:none;filter:brightness(1.08)}
 .btn.ghost{background:transparent;color:var(--link);padding:9px 4px}.btn.ghost:after{content:" ›"}
 .updated{margin-top:16px;font-size:13px;color:var(--muted);font-family:var(--mono)}
+@media (max-width:520px){.hero h1{font-size:27px}.hero .lede{font-size:15px}.ctas{margin-top:14px;gap:10px}.updated{margin-top:10px;font-size:12px}}
 
 /* sections */
 .band{background:var(--bg);padding:22px 0}
