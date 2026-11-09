@@ -47,7 +47,8 @@ Polymarket 0.05 &times; p &times; (1&minus;p)).</p></div>
 <div class=card><h3>Work out what's expected.</h3><p>Each site's odds become chances with its cut removed, then are averaged
 with equal weight. That gives every outcome's expected chance.</p></div>
 <div class=card><h3>Find the bets that beat it.</h3><p>A bet is listed when a site's odds pay more than its expected chance
-deserves. Gaps over 25% are left out as likely stale or mistyped prices.</p></div>
+deserves. Gaps over 25% are left out as likely stale or mistyped prices. Heavy favorites (shorter than &minus;600) are only listed
+if they're expected to return at least $3 per $100: they pay so little that a small error in the expected chance can wipe out their edge.</p></div>
 </div>
 </div></section>
 
