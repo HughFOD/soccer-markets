@@ -411,13 +411,14 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
           "lg=document.getElementById('rlg'),st=document.getElementById('rst'),more=document.getElementById('rmore'),cnt=document.getElementById('rcount');"
           "function apply(){var n=0;rows.forEach(function(t){var ok=(f==='all'||t.dataset.r===f)&&(!lg.value||t.dataset.lg===lg.value)"
           "&&(!st.value||t.dataset.st===st.value);if(ok)n++;t.hidden=!ok||n>shown});"
-          "more.hidden=n<=shown;more.textContent='Show all '+n+' bets';"
+          "var big=shown>PAGE;more.hidden=n<=PAGE;more.textContent=big?'Show fewer':'Show all '+n+' bets';"
           "cnt.textContent=n?'Showing '+Math.min(n,shown)+' of '+n+' bets':'No bets match these filters.'}"
           "document.querySelectorAll('.rfilt').forEach(function(b){b.addEventListener('click',function(){"
           "document.querySelectorAll('.rfilt').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});"
           "f=b.dataset.f;shown=PAGE;apply()})});"
           "lg.addEventListener('change',function(){shown=PAGE;apply()});st.addEventListener('change',function(){shown=PAGE;apply()});"
-          "more.addEventListener('click',function(){shown=1e9;apply()});apply()})()</script>")
+          "more.addEventListener('click',function(){if(shown>PAGE){shown=PAGE;apply();"
+          "document.getElementById('rall').scrollIntoView({behavior:'smooth'})}else{shown=1e9;apply()}});apply()})()</script>")
     other = int(L["result"].isin(["not graded", "no stats found"]).sum())
     note = (" Player bets, and corner or card bets outside the six leagues (Premier League, Championship, La Liga, "
             "Bundesliga, Serie A, Ligue 1), aren't counted, because there's no free record of how they ended "
@@ -426,7 +427,7 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
             f"{tiles}"
             f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
             f"several hundred.{note}</p>"
-            + (f"<h3 class=tally>Every settled bet</h3>{filt}"
+            + (f"<h3 class=tally id=rall>Every settled bet</h3>{filt}"
                f"<div class=tablewrap><table class=rec><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th><th class=n>Result</th>"
                f"<th class=n>Profit on $100</th></tr>{rows}</table></div>"
                f"<p class=rcount id=rcount></p><button class=rmore id=rmore hidden>Show more</button>{js}"
@@ -464,7 +465,7 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
                  ".bt .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}"
                  ".bt th{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink2)}"
                  ".bt .pos{color:var(--good)}.bt .neg{color:var(--bad,#c5221f)}.bt .muted{color:var(--muted)}"
-                 ".bth{margin:16px 0 4px;font-size:16px}.tw{overflow-x:auto}"
+                 ".bth{margin:16px 0 4px;font-size:16px}.tw{overflow-x:auto}.bt.odds td:first-child .muted{display:block;font-size:12px}"
                  "@media (max-width:600px){.bt{font-size:13px}.bt th,.bt td{padding:7px 6px}.bt th{font-size:11px;white-space:normal}"
                  ".bt th:nth-child(3),.bt td:nth-child(3){display:none}.bt td .muted{display:block;font-size:12px}.bt .num{white-space:normal}}")
 SETTLED = ["won", "lost", "push", "half won", "half lost"]
@@ -513,12 +514,56 @@ def breakdown_html(L: pd.DataFrame, min_n: int = 5) -> str:
         return (f"<div class=tw><table class=bt><tr><th>{head}</th><th class=num>Bets</th><th class=num>Won–lost</th>"
                 f"<th class=num>Profit</th><th class=num>Per $100 (95% range)</th></tr>{''.join(rows)}</table></div>")
 
-    return (f"<section class=section><div class=wrap><h2>By site and bet type.</h2>"
-            f"<p class=sub>Settled bets grouped by the site that paid the best price, and by kind of bet. The range shows "
+    return (f"<section class=section><div class=wrap><h2>By site, bet type and odds.</h2>"
+            f"<p class=sub>Settled bets grouped by the site that paid the best price, by kind of bet, and by the odds. The range shows "
             f"how much each group's return could differ by luck alone: when it runs from a loss to a profit, the group "
             f"hasn't shown anything yet. Groups with fewer than {min_n} bets, or with no losses yet, get no range: a range can't account for losses that haven't happened.</p>"
             f"<h4 class=bth>By site</h4>{table('site', 'Site')}<h4 class=bth>By bet type</h4>{table('type', 'Bet type')}"
-            f"</div></section>")
+            f"{odds_table(g, min_n)}</div></section>")
+
+
+ODDS_BANDS = [("Heavy favorites", "−600 or shorter", 1.0, 1 + 100 / 600),
+              ("Favorites", "−599 to −200", 1 + 100 / 600, 1.5),
+              ("Mild favorites", "−199 to −101", 1.5, 2.0),
+              ("Underdogs", "+100 or longer", 2.0, np.inf)]
+
+
+def odds_band(dec: float) -> str:
+    for name, _, lo, hi in ODDS_BANDS:
+        if lo < dec <= hi + 1e-9:
+            return name
+    return ODDS_BANDS[-1][0]
+
+
+def odds_table(g: pd.DataFrame, min_n: int = 5) -> str:
+    """Settled bets by odds band: wins against the wins the odds' chances expected, and the return per
+    $100 against the return the edge expected. Tests the research finding that long shots do worst."""
+    from .efficiency import mean_ci
+    g = g.assign(band=g["odds"].astype(float).map(odds_band))
+    rows = []
+    for name, label, _, _ in ODDS_BANDS:
+        x = g[g["band"] == name]
+        if not len(x):
+            continue
+        w = int(x["result"].isin(["won", "half won"]).sum())
+        exp_w = x["chance"].astype(float).sum()
+        exp = 100 * x["edge"].astype(float).mean()
+        lo = int(x["result"].isin(["lost", "half lost"]).sum())
+        if len(x) < min_n:
+            act = "<span class=muted>too few bets</span>"
+        elif w == 0 or lo == 0:
+            act = f"{_usd(x['profit'].mean())} <span class=muted>(no {'losses' if lo == 0 else 'wins'} yet)</span>"
+        else:
+            est, a, b = mean_ci(x["profit"].to_numpy(float))
+            act = f"{_usd(est)} <span class=muted>({_usd(a)} to {_usd(b)})</span>"
+        rows.append(f"<tr><td>{name}<span class=muted>{label}</span></td><td class=num>{len(x)}</td>"
+                    f"<td class=num>{w} <span class=muted>expected {exp_w:.0f}</span></td>"
+                    f"<td class=num>{_usd(exp)}</td><td class=num>{act}</td></tr>")
+    return (f"<h4 class=bth>By odds</h4><div class=tw><table class='bt odds'><tr><th>Odds</th><th class=num>Bets</th>"
+            f"<th class=num>Won</th><th class=num>Expected per $100</th><th class=num>Actual per $100 (95% range)</th></tr>"
+            f"{''.join(rows)}</table></div>"
+            f"<p class=note>Expected: what the odds and the consensus chance said each bet should return when it was listed. "
+            f"The research found long shots are the most overpriced bets in general; this table shows over time whether that holds for these picks too.</p>")
 
 
 def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
