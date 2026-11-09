@@ -31,3 +31,11 @@ def test_no_line_when_unchanged_or_new():
     when = pd.Timestamp("2026-11-03", tz="America/New_York")
     assert site.moved_html({"listed": (when, 2.0), "dec": 2.0}) == ""
     assert site.moved_html({"dec": 2.0}) == ""
+
+
+def test_heavy_favorites_need_a_bigger_edge():
+    assert abs(site.HEAVY_FAV - 1.1667) < 1e-3
+    keep = lambda dec, edge: dec >= site.HEAVY_FAV or edge >= site.HEAVY_FAV_EDGE
+    assert not keep(1.11, 0.011)     # -909 at +$1.10: left out
+    assert keep(1.11, 0.035)         # -909 at +$3.50: listed
+    assert keep(1.25, 0.005)         # -400 at +$0.50: unaffected
