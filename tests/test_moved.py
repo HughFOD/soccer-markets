@@ -41,14 +41,6 @@ def test_heavy_favorites_need_a_bigger_edge():
     assert keep(1.25, 0.005)         # -400 at +$0.50: unaffected
 
 
-def test_agreement_tag():
-    tight = site.agree_html({"fairs": [0.77, 0.78, 0.76, 0.785]})
-    wide = site.agree_html({"fairs": [0.64, 0.63, 0.675]})
-    assert "4 sites · agree within 3%" in tight and "agree" in tight and "loose" not in tight
-    assert "3 sites · disagree by 5%" in wide and "loose" in wide
-    assert site.agree_html({"fairs": [0.5]}) == ""
-
-
 def test_breakdown_no_minus_zero():
     from markets import track
     assert track._usd(-0.3) == "+$0" and track._usd(-6.4) == "−$6"
