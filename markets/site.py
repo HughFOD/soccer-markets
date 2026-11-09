@@ -105,6 +105,10 @@ def _pct(x, d=1, sign=True):
 
 TOP_N = 10      # bets listed per day
 MIN_EDGE = 0.001  # a bet is listed only if its best price beats the fair (consensus) price by 0.1%+
+# Heavy favorites (shorter than -600) pay little and a one-point error in the expected chance wipes out
+# their edge, so they're listed only with a bigger margin of safety.
+HEAVY_FAV = 1 + 100 / 600   # decimal odds of -600
+HEAVY_FAV_EDGE = 0.03       # +$3 per $100
 
 
 def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None = None,
@@ -200,6 +204,7 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
                          "every": ev_ext.get((mid, mk, line, outc), [])})
     if everything:
         return rows
+    rows = [x for x in rows if x["dec"] >= HEAVY_FAV or x["edge"] >= HEAVY_FAV_EDGE]
     out = []
     today = now.date()
     if not any(x["day"] == today for x in rows) and len(M):
