@@ -147,7 +147,8 @@ def run(raw_dir: Path = ROOT / "data" / "raw", fixtures: Path | None = None, out
         track.save(L)
         print(f"track record: {len(L)} bets saved, {int(L['result'].isin(['won', 'lost', 'push', 'half won', 'half lost']).sum())} settled")
         page_html = site.build(M, quotes, board, R, stamp, saved.get("remaining"), totals=G, extras=X,
-                               record_html=track.html_section(L), record_tile=track.headline(L))
+                               record_html=track.html_section(L), record_tile=track.headline(L),
+                               listed=track.listed(L, now))
         for name in ("index.html", "this-week.html"):
             (docs / name).write_text(page_html)
         from . import prices

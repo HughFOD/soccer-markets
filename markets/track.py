@@ -101,6 +101,18 @@ def update(L: pd.DataFrame, everything: list, now: pd.Timestamp) -> pd.DataFrame
     return L
 
 
+
+def listed(L: pd.DataFrame, now: pd.Timestamp) -> dict:
+    """Bets first listed before today that haven't kicked off: key -> (date listed, decimal odds then)."""
+    if not len(L):
+        return {}
+    ET = "America/New_York"
+    today = now.tz_convert(ET).normalize()
+    fl = pd.to_datetime(L["flagged_at"], utc=True).dt.tz_convert(ET)
+    ko = pd.to_datetime(L["kickoff"], utc=True)
+    keep = (fl < today) & (ko > now) & (L["result"] == "")
+    return {L.at[i, "key"]: (fl[i], float(L.at[i, "odds"])) for i in L.index[keep]}
+
 # ---- grading -------------------------------------------------------------------------------------
 
 def _line(margin: float) -> int:

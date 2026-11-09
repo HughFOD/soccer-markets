@@ -61,6 +61,7 @@ html:not(.js) .daytabs{display:none}html:not(.js) .daypane{display:block!importa
 .bet-what{font-size:19px;font-weight:600;letter-spacing:-.015em;line-height:1.25}
 .bet-match{font-size:14px;color:var(--muted);margin-top:2px}
 .bet-why{font-size:14px;color:var(--ink2);margin-top:6px}.bet-why b{font-weight:600;color:var(--ink)}
+.bet-moved{font-size:13px;color:var(--ink2);margin-top:4px}.bet-moved b{font-weight:600;color:var(--ink)}.bet-moved .toward{color:var(--good);font-weight:600}.bet-moved .away{font-weight:600}
 .bet-where{text-align:right}.bet-odds{font:600 22px/1.1 var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .bet-site{font-size:14px;color:var(--link);font-weight:500}
 .bet-value{text-align:right;min-width:116px}.bet-value .edge{margin:0}.bet-chance{font-size:13px;color:var(--muted);margin-top:4px}
@@ -237,6 +238,21 @@ def why_html(b: dict) -> str:
             + (f"<div class=whygrid>{grid}</div>" if grid else "") + "</details>")
 
 
+def moved_html(b: dict) -> str:
+    """'Listed Nov 3 at −1000 · now −1075 · Market moved toward this pick', for bets listed on an earlier day."""
+    if not b.get("listed"):
+        return ""
+    when, then = b["listed"]
+    now_dec = float(b["dec"])
+    if not (np.isfinite(then) and then > 1) or abs(now_dec - then) < 1e-9:
+        return ""
+    toward = now_dec < then          # shorter odds now: the market agrees with the pick
+    fmt = lambda d: american(d).replace("-", "−")
+    if fmt(then) == fmt(now_dec):    # moved by less than the odds are shown to
+        return ""
+    return (f"<div class=bet-moved>Listed {when.strftime('%b %-d')} at <b>{fmt(then)}</b> · now <b>{fmt(now_dec)}</b> · "
+            f"<span class={'toward' if toward else 'away'}>Market moved {'toward' if toward else 'away from'} this pick</span></div>")
+
 def days_html(days: list[tuple[str, list[dict]]]) -> str:
     e = html.escape
     when = lambda lab: lab.lower() if lab in ("Today", "Tomorrow") else "on " + e(lab)
@@ -251,7 +267,7 @@ def days_html(days: list[tuple[str, list[dict]]]) -> str:
         items = "".join(f"""<li class=bet-row data-ko="{b['ko'].tz_convert('UTC').isoformat()}"><span class=rank>{k}</span>
 <div class=bet-main><div class=bet-what>{e(b['bet'])}</div>
 <div class=bet-match>{e(b['match'])} · {e(b['league'])} · {b['ko'].strftime('%-I:%M %p')} ET</div>
-<div class=bet-why>Expected to win <b>{chance_pair(b['chance'], b['paid'])[0]}</b> of the time, paid as if <b>{chance_pair(b['chance'], b['paid'])[1]}</b></div></div>
+<div class=bet-why>Expected to win <b>{chance_pair(b['chance'], b['paid'])[0]}</b> of the time, paid as if <b>{chance_pair(b['chance'], b['paid'])[1]}</b></div>{moved_html(b)}</div>
 <div class=bet-where><div class=bet-odds>{b['odds'].replace('-', '−')}</div><div class=bet-site>{e(' or '.join(b['sites']))}</div></div>
 <div class=bet-value><span class=edge>+${100 * b['edge']:.2f}</span><div class=bet-chance>expected per $100</div></div>
 {why_html(b)}</li>"""
@@ -274,7 +290,7 @@ def days_html(days: list[tuple[str, list[dict]]]) -> str:
 
 def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | None, stamp: str, remaining=None,
           totals: pd.DataFrame | None = None, extras: pd.DataFrame | None = None, record_html: str = "",
-          record_tile: tuple[str, str] | None = None) -> str:
+          record_tile: tuple[str, str] | None = None, listed: dict | None = None) -> str:
     e = html.escape
     present = [s for s in SITES if len(quotes) and s in set(quotes["site"])]
     n_flags = int(sum(1 for f in M["flag"] if f)) if len(M) else 0
@@ -282,6 +298,12 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
 
     # ---- today's best bets: per day, up to TOP_N results whose best price beats the fair price
     days = daily_picks(M, quotes, totals=totals, extras=extras)
+    if listed:   # how each upcoming bet's odds have moved since it was first listed
+        from .track import bet_key
+        for _, bets in days:
+            for b in bets:
+                if bet_key(b) in listed:
+                    b["listed"] = listed[bet_key(b)]
     record_tile_html = (f'<a class=stat href="results.html" style="color:inherit;text-decoration:none"><div class=v>{e(record_tile[0])}</div>'
                         f'<div class=l>{e(record_tile[1]).replace(chr(10), "<br>")}</div></a>' if record_tile else
                         f"<div class=stat><div class=v>{sum(len(b) for _, b in days)}</div><div class=l>bets that beat what's expected</div></div>")

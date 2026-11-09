@@ -56,7 +56,7 @@ h1,h2,h3,h4,.display{font-family:var(--sans)}
 .gnav a,.gnav nav{white-space:nowrap}
 @media (max-width:500px){.gnav .wrap{padding:0 14px}.gnav .brand{font-size:15px}.gnav nav{gap:12px;font-size:13px}.gnav .right{gap:8px}}
 @media (max-width:620px){.gnav nav a[href^="https"],.gnav nav a[href="search.html"]{display:none}}
-@media (max-width:500px){.gnav .themebtn{display:none}.gnav .brand{margin-right:10px}}
+@media (max-width:500px){.gnav .wrap{position:relative}.gnav .themebtn{position:absolute;top:6px;right:10px}.gnav .brand{margin-right:10px}}
 @media (max-width:620px){.gnav .wrap{min-width:0}.gnav .right{min-width:0;flex:1;justify-content:flex-end}.gnav nav{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-right:2px}.gnav nav::-webkit-scrollbar{display:none}}
 @media (max-width:500px){.gnav .wrap{flex-wrap:wrap;height:auto;padding:8px 14px 0}.gnav .brand{margin:0}.gnav .right{flex:1 0 100%;justify-content:flex-start}.gnav nav{flex:1;justify-content:space-between;gap:8px;padding:6px 0 8px;font-size:14px}}
 .themebtn{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:0;border-radius:50%;background:transparent;
