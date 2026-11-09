@@ -61,6 +61,7 @@ html:not(.js) .daytabs{display:none}html:not(.js) .daypane{display:block!importa
 .bet-what{font-size:19px;font-weight:600;letter-spacing:-.015em;line-height:1.25}
 .bet-match{font-size:14px;color:var(--muted);margin-top:2px}
 .bet-why{font-size:14px;color:var(--ink2);margin-top:6px}.bet-why b{font-weight:600;color:var(--ink)}
+.bet-match .countdown{margin-left:8px;padding:1px 7px;border-radius:9px;background:var(--goodbg);color:var(--good);font-size:12px;font-weight:600;white-space:nowrap}
 .bet-moved{font-size:13px;color:var(--ink2);margin-top:4px}.bet-moved b{font-weight:600;color:var(--ink)}.bet-moved .toward{color:var(--good);font-weight:600}.bet-moved .away{font-weight:600}
 .bet-where{text-align:right}.bet-odds{font:600 22px/1.1 var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .bet-site{font-size:14px;color:var(--link);font-weight:500}
@@ -289,7 +290,14 @@ def days_html(days: list[tuple[str, list[dict]]]) -> str:
     js = ("<script>document.querySelectorAll('.daytab').forEach(t=>t.addEventListener('click',()=>{"
           "document.querySelectorAll('.daytab').forEach(x=>x.removeAttribute('aria-selected'));t.setAttribute('aria-selected','true');"
           "document.querySelectorAll('.daypane').forEach(p=>p.hidden=p.dataset.day!==t.dataset.day)}));"
-          "document.documentElement.classList.add('js')</script>")
+          "document.documentElement.classList.add('js');"
+          # kick-off countdown for bets starting within the next 24 hours, refreshed every minute
+          "(function(){function tick(){var now=Date.now();document.querySelectorAll('li.bet-row').forEach(function(li){"
+          "var m=li.querySelector('.bet-match'),c=li.querySelector('.countdown'),ms=new Date(li.dataset.ko)-now;"
+          "if(ms<=0||ms>864e5){if(c)c.remove();return}"
+          "var h=Math.floor(ms/36e5),min=Math.floor(ms%36e5/6e4),txt='Starts in '+(h?h+'h ':'')+min+'m';"
+          "if(!c){c=document.createElement('span');c.className='countdown';m.appendChild(c)}c.textContent=txt})}"
+          "tick();setInterval(tick,6e4)})()</script>")
     return f'<div class=daytabs role=tablist>{tabs}</div>{"".join(panes)}{theme.FRESH_JS}{js}'
 
 

@@ -85,7 +85,9 @@ settled from each game's statistics. Player bets aren't counted, because there's
 
 <section class=section><div class=wrap>
 <h2>Who made it.</h2>
-<p class=sub>Hugh O’Donnell, as a data science project in Python. The code is on <a href="{theme.REPO_URL}">GitHub</a>.</p>
+<p class=sub>I’m Hugh O’Donnell, a first-year master’s student in data science at Stevens Institute of Technology, graduating in May 2028. Before that I studied chemical engineering at Northeastern. I built this site in Python to study how accurately betting markets price soccer matches, and to find the bets they get wrong.</p>
+<p class=sub>I’m also working with two classmates on <a href="https://github.com/munipa/Faircall2">FairCall</a>, a machine learning project that audits MLB umpires’ ball-strike calls.</p>
+<p class=sub><a href="mailto:hugh@coolabah.org">hugh@coolabah.org</a> · <a href="https://www.linkedin.com/in/hughfodonnell/">LinkedIn</a> · <a href="https://github.com/HughFOD">GitHub</a> · <a href="{theme.REPO_URL}">This site’s code</a></p>
 </div></section>
 {theme.footer()}
 </body></html>"""
