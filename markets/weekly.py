@@ -126,6 +126,9 @@ def run(raw_dir: Path = ROOT / "data" / "raw", fixtures: Path | None = None, out
             print(f"extra markets: {X['id'].nunique()} matches, {X.groupby(['id', 'market', 'line', 'outcome']).ngroups} bets, "
                   f"{int(X['edge'].notna().sum())} prices with an expected chance; groups {X['group'].value_counts().to_dict()}")
         board = usbooks.scoreboard(quotes, t)
+        if key and download:
+            from . import archive
+            print(f"odds history: {archive.append(t, pd.Timestamp.now(tz='America/New_York'))} rows added")
         res = out_dir / "results.json"
         R = json.loads(res.read_text()) if res.exists() else None
         out_dir.mkdir(parents=True, exist_ok=True)

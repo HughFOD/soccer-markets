@@ -56,6 +56,17 @@ def _finding(n: int, slug: str, title: str, take: str, body: str, pic: str = "")
             f'<p class=take>{take}</p>{pic}{body}</div>')
 
 
+
+def promoted_html(ea: dict | None) -> str:
+    """One paragraph: newly promoted teams in their first ten games, chance given against how often they won."""
+    if not ea or not ea.get("promoted"):
+        return ""
+    ne = ea["promoted"]["new_early"]
+    P = lambda x: p(x, 0, False)
+    return (f"<p>Newly promoted teams are priced fairly too. In their first ten games back up, the odds gave them "
+            f"{an(P(ne['priced']))} {P(ne['priced'])} chance of winning, and they won {P(ne['happened'])} of the time. "
+            f"Backing them lost more ({dollars(ne['ret']['est'])} per $100) only because they're usually long shots.</p>")
+
 def sites_html(board: pd.DataFrame | None) -> tuple[str, str] | None:
     """Which site pays the most: match-result odds at each site, best first. Sites pricing under a quarter of the
     matches go below a line, since a handful of matches says little."""
@@ -96,8 +107,8 @@ def vs_html(b: pd.DataFrame) -> str:
             f"the prediction markets take a typical cut of <b>{100 * p['cut']:.1f}%</b>, against <b>{100 * s['cut']:.1f}%</b> for "
             f"the sportsbooks, so {cheaper} are cheaper today. A prediction market has the best odds on "
             f"<b>{100 * p['best']:.0f}%</b> of results, a sportsbook on <b>{100 * s['best']:.0f}%</b> (average per site). "
-            "The bigger question, whose odds are more accurate, needs a few hundred finished matches: every match is "
-            "saved each day, so that test runs as soon as there are enough.</p>")
+            "The bigger question, whose odds are more accurate, needs a few hundred finished matches. Every morning's odds "
+            "are now saved, so that test runs once there are enough.</p>")
 
 
 def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None = None, studies: dict | None = None) -> str:
@@ -159,15 +170,6 @@ def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None
                       "American sites aren't available for free. Actual wins and losses over a few hundred bets swing too much "
                       "to prove anything, so the kick-off odds are the fairer test.</p>",
                       viz.flagged(cs["rules"])))
-
-    bl = {r["league"]: r for r in R.get("by_league", [])}
-    if {"E0", "E1"} <= set(bl):
-        e0, e1 = bl["E0"], bl["E1"]
-        items.append(("leagues", "England’s second division is priced as accurately as the first",
-                      f"Calibration slope (1.00 is perfect): {e0['slope']:.2f} in the Premier League, {e1['slope']:.2f} in the Championship.",
-                      f"<div class=tw><table><tr><th>League</th><th class=num>Matches</th><th class=num>Margin</th><th class=num>Slope</th><th class=num>Betting $100 on everything</th></tr>"
-                      f"<tr><td>Premier League</td><td class=num>{e0['matches']:,}</td><td class=num>{p(e0['margin'], 1, False)}</td><td class=num>{e0['slope']:.2f}</td><td class=num>{dollars(e0['bet_everything'], True)}</td></tr>"
-                      f"<tr><td>Championship</td><td class=num>{e1['matches']:,}</td><td class=num>{p(e1['margin'], 1, False)}</td><td class=num>{e1['slope']:.2f}</td><td class=num>{dollars(e1['bet_everything'], True)}</td></tr></table></div>"))
 
     lv = R.get("live")
     if lv:
@@ -250,13 +252,56 @@ def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None
                       f"same odds and they lost {dollars(pp['others_matched'])} too. So big clubs are priced just like everyone else.",
                       f"<p>Betting against the big clubs was the worst of all: backing their opponents lost "
                       f"{dollars(pp['against']['est'])} per $100, mostly because those opponents are usually long shots. "
-                      "Big clubs here: " + ", ".join(pp["teams"]) + ".</p>", pic))
+                      "Big clubs here: " + ", ".join(pp["teams"]) + ".</p>" + promoted_html(S.get("early")), pic))
+
+    to = S.get("totals")
+    if to and to.get("bands"):
+        bd = to["bands"]
+        lo_b, hi_b = bd[0], bd[-1]
+        ov, un = to["sides"]["Over 2.5"], to["sides"]["Under 2.5"]
+        pic = viz.chart("totals", "The less likely side loses more",
+                        "Average result of a $100 bet on over or under 2.5 goals, by the chance the odds gave it",
+                        {"type": "hbar", "labels": [b["band"] for b in bd], "values": [round(100 * b["ret"]["est"], 1) for b in bd],
+                         "fmt": "usd", "unit": "per $100 bet", "notes": [f"{b['ret']['n']:,} bets" for b in bd]},
+                        viz._table(["Chance the odds gave", "Odds expected", "Happened", "Per $100", "Bets"],
+                                   [[b["band"], f"{100 * b['priced']:.0f}%", f"{100 * b['happened']:.0f}%",
+                                     dollars(b["ret"]["est"], True), f"{b['ret']['n']:,}"] for b in bd]))
+        items.append(("totals", "The long-shot pattern holds for total goals too",
+                      f"Over/under 2.5 goals works like match results. When the odds made a side unlikely (under 35%), "
+                      f"$100 on it lost {dollars(lo_b['ret']['est'])} on average. When they made it likely (65% or more), it lost "
+                      f"only {dollars(hi_b['ret']['est'])}.",
+                      f"<p>The unlikely side happened {P(lo_b['happened'])} of the time against {P(lo_b['priced'])} expected; the "
+                      f"likely side {P(hi_b['happened'])} against {P(hi_b['priced'])}. Overs and unders cost about the same overall: "
+                      f"each lost about {dollars((ov['ret']['est'] + un['ret']['est']) / 2)} per $100 at the average price. Based on "
+                      f"{to['matches']:,} matches since 2005.</p>", pic))
+    sk = S.get("stakes")
+    if sk and sk.get("motivated_vs_not"):
+        mv, nm, bo = sk["motivated_vs_not"], sk["not_vs_motivated"], sk["both"]
+        rows_ = [("Had something to play for, against a team with nothing", "Something to play for", mv),
+                 ("Had nothing to play for, against a team with something", "Nothing to play for", nm),
+                 ("Both teams had something to play for", "Both had something", bo)]
+        pic = viz.chart("stakes", "Teams won about as often as the odds expected",
+                        "How often each team won in the last eight games of a season, with the chance the odds gave it",
+                        {"type": "hbar", "labels": [f"{r[1]} (expected {100 * r[2]['priced']:.1f}%)" for r in rows_], "values": [round(100 * r[2]["happened"], 1) for r in rows_],
+                         "fmt": "pct1", "unit": "won", "notes": [f"odds expected {100 * r[2]['priced']:.1f}%" for r in rows_]},
+                        viz._table(["Team", "Odds expected", "Won", "Per $100", "Bets"],
+                                   [[r[0], f"{100 * r[2]['priced']:.1f}%", f"{100 * r[2]['happened']:.1f}%",
+                                     dollars(r[2]["ret"]["est"], True), f"{r[2]['ret']['n']:,}"] for r in rows_]))
+        items.append(("stakes", "Teams with nothing to play for aren't overpriced",
+                      f"Late in the season, some teams can't reach Europe or promotion and can't be relegated. Against a team that "
+                      f"still had something to play for, the team with something at stake was given {an(P(mv['priced']))} "
+                      f"{P(mv['priced'])} chance and won {P(mv['happened'])} of the time. That gap could easily be luck, so the odds "
+                      f"already account for motivation.",
+                      f"<p>Based on the last eight games of every finished season ({sk['matches']:,} matches). Nothing to play for "
+                      f"means already safe from relegation and unable to reach the top seven (top six in the Championship, "
+                      f"top five in Ligue 1), worked out from the league table before each match.</p>", pic))
 
     st = sites_html(board)
     if st:
         items.append(("sites", "Which site pays the most today", st[0], st[1]))
 
-    order = ["accurate", "longshots", "half-time", "line-moves", "flagged", "leagues", "crowds", "draws", "popular", "sites"]
+    order = ["accurate", "longshots", "totals", "line-moves", "flagged", "half-time", "crowds", "draws", "popular", "stakes",
+             "sites"]
     items.sort(key=lambda it: order.index(it[0]) if it[0] in order else len(order))
     toc, body = [], []
     for i, it in enumerate(items, 1):
