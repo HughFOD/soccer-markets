@@ -66,9 +66,6 @@ html:not(.js) .daytabs{display:none}html:not(.js) .daypane{display:block!importa
   table.rec td:nth-child(1){grid-column:1;grid-row:2}table.rec td:nth-child(1)::after,table.rec td:nth-child(3)::after{content:" ·"}
   table.rec td:nth-child(3){grid-column:2;grid-row:2}table.rec td:nth-child(4){grid-column:3;grid-row:2}
   table.rec td:nth-child(5){grid-column:4;grid-row:2;text-align:right}}
-@media (max-width:640px){.bet-row{grid-template-columns:20px 1fr auto;gap:4px 10px;padding:14px 14px}.rank{font-size:15px}
-  .bet-match{font-size:13px}
-  details.league>summary{padding:13px 48px 13px 16px;font-size:17px}details.league{margin:8px 0}}
 .bet-row{display:grid;grid-template-columns:44px 1fr auto auto;gap:18px;align-items:center;padding:16px 22px;border-top:1px solid var(--hair)}
 .bet-row:first-child{border-top:0}
 .rank{font:600 18px var(--mono);color:var(--muted);text-align:center}
@@ -101,6 +98,9 @@ details.league>summary span{color:var(--muted);font-weight:400;font-size:15px;ma
 .match table tr td.good{background:var(--goodbg)}
 .cons td{color:var(--muted)}
 .note{font-size:14px;color:var(--muted);margin-top:14px}
+@media (max-width:640px){.bet-row{grid-template-columns:20px 1fr auto;gap:4px 10px;padding:14px 14px}.rank{font-size:15px}
+  .bet-match{font-size:13px}
+  details.league>summary{padding:13px 48px 13px 16px;font-size:17px}details.league{margin:8px 0}}
 """
 
 
