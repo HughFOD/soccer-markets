@@ -61,6 +61,7 @@ html:not(.js) .daytabs{display:none}html:not(.js) .daypane{display:block!importa
 .bet-what{font-size:19px;font-weight:600;letter-spacing:-.015em;line-height:1.25}
 .bet-match{font-size:14px;color:var(--muted);margin-top:2px}
 .bet-why{font-size:14px;color:var(--ink2);margin-top:6px}.bet-why b{font-weight:600;color:var(--ink)}
+.agree{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:9px;font-size:12px;font-weight:600;background:var(--goodbg);color:var(--good);white-space:nowrap}.agree.loose{background:var(--warnbg,#fff4d6);color:var(--warn,#8a5a00)}
 .bet-match .countdown{margin-left:8px;padding:1px 7px;border-radius:9px;background:var(--goodbg);color:var(--good);font-size:12px;font-weight:600;white-space:nowrap}
 .bet-moved{font-size:13px;color:var(--ink2);margin-top:4px}.bet-moved b{font-weight:600;color:var(--ink)}.bet-moved .toward{color:var(--good);font-weight:600}.bet-moved .away{font-weight:600}
 .bet-where{text-align:right}.bet-odds{font:600 22px/1.1 var(--mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
@@ -110,6 +111,7 @@ MIN_EDGE = 0.001  # a bet is listed only if its best price beats the fair (conse
 # their edge, so they're listed only with a bigger margin of safety.
 HEAVY_FAV = 1 + 100 / 600   # decimal odds of -600
 HEAVY_FAV_EDGE = 0.03       # +$3 per $100
+AGREE_PTS = 3               # sites 'agree' when their chances (cuts removed) are within 3 points
 
 
 def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None = None,
@@ -146,6 +148,21 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
     ev_res = every_site(quotes, ["id", "result"]) if len(quotes) else {}
     ev_tot = every_site(totals, ["id", "point", "side"]) if has_totals else {}
     ev_ext = every_site(extras, ["id", "market", "line", "outcome"]) if extras is not None and len(extras) else {}
+    def fair_by_site(df, market_keys, outcome_key):
+        """{bet key: [each site's chance for that outcome, with that site's cut removed]}"""
+        if df is None or not len(df):
+            return {}
+        d = df[np.isfinite(df["odds"]) & (df["odds"] > 1)].copy()
+        d["inv"] = 1 / d["odds"]
+        grp = d.groupby(market_keys + ["site"])
+        d["n_out"] = grp["inv"].transform("size")
+        d["fair"] = d["inv"] / grp["inv"].transform("sum")
+        full = d.groupby(market_keys)["n_out"].transform("max")
+        d = d[(d["n_out"] == full) & (full >= 2)]       # only sites that price every outcome of the bet
+        return {k: list(g["fair"]) for k, g in d.groupby(market_keys + [outcome_key], sort=False)}
+    fair_res = fair_by_site(quotes, ["id"], "result") if len(quotes) else {}
+    fair_tot = fair_by_site(totals, ["id", "point"], "side") if has_totals else {}
+    fair_ext = fair_by_site(extras, ["id", "market", "line"], "outcome") if extras is not None and len(extras) else {}
     rows = []
     if len(quotes):
         q = quotes.merge(M[["id", "kickoff", "home", "away", "league", "best_h", "best_d", "best_a",
@@ -167,7 +184,7 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
                          "league": r["league"], "sites": [SITES[x][0] for x in g["site"]],
                          "chance": float(r[f"cons_{res}"]), "n_sites": n,
                          "id": mid, "dec": float(r["odds"]), "kind": "result", "outcome": res, "point": np.nan,
-                         "every": ev_res.get((mid, res), [])})
+                         "every": ev_res.get((mid, res), []), "fairs": fair_res.get((mid, res), [])})
     if totals is not None and len(totals):
         g2 = totals.copy()
         g2["ko"] = pd.to_datetime(g2["kickoff"]).dt.tz_convert(ET)
@@ -184,7 +201,7 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
                          "match": f"{r['home']} v {r['away']}", "league": r["league"],
                          "sites": [SITES[x][0] for x in g["site"]], "chance": float(r["chance"]), "n_sites": n,
                          "id": mid, "dec": float(r["odds"]), "kind": "totals", "outcome": side, "point": float(point),
-                         "every": ev_tot.get((mid, point, side), [])})
+                         "every": ev_tot.get((mid, point, side), []), "fairs": fair_tot.get((mid, point, side), [])})
     if extras is not None and len(extras):
         info = M.set_index("id")[["kickoff", "home", "away", "league"]]
         x = extras[extras["best"] & extras["edge"].notna() & extras["id"].isin(info.index)]
@@ -202,7 +219,7 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
                          "sites": [SITES[s][0] for s in g["site"]], "chance": float(r["chance"]), "n_sites": n,
                          "id": mid, "dec": float(r["odds"]), "kind": mk, "outcome": outc,
                          "point": float(r["point"]) if pd.notna(r["point"]) else np.nan,
-                         "every": ev_ext.get((mid, mk, line, outc), [])})
+                         "every": ev_ext.get((mid, mk, line, outc), []), "fairs": fair_ext.get((mid, mk, line, outc), [])})
     if everything:
         return rows
     rows = [x for x in rows if x["dec"] >= HEAVY_FAV or x["edge"] >= HEAVY_FAV_EDGE]
@@ -244,6 +261,18 @@ def why_html(b: dict) -> str:
             + (f"<div class=whygrid>{grid}</div>" if grid else "") + "</details>")
 
 
+def agree_html(b: dict) -> str:
+    """How closely the sites agree on the bet's chance, once each site's cut is removed:
+    '7 sites · agree within 1%' (green) or '3 sites · disagree by 5%' (amber)."""
+    f = [x for x in b.get("fairs", []) if np.isfinite(x)]
+    if len(f) < 2:
+        return ""
+    spread = 100 * (max(f) - min(f))
+    pts = max(1, round(spread))
+    if pts <= AGREE_PTS and len(f) >= 4:
+        return f"<span class=agree>{len(f)} sites · agree within {pts}%</span>"
+    return f"<span class='agree loose'>{len(f)} sites · disagree by {pts}%</span>"
+
 def moved_html(b: dict) -> str:
     """'Listed Nov 3 at −1000 · now −1075 · Market moved toward this pick', for bets listed on an earlier day."""
     if not b.get("listed"):
@@ -273,7 +302,7 @@ def days_html(days: list[tuple[str, list[dict]]]) -> str:
         items = "".join(f"""<li class=bet-row data-ko="{b['ko'].tz_convert('UTC').isoformat()}"><span class=rank>{k}</span>
 <div class=bet-main><div class=bet-what>{e(b['bet'])}</div>
 <div class=bet-match>{e(b['match'])} · {e(b['league'])} · {b['ko'].strftime('%-I:%M %p')} ET</div>
-<div class=bet-why>Expected to win <b>{chance_pair(b['chance'], b['paid'])[0]}</b> of the time, paid as if <b>{chance_pair(b['chance'], b['paid'])[1]}</b></div>{moved_html(b)}</div>
+<div class=bet-why>Expected to win <b>{chance_pair(b['chance'], b['paid'])[0]}</b> of the time, paid as if <b>{chance_pair(b['chance'], b['paid'])[1]}</b>{agree_html(b)}</div>{moved_html(b)}</div>
 <div class=bet-where><div class=bet-odds>{b['odds'].replace('-', '−')}</div><div class=bet-site>{e(' or '.join(b['sites']))}</div></div>
 <div class=bet-value><span class=edge>+${100 * b['edge']:.2f}</span><div class=bet-chance>expected per $100</div></div>
 {why_html(b)}</li>"""

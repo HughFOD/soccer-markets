@@ -28,15 +28,15 @@ def meta(path: str, title: str, desc: str) -> str:
 
 CSS = """
 :root{--bg:#fff;--bg2:#f4f4f1;--tile:#fff;--ink:#141414;--ink2:#333;--muted:#666;--line:#cfcfc8;--hair:#e4e4de;
-  --link:#0b5394;--blue:#0b5394;--good:#137333;--goodbg:#e6f4ea;--card:#fff;--nav:#141414;
+  --link:#0b5394;--blue:#0b5394;--good:#137333;--goodbg:#e6f4ea;--warn:#8a5a00;--warnbg:#fff4d6;--bad:#c5221f;--card:#fff;--nav:#141414;
   --c1:#0b5394;--c2:#d9480f;--grid:#e4e4de;--axis:#888;--accent:#0b5394;--hi:#f2b705;--r:3px;
   --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111;--bg2:#1a1a1a;--tile:#151515;--ink:#ececec;--ink2:#cfcfcf;
-  --muted:#9a9a9a;--line:#333;--hair:#262626;--link:#7cb2f0;--blue:#2f6fb5;--good:#5cc97b;--goodbg:#14281a;--card:#151515;
+  --muted:#9a9a9a;--line:#333;--hair:#262626;--link:#7cb2f0;--blue:#2f6fb5;--good:#5cc97b;--goodbg:#14281a;--warn:#e0b04a;--warnbg:#2a2210;--bad:#f28b82;--card:#151515;
   --nav:#000;--c1:#7cb2f0;--c2:#f08c4a;--grid:#262626;--axis:#888;--accent:#7cb2f0;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#111;--bg2:#1a1a1a;--tile:#151515;--ink:#ececec;--ink2:#cfcfcf;
-  --muted:#9a9a9a;--line:#333;--hair:#262626;--link:#7cb2f0;--blue:#2f6fb5;--good:#5cc97b;--goodbg:#14281a;--card:#151515;
+  --muted:#9a9a9a;--line:#333;--hair:#262626;--link:#7cb2f0;--blue:#2f6fb5;--good:#5cc97b;--goodbg:#14281a;--warn:#e0b04a;--warnbg:#2a2210;--bad:#f28b82;--card:#151515;
   --nav:#000;--c1:#7cb2f0;--c2:#f08c4a;--grid:#262626;--axis:#888;--accent:#7cb2f0;color-scheme:dark}
 :root[data-theme="light"]{color-scheme:light}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
