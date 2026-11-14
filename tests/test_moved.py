@@ -44,3 +44,16 @@ def test_heavy_favorites_need_a_bigger_edge():
 def test_breakdown_no_minus_zero():
     from markets import track
     assert track._usd(-0.3) == "+$0" and track._usd(-6.4) == "−$6"
+
+
+def test_only_checkable_bets_listed():
+    assert track.settleable("result", "Serie A") and track.settleable("alternate_team_totals", "La Liga")
+    assert track.settleable("alternate_totals_corners", "Premier League")
+    assert not track.settleable("alternate_totals_corners", "Champions League")
+    assert not track.settleable("player_goal_scorer_anytime", "Premier League")
+
+
+def test_team_goals_settle():
+    row = {"kind": "alternate_team_totals", "outcome": "Over", "point": 1.5, "bet": "Real Madrid Over 1.5 goals",
+           "home": "Racing", "away": "Real Madrid"}
+    assert track.settle(row, 0, 2) == [(1.0, 1)] and track.settle(row, 3, 1) == [(1.0, -1)]
