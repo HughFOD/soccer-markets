@@ -84,11 +84,27 @@ def api_key() -> str | None:
     return f.read_text().strip() if f.exists() else None
 
 
+# The Odds API lists Polymarket's US exchange as "polymarket_us" and the international one as "polymarket".
+# The site covers the US exchange (its fee is the one in FEE_RATES), so its odds are kept under "polymarket".
+ALIASES = {"polymarket_us": "polymarket"}
+
+
+def same_site(ev: dict) -> dict:
+    """Rename aliased sites in one event; where both names quote the match, keep the US exchange's odds."""
+    bks = ev.get("bookmakers")
+    if not bks or not any(b.get("key") in ALIASES for b in bks):
+        return ev
+    keep = {ALIASES[b["key"]] for b in bks if b.get("key") in ALIASES}
+    ev["bookmakers"] = [{**b, "key": ALIASES[b["key"]]} if b.get("key") in ALIASES else b
+                        for b in bks if b.get("key") not in keep]
+    return ev
+
+
 def fetch(key: str, sport: str, region: str, markets: str = "h2h") -> tuple[list, str | None]:
     url = (f"https://api.the-odds-api.com/v4/sports/{sport}/odds?regions={region}&markets={markets}"
            f"&oddsFormat=decimal&apiKey={key}")
     with urllib.request.urlopen(url, timeout=30) as r:
-        return json.loads(r.read()), r.headers.get("x-requests-remaining")
+        return [same_site(ev) for ev in json.loads(r.read())], r.headers.get("x-requests-remaining")
 
 
 def download(key: str, dest: Path) -> dict:

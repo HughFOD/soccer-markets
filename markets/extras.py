@@ -22,7 +22,7 @@ import pandas as pd
 
 from .consensus import _probs
 from .fairprice import pool
-from .usbooks import after_fees
+from .usbooks import after_fees, same_site
 
 REGIONS = "us,us_ex"
 WINDOW_HOURS = 24        # fetch matches kicking off within this many hours of the run
@@ -100,7 +100,7 @@ def download(key: str, raw: dict, remaining) -> tuple[dict, object]:
                f"&markets={markets}&oddsFormat=decimal&apiKey={key}")
         try:
             with urllib.request.urlopen(url, timeout=30) as r:
-                out[eid] = json.loads(r.read())
+                out[eid] = same_site(json.loads(r.read()))
                 remaining = r.headers.get("x-requests-remaining", remaining)
         except Exception as e:
             print(f"  skipped extra markets for {eid}: {e}")
