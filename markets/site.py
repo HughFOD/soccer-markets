@@ -221,6 +221,8 @@ def daily_picks(M: pd.DataFrame, quotes: pd.DataFrame, now: pd.Timestamp | None 
     if everything:
         return rows
     rows = [x for x in rows if x["dec"] >= HEAVY_FAV or x["edge"] >= HEAVY_FAV_EDGE]
+    from .track import settleable
+    rows = [x for x in rows if settleable(x["kind"], x["league"])]    # only bets whose result can be checked
     out = []
     today = now.date()
     if not any(x["day"] == today for x in rows) and len(M):

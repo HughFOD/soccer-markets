@@ -29,7 +29,7 @@ from .usbooks import ROOT, SPORTS, american
 LEDGER = ROOT / "data" / "track_record.csv"
 COLS = ["key", "flagged_at", "kickoff", "league", "id", "home", "away", "match", "bet", "kind", "outcome", "point",
         "sites", "n_sites", "odds", "chance", "edge", "last_checked", "last_chance", "last_value", "result", "profit"]
-GRADABLE = {"result", "totals", "alternate_totals", "alternate_spreads", "btts", "draw_no_bet"}
+GRADABLE = {"result", "totals", "alternate_totals", "alternate_spreads", "btts", "draw_no_bet", "alternate_team_totals"}
 SETTLE_HOURS = 2.5   # a match is treated as finished this long after kick-off
 MAX_ROWS = 500       # settled bets listed on the homepage (newest first)
 GIVE_UP_DAYS = 3     # the scores endpoint only looks back 3 days
@@ -42,6 +42,12 @@ STATS_KINDS = {"alternate_totals_corners", "alternate_team_totals_corners", "alt
 STATS_LEAGUES = {"Premier League": "E0", "Championship": "E1", "La Liga": "SP1", "Bundesliga": "D1",
                  "Serie A": "I1", "Ligue 1": "F1"}
 STATS_DAYS = 10
+
+
+def settleable(kind: str, league: str) -> bool:
+    """Can this bet's result be checked? Score-based bets anywhere; corners and cards only in the six leagues
+    with free match statistics. Player bets and the rest can't be, so the site doesn't list them."""
+    return kind in GRADABLE or (kind in STATS_KINDS and league in STATS_LEAGUES)
 
 
 def load() -> pd.DataFrame:
@@ -146,6 +152,16 @@ def settle(row, hg: int, ag: int) -> list[tuple[float, int]] | None:
             return _asian(hg - ag, point)
         if out == row["away"]:
             return _asian(ag - hg, point)
+        return None
+    if kind == "alternate_team_totals":                   # the bet's name starts with the team it's about
+        bet = str(row["bet"])
+        goals = hg if bet.startswith(str(row["home"])) else ag if bet.startswith(str(row["away"])) else None
+        if goals is None:
+            return None
+        if out == "Over":
+            return _asian(goals, -point)
+        if out == "Under":
+            return _asian(-goals, point)
         return None
     if kind == "btts":
         return [(1.0, 1 if (out == "Yes") == (hg > 0 and ag > 0) else -1)]
@@ -375,7 +391,9 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
     pbar = float((1 / g["odds"].astype(float)).mean())
     tiles = (f"<div class=stats><div class=stat><div class=v>{w}–{lo}{f'–{pu}' if pu else ''}</div><div class=l>won–lost{'–push' if pu else ''}</div></div>"
              f"<div class=stat><div class=v>{_usd(profit)}</div><div class=l>profit from $100 on each ({100 * profit / (100 * n):+.1f}%)</div></div>"
-             f"<div class=stat><div class=v>{100 * g['edge'].mean():+.1f}%</div><div class=l>expected return when listed</div></div>"
+             + (f"<div class=stat><div class=v>{_usd(100 * g['edge'].astype(float).sum())}</div><div class=l>expected profit when listed "
+                f"({100 * g['edge'].mean():+.1f}% a bet)</div></div>" if full else
+                f"<div class=stat><div class=v>{100 * g['edge'].mean():+.1f}%</div><div class=l>expected return when listed</div></div>") +
              # average odds via the average chance they imply (averaging American odds directly is meaningless)
              f"<div class=stat><div class=v>{american(1 / pbar).replace('-', '−')}</div><div class=l>average odds, "
              f"{'mostly favorites' if pbar > 0.5 else 'mostly underdogs'} ({100 * pbar:.0f}% chance on average)</div></div></div>")
@@ -425,8 +443,9 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
             f"({other} bet{'' if other == 1 else 's'} so far)." if other else "")
     return (f"<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>"
             f"{tiles}"
-            f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
-            f"several hundred.{note}</p>"
+            + (f"<p class=note>{note.strip()}</p>" if full and note else "" if full else
+               f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
+               f"several hundred.{note}</p>")
             + (f"<h3 class=tally id=rall>Every settled bet</h3>{filt}"
                f"<div class=tablewrap><table class=rec><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th><th class=n>Result</th>"
                f"<th class=n>Profit on $100</th></tr>{rows}</table></div>"
@@ -448,7 +467,12 @@ def profit_chart(g: pd.DataFrame) -> str:
     actual = g["profit"].astype(float).cumsum().round(2).tolist()
     expected = (100 * g["edge"].astype(float)).cumsum().round(2).tolist()
     days = [f"{d:%b %-d}" for d in ko]
-    ticks = [d if i == 0 or d != days[i - 1] else "" for i, d in enumerate(days)]
+    # a date label at the first bet of each day, skipping any that would sit too close to the last one shown
+    gap, last, ticks = max(1, len(days) // 10), -10 ** 9, []
+    for i, d in enumerate(days):
+        show = (i == 0 or d != days[i - 1]) and i - last >= gap
+        ticks.append(d if show else "")
+        last = i if show else last
     n = len(g)
     return viz.chart("profit", "Running profit, bet by bet",
                      "Blue: actual profit from $100 on each settled bet, in kick-off order. "
@@ -471,6 +495,7 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
                  ".best .b span{font-family:var(--mono);margin-left:6px}"
                  ".dots{display:flex;flex-wrap:wrap;gap:5px;margin:16px 0 4px}.dots i{width:16px;height:16px;border-radius:3px;background:var(--hair)}"
                  ".dots i.w{background:var(--good)}.dots i.l{background:var(--bad,#c5221f)}"
+                 "@media (max-width:600px){.stats.hu{grid-template-columns:1fr}}"
                  ".bth{margin:16px 0 4px;font-size:16px}.tw{overflow-x:auto}.bt.odds td:first-child .muted{display:block;font-size:12px}"
                  "@media (max-width:600px){.bt{font-size:13px}.bt th,.bt td{padding:7px 6px}.bt th{font-size:11px;white-space:normal}"
                  ".bt th:nth-child(3),.bt td:nth-child(3){display:none}.bt td .muted{display:block;font-size:12px}.bt .num{white-space:normal}}")
@@ -631,16 +656,17 @@ def held_up_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
     held = (d["last_value"].astype(float) > 0).mean()
     hours = float((ko - lc)[d.index].dt.total_seconds().median() / 3600)
     pct = lambda x: f"{100 * x:+.1f}%"
-    return (f"<section class=section style='padding-top:26px;padding-bottom:0'><div class=wrap><h2>Did the prices hold up?</h2>"
-            f"<p class=sub>Winning or losing a few dozen bets is mostly luck. A fairer test is whether each price was still better "
-            f"than the consensus just before kick-off, once the news was in. This uses the last check before each match.</p>"
-            f"<div class=stats><div class=stat><div class=v>{100 * held:.0f}%</div><div class=l>still a better price than the "
-            f"consensus at the last check ({len(d)} bets)</div></div>"
-            f"<div class=stat><div class=v>{pct(d['edge'].astype(float).mean())}</div><div class=l>expected return when listed</div></div>"
-            f"<div class=stat><div class=v>{pct(d['last_value'].astype(float).mean())}</div><div class=l>expected return at the last check</div></div>"
-            f"<div class=stat><div class=v>{hours:.0f} hours</div><div class=l>typical time between the last check and kick-off</div></div></div>"
-            f"<p class=note>The last check is the morning update, so it isn't the exact kick-off price. Bets listed on the day of "
-            f"their match aren't checked again, so they're left out.</p></div></section>")
+    n_held = int((d["last_value"].astype(float) > 0).sum())
+    return (f"<section class=section style='padding-top:26px;padding-bottom:0'><div class=wrap><h2>Did the picks beat the market?</h2>"
+            f"<p class=sub>Winning or losing a few dozen bets is mostly luck. A fairer test: was each pick still a better price "
+            f"than the other sites on the morning of the match, once more news was in?</p>"
+            f"<div class='stats hu'><div class=stat><div class=v>{100 * held:.0f}%</div><div class=l>of picks were still a better "
+            f"price on the morning of the match ({n_held} of {len(d)})</div></div>"
+            f"<div class=stat><div class=v style=white-space:nowrap>{pct(d['edge'].astype(float).mean())} → {pct(d['last_value'].astype(float).mean())}</div>"
+            f"<div class=l>how much the average pick was worth when listed, and on the morning of the match. It went up, so the "
+            f"market moved toward the picks.</div></div></div>"
+            f"<p class=note>The site checks prices once a day, early in the morning, so the last check is usually about "
+            f"{hours:.0f} hours before kick-off. Picks listed on the morning of their match aren't checked again, so they're left out.</p></div></section>")
 
 
 def results_page(L: pd.DataFrame, stamp: str) -> str:
@@ -655,7 +681,10 @@ def results_page(L: pd.DataFrame, stamp: str) -> str:
     body = body.replace("Profit assumes $100 on each bet.",
                         "Profit assumes $100 on each bet. <a href=track-record.csv download>Download every bet (CSV)</a>.", 1)
     now = pd.Timestamp.now(tz="America/New_York")
-    body = last_week_html(L, now) + body + held_up_html(L, now) + breakdown_html(L)
+    held = held_up_html(L, now)
+    cut = body.find("<h3 class=tally id=rall>")
+    body = last_week_html(L, now) + (body[:cut] + "</div></section>" + held + "<section class=section style=padding-top:26px><div class=wrap>" + body[cut:]
+                                     if cut > 0 and held else body + held) + breakdown_html(L)
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 {theme.meta("results.html", "Results: how every pick has done · Today's Soccer Bets",
             "Every bet listed on Today's Soccer Bets, saved at the price shown and settled from the final score.")}
