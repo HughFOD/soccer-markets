@@ -22,6 +22,9 @@ EXTRA_CSS = """
 .toc{columns:2;column-gap:28px;padding:0;list-style:none;margin:0}.toc li{break-inside:avoid;margin-bottom:10px}
 .toc a{color:var(--ink);font-size:16px;display:flex;gap:12px;align-items:baseline}.toc a:hover{color:var(--link);text-decoration:none}
 .toc a b{color:var(--muted);font-size:13px;font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums}
+.short{background:var(--bg2);border:1px solid var(--hair);border-radius:var(--r);padding:20px 24px 8px;margin:6px 0 26px}
+.short h3{margin:0 0 10px;font-size:17px}.short ul{margin:0;padding-left:20px}.short li{margin:0 0 12px;font-size:16px;line-height:1.5}
+.short a{color:var(--link)}
 .finding{background:var(--tile);border:1px solid var(--line);border-top:3px solid var(--ink);border-radius:var(--r);padding:26px 28px 20px;margin:0 0 22px}
 .finding .n{font:600 12px var(--mono);color:var(--link);margin-bottom:6px;letter-spacing:.06em}
 .finding h3{font-size:clamp(21px,2.6vw,26px);line-height:1.2;font-weight:700;margin:0 0 10px}
@@ -142,6 +145,7 @@ def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None
         cl = R["closing"]
         top = max(m["threshold"] for m in cl["moves"])
         mv = {m["direction"]: m for m in cl["moves"] if abs(m["threshold"] - top) < 1e-9}
+        moves = mv
         every = cl.get("bet_all_open")
         items.append(("line-moves", "When odds change before kick-off, they're usually right to do so",
                       f"Odds move as news comes in. The bigger the move, the more it mattered: when a team's chance rose by "
@@ -304,10 +308,32 @@ def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None
              "sites"]
     items.sort(key=lambda it: order.index(it[0]) if it[0] in order else len(order))
     toc, body = [], []
+    num = {it[0]: i for i, it in enumerate(items, 1)}
     for i, it in enumerate(items, 1):
         a, b = _finding(i, *it)
         toc.append(a)
         body.append(b)
+    # the five results to read if you read nothing else, each linking to its finding
+    short = []
+    see = lambda k: f" <a href=#{k}>Finding {num[k]}</a>" if k in num else ""
+    if "longshots" in num:
+        short.append(f"<b>Long shots are the worst bet.</b> $100 on every long shot lost {dollars(avg[-1]['return'])} on average; "
+                     f"on every heavy favorite, {dollars(avg[0]['return'])}.{see('longshots')}")
+    to = S.get("totals")
+    if "totals" in num and to:
+        short.append(f"<b>The same holds for total goals.</b> The unlikely side of over/under 2.5 lost "
+                     f"{dollars(to['bands'][0]['ret']['est'])} per $100; the likely side {dollars(to['bands'][-1]['ret']['est'])}.{see('totals')}")
+    if "line-moves" in num:
+        short.append(f"<b>When odds move before kick-off, they're usually right.</b> An early bet on a team whose chance then rose "
+                     f"{100 * top:.0f}+ points made {dollars(moves['shortened']['return'], True)} per $100.{see('line-moves')}")
+    if "flagged" in num:
+        short.append(f"<b>This site's method holds up.</b> {100 * r2['beat_close']:.0f}% of prices flagged as {100 * r2['threshold']:.0f}%+ "
+                     f"better than the consensus were still better at kick-off.{see('flagged')}")
+    if "half-time" in num:
+        short.append(f"<b>Teams behind at half-time score more than the odds expect:</b> {P(se[-2]['ratio'] - 1)} more for teams "
+                     f"losing by 2 or more.{see('half-time')}")
+    short_html = (f"<div class=short><h3>In short</h3><ul>{''.join(f'<li>{x}</li>' for x in short)}</ul></div>"
+                  if short else "")
 
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 {theme.meta("research.html", "How accurate are betting odds? · Today's Soccer Bets", f"What {int(R['seasons'][-1][:4]) - int(R['seasons'][0][:4])} years of soccer betting odds show about how accurate the odds are.")}
@@ -322,7 +348,7 @@ def build(R: dict, curve: pd.DataFrame | None = None, board: pd.DataFrame | None
 
 <section class=section id=found><div class=wrap>
 <h2>What I found.</h2>
-<ul class=toc>{''.join(toc)}</ul>
+{short_html}<ul class=toc>{''.join(toc)}</ul>
 </div></section>
 <div class=wrap>{''.join(body)}</div>
 

@@ -58,7 +58,7 @@ if they're expected to return at least $3 per $100: they pay so little that a sm
 <li><b>Sportsbooks:</b> {e(', '.join(books))}.</li>
 <li><b>Prediction markets:</b> {e(' and '.join(markets))}.</li>
 <li><b>Club competitions:</b> {e(', '.join(leagues))}.</li>
-<li><b>National teams:</b> {e(', '.join(NATIONAL.values()))}, whenever they're being played. The research behind the
+<li><b>National teams:</b> {e(', '.join(NATIONAL.values()))}. The research behind the
 method used club matches, so national team picks haven't been tested the same way.</li>
 <li><b>Bets:</b> the match result and total goals for every match. On match day, corners, cards, player bets and more are added.</li>
 <li><b>Updates:</b> the odds are refreshed every morning, New York time. Once a match kicks off, it disappears from the lists.</li>

@@ -587,6 +587,42 @@ def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
             f"({html.escape(str(best['match']))}), {_usd(best['profit'])}.</p></div></section>")
 
 
+CSV_COLS = {"flagged_at": "listed_at", "kickoff": "kickoff", "league": "league", "match": "match", "bet": "bet",
+            "sites": "best_site", "odds": "decimal_odds", "chance": "expected_chance", "edge": "expected_return",
+            "last_checked": "last_checked", "last_value": "expected_return_at_last_check", "result": "result",
+            "profit": "profit_per_100"}
+
+
+def csv_export(L: pd.DataFrame, path: Path) -> None:
+    """docs/track-record.csv: every bet the site has listed, for anyone to check the record themselves."""
+    d = L[list(CSV_COLS)].rename(columns=CSV_COLS).sort_values("listed_at")
+    d.to_csv(path, index=False, float_format="%.4f")
+
+
+def held_up_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
+    """Results page: of the bets whose match has started and that were checked again after being listed, how many were
+    still a better price than the consensus at the last check before kick-off."""
+    ko = pd.to_datetime(L["kickoff"], utc=True)
+    lc = pd.to_datetime(L["last_checked"], utc=True)
+    fl = pd.to_datetime(L["flagged_at"], utc=True)
+    d = L[(ko < now) & (lc > fl)]
+    if len(d) < 5:
+        return ""
+    held = (d["last_value"].astype(float) > 0).mean()
+    hours = float((ko - lc)[d.index].dt.total_seconds().median() / 3600)
+    pct = lambda x: f"{100 * x:+.1f}%"
+    return (f"<section class=section style='padding-top:26px;padding-bottom:0'><div class=wrap><h2>Did the prices hold up?</h2>"
+            f"<p class=sub>Winning or losing a few dozen bets is mostly luck. A fairer test is whether each price was still better "
+            f"than the consensus just before kick-off, once the news was in. This uses the last check before each match.</p>"
+            f"<div class=stats><div class=stat><div class=v>{100 * held:.0f}%</div><div class=l>still a better price than the "
+            f"consensus at the last check ({len(d)} bets)</div></div>"
+            f"<div class=stat><div class=v>{pct(d['edge'].astype(float).mean())}</div><div class=l>expected return when listed</div></div>"
+            f"<div class=stat><div class=v>{pct(d['last_value'].astype(float).mean())}</div><div class=l>expected return at the last check</div></div>"
+            f"<div class=stat><div class=v>{hours:.0f} hours</div><div class=l>typical time between the last check and kick-off</div></div></div>"
+            f"<p class=note>The last check is the morning update, so it isn't the exact kick-off price. Bets listed on the day of "
+            f"their match aren't checked again, so they're left out.</p></div></section>")
+
+
 def results_page(L: pd.DataFrame, stamp: str) -> str:
     """docs/results.html: the full track record."""
     from . import theme, viz
@@ -596,7 +632,10 @@ def results_page(L: pd.DataFrame, stamp: str) -> str:
     body = body.replace("<h2>How the picks have done.</h2>", "<h2>All time.</h2>", 1)
     body = body.replace("<section class=section style=padding-top:0>", "<section class=section style=padding-top:26px>", 1)
     body = body.replace("Every bet listed on this page since", "Every bet listed on the homepage since", 1)
-    body = last_week_html(L, pd.Timestamp.now(tz="America/New_York")) + body + breakdown_html(L)
+    body = body.replace("Profit assumes $100 on each bet.",
+                        "Profit assumes $100 on each bet. <a href=track-record.csv download>Download every bet (CSV)</a>.", 1)
+    now = pd.Timestamp.now(tz="America/New_York")
+    body = last_week_html(L, now) + body + held_up_html(L, now) + breakdown_html(L)
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 {theme.meta("results.html", "Results: how every pick has done · Today's Soccer Bets",
             "Every bet listed on Today's Soccer Bets, saved at the price shown and settled from the final score.")}
