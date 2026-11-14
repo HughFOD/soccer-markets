@@ -571,8 +571,8 @@ def odds_table(g: pd.DataFrame, min_n: int = 5) -> str:
             f"{''.join(rows)}</table></div>"
             f"<p class=note>Expected: what the odds and the consensus chance said each bet should return when it was listed. "
             f"The research found long shots are the most overpriced bets in general; this table shows over time whether that holds for these picks too. "
-            f"Since {HEAVY_RULE:%B %-d}, heavy favorites are only listed when they're expected to make at least $3 per $100, "
-            f"so most heavy favorites in this table are from before then.</p>")
+            f"Most of these heavy favorites date from before {HEAVY_RULE:%B %-d}, when they only needed a small edge to be "
+            f"listed. Now they need at least $3 per $100.</p>")
 
 
 def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
