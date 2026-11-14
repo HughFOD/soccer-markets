@@ -465,6 +465,12 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
                  ".bt .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}"
                  ".bt th{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink2)}"
                  ".bt .pos{color:var(--good)}.bt .neg{color:var(--bad,#c5221f)}.bt .muted{color:var(--muted)}"
+                 ".lw .pos,.best .pos{color:var(--good)}.lw .neg{color:var(--bad,#c5221f)}"
+                 ".best .b{font-size:17px;font-weight:600;margin:6px 0 4px;line-height:1.3;color:var(--ink)}"
+                 "@media (max-width:640px){.lw .best{grid-column:1/-1}}"
+                 ".best .b span{font-family:var(--mono);margin-left:6px}"
+                 ".dots{display:flex;flex-wrap:wrap;gap:5px;margin:16px 0 4px}.dots i{width:16px;height:16px;border-radius:3px;background:var(--hair)}"
+                 ".dots i.w{background:var(--good)}.dots i.l{background:var(--bad,#c5221f)}"
                  ".bth{margin:16px 0 4px;font-size:16px}.tw{overflow-x:auto}.bt.odds td:first-child .muted{display:block;font-size:12px}"
                  "@media (max-width:600px){.bt{font-size:13px}.bt th,.bt td{padding:7px 6px}.bt th{font-size:11px;white-space:normal}"
                  ".bt th:nth-child(3),.bt td:nth-child(3){display:none}.bt td .muted{display:block;font-size:12px}.bt .num{white-space:normal}}")
@@ -522,6 +528,7 @@ def breakdown_html(L: pd.DataFrame, min_n: int = 5) -> str:
             f"{odds_table(g, min_n)}</div></section>")
 
 
+HEAVY_RULE = pd.Timestamp("2026-11-09", tz="America/New_York")   # heavy favorites need +$3 per $100 from this date
 ODDS_BANDS = [("Heavy favorites", "−600 or shorter", 1.0, 1 + 100 / 600),
               ("Favorites", "−599 to −200", 1 + 100 / 600, 1.5),
               ("Mild favorites", "−199 to −101", 1.5, 2.0),
@@ -563,7 +570,9 @@ def odds_table(g: pd.DataFrame, min_n: int = 5) -> str:
             f"<th class=num>Won</th><th class=num>Expected per $100</th><th class=num>Actual per $100 (95% range)</th></tr>"
             f"{''.join(rows)}</table></div>"
             f"<p class=note>Expected: what the odds and the consensus chance said each bet should return when it was listed. "
-            f"The research found long shots are the most overpriced bets in general; this table shows over time whether that holds for these picks too.</p>")
+            f"The research found long shots are the most overpriced bets in general; this table shows over time whether that holds for these picks too. "
+            f"Since {HEAVY_RULE:%B %-d}, heavy favorites are only listed when they're expected to make at least $3 per $100, "
+            f"so most heavy favorites in this table are from before then.</p>")
 
 
 def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
@@ -581,10 +590,21 @@ def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
     won = int(w["result"].isin(["won", "half won"]).sum()); lost = int(w["result"].isin(["lost", "half lost"]).sum())
     best = w.loc[w["profit"].idxmax()]
     last = (end - pd.Timedelta(days=1))
+    profit = float(w["profit"].sum())
+    tone = "pos" if profit >= 0 else "neg"
+    w = w.assign(_ko=ko[w.index]).sort_values("_ko")
+    dots = "".join(f"<i class={'w' if r in ('won', 'half won') else 'l' if r in ('lost', 'half lost') else 'p'} "
+                   f"title='{html.escape(str(b))}: {r}'></i>" for b, r in zip(w["bet"], w["result"]))
+    e = html.escape
     return (f"<section class=section style='padding-top:26px;padding-bottom:0'><div class=wrap><h2>Last week.</h2>"
-            f"<p class=sub>{start.strftime('%b %-d')} – {last.strftime('%b %-d')}: <b>{len(w)} bets settled, {won}–{lost}</b>, "
-            f"{_usd(w['profit'].sum())} at $100 a bet. Best result: {html.escape(str(best['bet']))} "
-            f"({html.escape(str(best['match']))}), {_usd(best['profit'])}.</p></div></section>")
+            f"<p class=sub>{start.strftime('%b %-d')} – {last.strftime('%b %-d')} · {len(w)} bets settled</p>"
+            f"<div class='stats lw'><div class=stat><div class=v>{won}–{lost}</div><div class=l>won–lost</div></div>"
+            f"<div class=stat><div class='v {tone}'>{_usd(profit)}</div><div class=l>profit from $100 on each "
+            f"({100 * profit / (100 * len(w)):+.1f}%)</div></div>"
+            f"<div class='stat best'><div class=l>Best result</div><div class=b>{e(str(best['bet']))} "
+            f"<span class=pos>{_usd(best['profit'])}</span></div><div class=l>{e(str(best['match']))}</div></div></div>"
+            f"<div class=dots aria-label='Each bet in kick-off order: green won, red lost'>{dots}</div>"
+            f"<p class=note>Each square is one bet, in kick-off order: green won, red lost.</p></div></section>")
 
 
 CSV_COLS = {"flagged_at": "listed_at", "kickoff": "kickoff", "league": "league", "match": "match", "bet": "bet",
