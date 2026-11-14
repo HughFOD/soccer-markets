@@ -10,7 +10,7 @@ from pathlib import Path
 
 from . import theme
 from .site import CSS
-from .usbooks import SITES, SPORTS
+from .usbooks import CLUBS, NATIONAL, SITES
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -26,7 +26,7 @@ def build() -> str:
     e = html.escape
     books = [n for n, k in SITES.values() if k == "Sportsbook"]
     markets = [n for n, k in SITES.values() if k != "Sportsbook"]
-    leagues = list(SPORTS.values())
+    leagues = list(CLUBS.values())
     return f"""<!doctype html><html lang=en><head>{theme.HEAD}
 {theme.meta("about.html", "About · Today's Soccer Bets",
             "How Today's Soccer Bets chooses each bet, which sites and competitions it covers, and how its picks are scored.")}
@@ -57,7 +57,9 @@ if they're expected to return at least $3 per $100: they pay so little that a sm
 <ul class=facts>
 <li><b>Sportsbooks:</b> {e(', '.join(books))}.</li>
 <li><b>Prediction markets:</b> {e(' and '.join(markets))}.</li>
-<li><b>Competitions:</b> {e(', '.join(leagues))}.</li>
+<li><b>Club competitions:</b> {e(', '.join(leagues))}.</li>
+<li><b>National teams:</b> {e(', '.join(NATIONAL.values()))}, whenever they're being played. The research behind the
+method used club matches, so national team picks haven't been tested the same way.</li>
 <li><b>Bets:</b> the match result and total goals for every match. On match day, corners, cards, player bets and more are added.</li>
 <li><b>Updates:</b> the odds are refreshed every morning, New York time. Once a match kicks off, it disappears from the lists.</li>
 </ul>

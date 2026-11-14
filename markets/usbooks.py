@@ -34,6 +34,14 @@ SPORTS = {"soccer_epl": "Premier League", "soccer_efl_champ": "Championship", "s
           "soccer_germany_dfb_pokal": "DFB-Pokal", "soccer_spain_copa_del_rey": "Copa del Rey",
           "soccer_italy_coppa_italia": "Coppa Italia", "soccer_france_coupe_de_france": "Coupe de France",
           "soccer_england_efl_cup": "Carabao Cup", "soccer_uefa_europa_conference_league": "Conference League"}
+# National teams. A competition that's out of season returns no matches, and The Odds API doesn't charge for those.
+NATIONAL = {"soccer_uefa_nations_league": "Nations League", "soccer_uefa_euro_qualification": "Euro qualifiers",
+            "soccer_fifa_world_cup_qualifiers_europe": "World Cup qualifiers (Europe)",
+            "soccer_fifa_world_cup_qualifiers_south_america": "World Cup qualifiers (South America)",
+            "soccer_fifa_world_cup": "World Cup", "soccer_uefa_european_championship": "Euro",
+            "soccer_conmebol_copa_america": "Copa América", "soccer_africa_cup_of_nations": "Africa Cup of Nations"}
+CLUBS = dict(SPORTS)
+SPORTS = {**SPORTS, **NATIONAL}
 REGIONS = ("us", "us_ex")
 SITES = {  # key -> (display name, kind). Only these sites are used, listed by US market share
     # (sportsbooks: Q3 2026 revenue share; prediction markets: trading volume).
