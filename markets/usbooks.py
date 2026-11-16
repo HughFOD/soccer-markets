@@ -109,11 +109,12 @@ def fetch(key: str, sport: str, region: str, markets: str = "h2h") -> tuple[list
 
 def download(key: str, dest: Path) -> dict:
     """Save the raw responses (so pages can be rebuilt without spending credits)."""
-    out, remaining = {}, None
+    out, remaining, first = {}, None, None
     for sport in SPORTS:
         for region in REGIONS:
             try:
                 out[f"{sport}|{region}"], remaining = fetch(key, sport, region)
+                first = first if first is not None else remaining
             except Exception as e:  # league out of season, or a temporary error
                 print(f"  skipped {sport} {region}: {e}")
                 out[f"{sport}|{region}"] = []
@@ -127,19 +128,31 @@ def download(key: str, dest: Path) -> dict:
         except Exception as e:
             print(f"  skipped {sport} totals: {e}")
     from . import extras
-    before = remaining
-    ext, remaining = extras.download(key, out, remaining)
-    if ext:
-        try:
-            used = float(before) - float(remaining)
-        except (TypeError, ValueError):
-            used = float("nan")
-        print(f"  extra markets for {len(ext)} matches ({used:.0f} credits)")
+    try:
+        base_used = float(first) - float(remaining) + 2   # + the first request itself (one league, one region)
+    except (TypeError, ValueError):
+        base_used = 60.0
+    after_base = remaining
+    ext, remaining, info = extras.download(key, out, remaining, base_per_day=max(base_used, 30.0))
+    log_credits({"date": datetime.now(timezone.utc).strftime("%Y-%m-%d"), "left_after_odds": after_base,
+                 "odds_used": round(base_used), **info, "left": remaining})
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(json.dumps({"fetched": datetime.now(timezone.utc).isoformat(), "remaining": remaining,
                                 "data": out, "extras": ext}))
     print(f"  saved {dest.name}; API credits left this month: {remaining}")
     return out
+
+
+def log_credits(row: dict, path: Path | None = None) -> None:
+    """data/credits.csv: one line per morning run, to keep an eye on the monthly allowance."""
+    import csv
+    path = path or Path(__file__).resolve().parent.parent / "data" / "credits.csv"
+    new = not path.exists()
+    with path.open("a", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(row))
+        if new:
+            w.writeheader()
+        w.writerow(row)
 
 
 def soon_sports(raw: dict, now: pd.Timestamp | None = None, days: int = TOTALS_DAYS,
