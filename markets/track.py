@@ -389,6 +389,13 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
     w, lo = g["result"].isin(["won", "half won"]).sum(), g["result"].isin(["lost", "half lost"]).sum()
     pu = (g["result"] == "push").sum()
     pbar = float((1 / g["odds"].astype(float)).mean())
+    exp_won, exp_profit = float(g["chance"].astype(float).sum()), float(100 * g["edge"].astype(float).sum())
+    tiles_full = (f"<div class='stats lw'><div class=stat><div class=v>{w} won<span class=e>expected {exp_won:.1f}</span></div>"
+                  f"<div class=l>out of {n}{f', {pu} push' if pu else ''}</div></div>"
+                  f"<div class=stat><div class='v {'pos' if profit >= 0 else 'neg'}'>{_usd(profit)}<span class=e>expected {_usd(exp_profit)}</span></div>"
+                  f"<div class=l>profit from $100 on each</div></div>"
+                  f"<div class=stat><div class=v>{american(1 / pbar).replace('-', chr(8722))}</div><div class=l>average odds "
+                  f"({100 * pbar:.0f}% chance)</div></div></div>")
     tiles = (f"<div class=stats><div class=stat><div class=v>{w}–{lo}{f'–{pu}' if pu else ''}</div><div class=l>won–lost{'–push' if pu else ''}</div></div>"
              f"<div class=stat><div class=v>{_usd(profit)}</div><div class=l>profit from $100 on each ({100 * profit / (100 * n):+.1f}%)</div></div>"
              + (f"<div class=stat><div class=v>{_usd(100 * g['edge'].astype(float).sum())}</div><div class=l>expected profit when listed "
@@ -406,6 +413,15 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
         f"<td>{pd.Timestamp(r['kickoff']).tz_convert('America/New_York'):%b %-d}</td><td>{e(r['bet'])}<br><span class=kind>{e(r['match'])}</span></td>"
         f"<td>{e(site1(r))}</td><td class=n>{american(float(r['odds']))}</td>"
         f"<td class=n>{e(r['result'])}</td><td class=n>{_usd(float(r['profit']))}</td></tr>"
+        for _, r in allbets.iterrows())
+    odds_m = lambda d: american(float(d)).replace("-", "\u2212")
+    rows_full = "".join(
+        f"<tr data-r={simple(r['result'])} data-lg=\"{e(r['league'])}\" data-st=\"{e(site1(r))}\">"
+        f"<td>{pd.Timestamp(r['kickoff']).tz_convert('America/New_York'):%b %-d}</td>"
+        f"<td>{e(r['bet'])}<span class=kind>{e(r['match'])} \u00b7 {e(site1(r))}</span></td>"
+        f"<td class=num>{odds_m(r['odds'])}</td><td class=num>{100 * float(r['chance']):.0f}%</td>{_morning(r)}"
+        f"<td class='num {'pos' if r['profit'] > 0 else 'neg' if r['profit'] < 0 else ''}'>"
+        f"{str(r['result']).capitalize()} {_usd(float(r['profit']))}</td></tr>"
         for _, r in allbets.iterrows())
     recent = "".join(re.sub(r"^<tr [^>]*>", "<tr>", x) for x in re.findall(r"<tr data-r.*?</tr>", rows)[:10])
     counts = {"all": len(allbets), "won": int(w), "lost": int(lo), "push": int(pu)}
@@ -442,13 +458,15 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
             "Bundesliga, Serie A, Ligue 1), aren't counted, because there's no free record of how they ended "
             f"({other} bet{'' if other == 1 else 's'} so far)." if other else "")
     return (f"<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>"
-            f"{tiles}"
+            f"{tiles_full if full else tiles}"
             + (f"<p class=note>{note.strip()}</p>" if full and note else "" if full else
                f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
                f"several hundred.{note}</p>")
             + (f"<h3 class=tally id=rall>Every settled bet</h3>{filt}"
-               f"<div class=tablewrap><table class=rec><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th><th class=n>Result</th>"
-               f"<th class=n>Profit on $100</th></tr>{rows}</table></div>"
+               f"<div class=tablewrap><table class='bt rec2'><tr><th>Date</th><th>Bet</th><th class=num>Odds</th><th class=num>Chance</th>"
+               f"<th class=num>Match morning</th><th class=num>Result on $100</th></tr>{rows_full}</table></div>"
+               f"<p class=note>Chance: the bet's expected chance when it was listed. Match morning: the same chance at the last check "
+               f"before kick-off. Green means it went up, so the market moved toward the pick.</p>"
                f"<p class=rcount id=rcount></p><button class=rmore id=rmore hidden>Show more</button>{js}"
                + "<div class=chart-wrap style='margin:34px 0 6px'>" + profit_chart(g) + "</div>" if full else
                f"<h3 class=tally>Latest results</h3><div class=tablewrap><table class=rec><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th>"
@@ -491,14 +509,27 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
                  ".bt .pos{color:var(--good)}.bt .neg{color:var(--bad,#c5221f)}.bt .muted{color:var(--muted)}"
                  ".lw .pos,.best .pos{color:var(--good)}.lw .neg{color:var(--bad,#c5221f)}"
                  ".best .b{font-size:17px;font-weight:600;margin:6px 0 4px;line-height:1.3;color:var(--ink)}"
-                 "@media (max-width:640px){.lw .best{grid-column:1/-1}}"
+                 ".stats.lw{grid-template-columns:repeat(3,1fr)}.lw .arr{color:var(--muted);font-weight:400}.lw .e{font:500 14px var(--sans);color:var(--muted);margin-left:8px;letter-spacing:0}"
+                 "@media (max-width:640px){.lw .e{display:block;margin:2px 0 0;font-size:12px}.lw .stat .l{font-size:11.5px}}"
+                 ".lwrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 0 4px}"
+                 ".lwbtn{background:none;border:0;padding:0;font:inherit;font-size:15px;color:var(--link);cursor:pointer}"
+                 ".lwall{margin-top:10px}.lwall td:first-child .muted{display:block;font-size:12px}"
                  ".best .b span{font-family:var(--mono);margin-left:6px}"
-                 ".dots{display:flex;flex-wrap:wrap;gap:5px;margin:16px 0 4px}.dots i{width:16px;height:16px;border-radius:3px;background:var(--hair)}"
+                 ".dots{display:flex;flex-wrap:wrap;gap:6px;margin:0}.dots i{font:600 12px var(--mono);font-style:normal;padding:3px 7px;border-radius:4px;background:var(--hair);color:var(--bg)}"
                  ".dots i.w{background:var(--good)}.dots i.l{background:var(--bad,#c5221f)}"
-                 "@media (max-width:600px){.stats.hu{grid-template-columns:1fr}}"
+                 "@media (max-width:600px){.stats.hu{grid-template-columns:1fr}.stats.hu .e{display:inline}}"
                  ".bth{margin:16px 0 4px;font-size:16px}.tw{overflow-x:auto}.bt.odds td:first-child .muted{display:block;font-size:12px}"
                  "@media (max-width:600px){.bt{font-size:13px}.bt th,.bt td{padding:7px 6px}.bt th{font-size:11px;white-space:normal}"
-                 ".bt th:nth-child(3),.bt td:nth-child(3){display:none}.bt td .muted{display:block;font-size:12px}.bt .num{white-space:normal}}")
+                 ".bt th:nth-child(3),.bt td:nth-child(3){display:none}.bt td .muted{display:block;font-size:12px}.bt .num{white-space:normal}}"
+                 ".rec2 .kind{display:block;font-size:12px;color:var(--muted)}.bt.rec2 td:first-child{white-space:nowrap;color:var(--muted)}"
+                 "@media (max-width:600px){.bt.rec2,.bt.rec2 tbody{display:block}.bt.rec2 tr:first-child{display:none}"
+                 ".bt.rec2 tr{display:grid;grid-template-columns:auto auto auto 1fr auto;column-gap:5px;row-gap:2px;padding:10px 0;border-bottom:1px solid var(--hair)}"
+                 ".bt.rec2 td{display:block;padding:0;border:0;background:none!important;font-size:13px;color:var(--muted);white-space:nowrap;text-align:left}"
+                 ".bt.rec2 td:nth-child(2){grid-column:1/5;grid-row:1;font-size:15px;color:var(--ink);white-space:normal}"
+                 ".bt.rec2 td:nth-child(6){grid-column:5;grid-row:1;text-align:right;font-family:var(--mono)}"
+                 ".bt.rec2 td.pos{color:var(--good)}.bt.rec2 td.neg{color:var(--bad,#c5221f)}"
+                 ".bt.rec2 td:nth-child(1)::after,.bt.rec2 td:nth-child(3)::after{content:' \u00b7'}.bt.rec2 td:nth-child(4)::after{content:' \u2192'}"
+                 ".bt.rec2 td:nth-child(5){grid-column:4}.bt.rec2 tr[hidden]{display:none}}")
 SETTLED = ["won", "lost", "push", "half won", "half lost"]
 
 
@@ -600,6 +631,14 @@ def odds_table(g: pd.DataFrame, min_n: int = 5) -> str:
             f"listed. Now they need at least $3 per $100.</p>")
 
 
+def _morning(r) -> str:
+    """The bet's chance at the last check before kick-off, with an arrow when it moved by more than half a point."""
+    lc = r["last_chance"] if pd.notna(r.get("last_chance")) else r["chance"]
+    d = round(100 * float(lc)) - round(100 * float(r["chance"]))     # only when the shown number changes
+    cls, arrow = ("pos", " \u2191") if d > 0 else ("neg", " \u2193") if d < 0 else ("", "")
+    return f"<td class='num {cls}'>{100 * float(lc):.0f}%{arrow}</td>"
+
+
 def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
     """Results page: the last seven days in one paragraph."""
     g = L[L["result"].isin(SETTLED)].copy()
@@ -612,24 +651,39 @@ def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
     w = g[(ko >= start) & (ko < end)]
     if not len(w):
         return ""
-    won = int(w["result"].isin(["won", "half won"]).sum()); lost = int(w["result"].isin(["lost", "half lost"]).sum())
-    best = w.loc[w["profit"].idxmax()]
+    won = int(w["result"].isin(["won", "half won"]).sum())
     last = (end - pd.Timedelta(days=1))
     profit = float(w["profit"].sum())
+    exp_won = float(w["chance"].sum())                       # a 57% bet counts as 0.57 of a win
+    exp_profit = float((100 * w["edge"]).sum())              # each bet's expected profit when listed
+    held = w["last_value"].where(w["last_value"].notna(), w["edge"])
+    good = int((held > 0).sum())
     tone = "pos" if profit >= 0 else "neg"
     w = w.assign(_ko=ko[w.index]).sort_values("_ko")
-    dots = "".join(f"<i class={'w' if r in ('won', 'half won') else 'l' if r in ('lost', 'half lost') else 'p'} "
-                   f"title='{html.escape(str(b))}: {r}'></i>" for b, r in zip(w["bet"], w["result"]))
     e = html.escape
+    odds = lambda d: american(float(d)).replace("-", "\u2212")
+    res = lambda r: "w" if r in ("won", "half won") else "l" if r in ("lost", "half lost") else "p"
+    dots = "".join(f"<i class={res(r)} title='{e(str(b))}: {r}'>{odds(o)}</i>"
+                   for b, r, o in zip(w["bet"], w["result"], w["odds"]))
+    rows = []
+    for _, r in w.iterrows():
+        rows.append(f"<tr><td>{e(str(r['bet']))}<span class=muted>{e(str(r['match']))} \u00b7 {e(str(r['sites']))}</span></td>"
+                    f"<td class=num>{odds(r['odds'])}</td><td class=num>{100 * r['chance']:.0f}%</td>{_morning(r)}"
+                    f"<td class='num {'pos' if r['profit'] > 0 else 'neg' if r['profit'] < 0 else ''}'>"
+                    f"{str(r['result']).capitalize()} {_usd(r['profit'])}</td></tr>")
+    table = ("<div class=tw><table class=bt><tr><th>Bet</th><th class=num>Odds</th><th class=num>Chance</th>"
+             f"<th class=num>Match morning</th><th class=num>Result</th></tr>{''.join(rows)}</table></div>")
+    btn = ("this.parentNode.nextElementSibling.hidden=!this.parentNode.nextElementSibling.hidden;"
+           "this.textContent=this.parentNode.nextElementSibling.hidden?'Show every bet \u203a':'Hide every bet'")
     return (f"<section class=section style='padding-top:26px;padding-bottom:0'><div class=wrap><h2>Last week.</h2>"
-            f"<p class=sub>{start.strftime('%b %-d')} – {last.strftime('%b %-d')} · {len(w)} bets settled</p>"
-            f"<div class='stats lw'><div class=stat><div class=v>{won}–{lost}</div><div class=l>won–lost</div></div>"
-            f"<div class=stat><div class='v {tone}'>{_usd(profit)}</div><div class=l>profit from $100 on each "
-            f"({100 * profit / (100 * len(w)):+.1f}%)</div></div>"
-            f"<div class='stat best'><div class=l>Best result</div><div class=b>{e(str(best['bet']))} "
-            f"<span class=pos>{_usd(best['profit'])}</span></div><div class=l>{e(str(best['match']))}</div></div></div>"
-            f"<div class=dots aria-label='Each bet in kick-off order: green won, red lost'>{dots}</div>"
-            f"<p class=note>Each square is one bet, in kick-off order: green won, red lost.</p></div></section>")
+            f"<p class=sub>{start.strftime('%b %-d')} \u2013 {last.strftime('%b %-d')} \u00b7 {len(w)} bets settled</p>"
+            f"<div class='stats lw'><div class=stat><div class=v>{good} of {len(w)}</div><div class=l>still a good bet on match morning</div></div>"
+            f"<div class=stat><div class=v>{won} won<span class=e>expected {exp_won:.1f}</span></div><div class=l>out of {len(w)}</div></div>"
+            f"<div class=stat><div class='v {tone}'>{_usd(profit)}<span class=e>expected {_usd(exp_profit)}</span></div>"
+            f"<div class=l>profit from $100 on each</div></div></div>"
+            f"<div class=lwrow><div class=dots aria-label='Each bet in kick-off order with its odds: green won, red lost'>{dots}</div>"
+            f"<button type=button class=lwbtn onclick=\"{btn}\">Show every bet \u203a</button></div>"
+            f"<div class=lwall hidden>{table}</div></div></section>")
 
 
 CSV_COLS = {"flagged_at": "listed_at", "kickoff": "kickoff", "league": "league", "match": "match", "bet": "bet",
@@ -653,20 +707,23 @@ def held_up_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
     d = L[(ko < now) & (lc > fl)]
     if len(d) < 5:
         return ""
-    held = (d["last_value"].astype(float) > 0).mean()
-    hours = float((ko - lc)[d.index].dt.total_seconds().median() / 3600)
-    pct = lambda x: f"{100 * x:+.1f}%"
     n_held = int((d["last_value"].astype(float) > 0).sum())
+    hours = float((ko - lc)[d.index].dt.total_seconds().median() / 3600)
+    pct = lambda x: f"{100 * x:+.1f}%".replace("-", "\u2212")
+    before, after = float(d["edge"].astype(float).mean()), float(d["last_value"].astype(float).mean())
+    c0, c1 = float(d["chance"].astype(float).mean()), float(d["last_chance"].astype(float).mean())
+    moved = "toward" if after > before else "against"
     return (f"<section class=section style='padding-top:26px;padding-bottom:0'><div class=wrap><h2>Did the picks beat the market?</h2>"
-            f"<p class=sub>Winning or losing a few dozen bets is mostly luck. A fairer test: was each pick still a better price "
-            f"than the other sites on the morning of the match, once more news was in?</p>"
-            f"<div class='stats hu'><div class=stat><div class=v>{100 * held:.0f}%</div><div class=l>of picks were still a better "
-            f"price on the morning of the match ({n_held} of {len(d)})</div></div>"
-            f"<div class=stat><div class=v style=white-space:nowrap>{pct(d['edge'].astype(float).mean())} → {pct(d['last_value'].astype(float).mean())}</div>"
-            f"<div class=l>how much the average pick was worth when listed, and on the morning of the match. It went up, so the "
-            f"market moved toward the picks.</div></div></div>"
-            f"<p class=note>The site checks prices once a day, early in the morning, so the last check is usually about "
-            f"{hours:.0f} hours before kick-off. Picks listed on the morning of their match aren't checked again, so they're left out.</p></div></section>")
+            f"<p class=sub>A few dozen wins and losses are mostly luck. A better test is whether the other sites agreed with each pick "
+            f"by the morning of the match, once the team news was in.</p>"
+            f"<div class='stats lw hu'><div class=stat><div class=v>{n_held} of {len(d)}</div>"
+            f"<div class=l>still a good bet on match morning</div></div>"
+            f"<div class=stat><div class=v>{100 * c0:.0f}% <span class=arr>\u2192</span> {100 * c1:.0f}%</div>"
+            f"<div class=l>average chance when listed, then on match morning</div></div>"
+            f"<div class=stat><div class='v {'pos' if after > 0 else 'neg'}'>{pct(before)} <span class=arr>\u2192</span> {pct(after)}</div>"
+            f"<div class=l>average expected return, when listed then on match morning</div></div></div>"
+            f"<p class=note>The market moved {moved} the picks. Odds are checked once a day, early in the morning, usually about "
+            f"{hours:.0f} hours before kick-off. Picks first listed on match morning have no second check, so they're left out.</p></div></section>")
 
 
 def results_page(L: pd.DataFrame, stamp: str) -> str:
