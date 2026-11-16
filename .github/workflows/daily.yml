@@ -38,6 +38,7 @@ jobs:
           git add docs/index.html docs/this-week.html docs/best-prices.html docs/search.html docs/about.html docs/results.html docs/research.html docs/track-record.csv data/track_record.csv
           if [ -f data/odds_history.csv ]; then git add data/odds_history.csv; fi
           if [ -f data/credits.csv ]; then git add data/credits.csv; fi
+          git add docs/og.png docs/week-*.html 2>/dev/null || true
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git commit -m "Daily odds update $(date -u +%Y-%m-%d)"
           git push
