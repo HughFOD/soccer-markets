@@ -419,7 +419,7 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
         f"<tr data-r={simple(r['result'])} data-lg=\"{e(r['league'])}\" data-st=\"{e(site1(r))}\">"
         f"<td>{pd.Timestamp(r['kickoff']).tz_convert('America/New_York'):%b %-d}</td>"
         f"<td>{e(r['bet'])}<span class=kind>{e(r['match'])} \u00b7 {e(site1(r))}</span></td>"
-        f"<td class=num>{odds_m(r['odds'])}</td><td class=num>{100 * float(r['chance']):.0f}%</td>{_morning(r)}"
+        f"<td class=num>{odds_m(r['odds'])}</td>{_chance(r)}"
         f"<td class='num {'pos' if r['profit'] > 0 else 'neg' if r['profit'] < 0 else ''}'>"
         f"{str(r['result']).capitalize()} {_usd(float(r['profit']))}</td></tr>"
         for _, r in allbets.iterrows())
@@ -464,9 +464,9 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
                f"several hundred.{note}</p>")
             + (f"<h3 class=tally id=rall>Every settled bet</h3>{filt}"
                f"<div class=tablewrap><table class='bt rec2'><tr><th>Date</th><th>Bet</th><th class=num>Odds</th><th class=num>Chance</th>"
-               f"<th class=num>Match morning</th><th class=num>Result on $100</th></tr>{rows_full}</table></div>"
-               f"<p class=note>Chance: the bet's expected chance when it was listed. Match morning: the same chance at the last check "
-               f"before kick-off. Green means it went up, so the market moved toward the pick.</p>"
+               f"<th class=num>Result on $100</th></tr>{rows_full}</table></div>"
+               f"<p class=note>Chance: how likely the bet was to win when it was listed. If that changed by the morning of the match, "
+               f"the new chance follows the arrow. Green: it went up, so the other sites moved toward the pick. Red: they moved away from it.</p>"
                f"<p class=rcount id=rcount></p><button class=rmore id=rmore hidden>Show more</button>{js}"
                + "<div class=chart-wrap style='margin:34px 0 6px'>" + profit_chart(g) + "</div>" if full else
                f"<h3 class=tally>Latest results</h3><div class=tablewrap><table class=rec><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th>"
@@ -526,10 +526,10 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
                  ".bt.rec2 tr{display:grid;grid-template-columns:auto auto auto 1fr auto;column-gap:5px;row-gap:2px;padding:10px 0;border-bottom:1px solid var(--hair)}"
                  ".bt.rec2 td{display:block;padding:0;border:0;background:none!important;font-size:13px;color:var(--muted);white-space:nowrap;text-align:left}"
                  ".bt.rec2 td:nth-child(2){grid-column:1/5;grid-row:1;font-size:15px;color:var(--ink);white-space:normal}"
-                 ".bt.rec2 td:nth-child(6){grid-column:5;grid-row:1;text-align:right;font-family:var(--mono)}"
-                 ".bt.rec2 td.pos{color:var(--good)}.bt.rec2 td.neg{color:var(--bad,#c5221f)}"
-                 ".bt.rec2 td:nth-child(1)::after,.bt.rec2 td:nth-child(3)::after{content:' \u00b7'}.bt.rec2 td:nth-child(4)::after{content:' \u2192'}"
-                 ".bt.rec2 td:nth-child(5){grid-column:4}.bt.rec2 tr[hidden]{display:none}}")
+                 ".bt.rec2 td:nth-child(5){grid-column:5;grid-row:1;text-align:right;font-family:var(--mono)}"
+                 ".bt.rec2 .pos{color:var(--good)}.bt.rec2 .neg{color:var(--bad,#c5221f)}"
+                 ".bt.rec2 td:nth-child(1)::after,.bt.rec2 td:nth-child(3)::after{content:' \u00b7'}"
+                 ".bt.rec2 td:nth-child(4){grid-column:3/5}.bt.rec2 td:nth-child(4)::after{content:' chance'}.bt.rec2 tr[hidden]{display:none}}")
 SETTLED = ["won", "lost", "push", "half won", "half lost"]
 
 
@@ -631,12 +631,14 @@ def odds_table(g: pd.DataFrame, min_n: int = 5) -> str:
             f"listed. Now they need at least $3 per $100.</p>")
 
 
-def _morning(r) -> str:
-    """The bet's chance at the last check before kick-off, with an arrow when it moved by more than half a point."""
+def _chance(r) -> str:
+    """The bet's chance when listed, and on match morning when that moved: "57% → 62%"."""
+    c0 = round(100 * float(r["chance"]))
     lc = r["last_chance"] if pd.notna(r.get("last_chance")) else r["chance"]
-    d = round(100 * float(lc)) - round(100 * float(r["chance"]))     # only when the shown number changes
-    cls, arrow = ("pos", " \u2191") if d > 0 else ("neg", " \u2193") if d < 0 else ("", "")
-    return f"<td class='num {cls}'>{100 * float(lc):.0f}%{arrow}</td>"
+    c1 = round(100 * float(lc))
+    if c1 == c0:
+        return f"<td class=num>{c0}%</td>"
+    return f"<td class=num>{c0}% <span class={'pos' if c1 > c0 else 'neg'}>\u2192 {c1}%</span></td>"
 
 
 def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
@@ -668,11 +670,11 @@ def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
     rows = []
     for _, r in w.iterrows():
         rows.append(f"<tr><td>{e(str(r['bet']))}<span class=muted>{e(str(r['match']))} \u00b7 {e(str(r['sites']))}</span></td>"
-                    f"<td class=num>{odds(r['odds'])}</td><td class=num>{100 * r['chance']:.0f}%</td>{_morning(r)}"
+                    f"<td class=num>{odds(r['odds'])}</td>{_chance(r)}"
                     f"<td class='num {'pos' if r['profit'] > 0 else 'neg' if r['profit'] < 0 else ''}'>"
                     f"{str(r['result']).capitalize()} {_usd(r['profit'])}</td></tr>")
     table = ("<div class=tw><table class=bt><tr><th>Bet</th><th class=num>Odds</th><th class=num>Chance</th>"
-             f"<th class=num>Match morning</th><th class=num>Result</th></tr>{''.join(rows)}</table></div>")
+             f"<th class=num>Result</th></tr>{''.join(rows)}</table></div>")
     btn = ("this.parentNode.nextElementSibling.hidden=!this.parentNode.nextElementSibling.hidden;"
            "this.textContent=this.parentNode.nextElementSibling.hidden?'Show every bet \u203a':'Hide every bet'")
     return (f"<section class=section style='padding-top:26px;padding-bottom:0'><div class=wrap><h2>Last week.</h2>"
