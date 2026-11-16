@@ -416,3 +416,14 @@ def test_results_page_lists_every_settled_bet_with_filters():
     assert "results.html" in home and "data-r=" not in home            # homepage: summary and a link only
     assert page.count("data-r=") == 4 and page.count("data-r=won") == 2  # half won counts as won
     assert "data-f=lost" in page and "data-f=push" in page and 'href="results.html" class=on' in page
+
+
+def test_extras_budget_spreads_credits_to_renewal():
+    import pandas as pd
+    from markets import extras
+    assert extras.days_to_renewal(pd.Timestamp("2026-11-16")) == 14
+    assert extras.days_to_renewal(pd.Timestamp("2026-11-30")) == 30
+    assert extras.days_to_renewal(pd.Timestamp("2027-02-27")) == 1      # renews on the 28th in February
+    # 2,000 left with 14 days to go: keep 300 back and 60 a day for the odds, share the rest evenly
+    assert round(extras.budget(2000, 60, pd.Timestamp("2026-11-16"))) == round((2000 - 300 - 60 * 13) / 14)
+    assert extras.budget(500, 60, pd.Timestamp("2026-11-16")) == 0
