@@ -385,11 +385,6 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
                 f"<p class=sub><b>{len(L)} bets recorded so far.</b> Results appear here once their matches finish."
                 + (f" So far, <b>{still}</b> of the bets re-checked before kick-off were still good value." if len(checked) else "")
                 + "</p></div></section>")
-    if not full:     # homepage: the record is in the boxes at the top; the details are on the Results page
-        return ("<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2>"
-                "<p class=sub>Every bet listed here is saved at the price first shown and settled after the match, assuming $100 on each.</p>"
-                "<p class=sub><a href=\"results.html\">See every result, and how the profit compares with what the odds expected&nbsp;›</a></p>"
-                "</div></section>")
     n, profit = len(g), g["profit"].sum()
     w, lo = g["result"].isin(["won", "half won"]).sum(), g["result"].isin(["lost", "half lost"]).sum()
     pu = (g["result"] == "push").sum()
@@ -429,6 +424,16 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
         f"{str(r['result']).capitalize()} {_usd(float(r['profit']))}</td></tr>"
         for _, r in allbets.iterrows())
     recent = "".join(re.sub(r"^<tr [^>]*>", "<tr>", x) for x in re.findall(r"<tr data-r.*?</tr>", rows)[:10])
+    if not full:     # homepage: the latest results; the record is in the boxes at the top, the rest on the Results page
+        latest = "".join(re.sub(r"^<tr [^>]*>", "<tr>", x) for x in re.findall(r"<tr data-r.*?</tr>", rows_full)[:6])
+        return ("<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2>"
+                "<p class=sub>Every bet listed here is saved at the price first shown and settled after the match, assuming $100 on each. "
+                "The latest results:</p>"
+                f"<style>{BREAKDOWN_CSS}</style>"
+                "<div class=tablewrap><table class='bt rec2'><tr><th>Date</th><th>Bet</th><th class=num>Odds</th><th class=num>Chance</th>"
+                f"<th class=num>Result on $100</th></tr>{latest}</table></div>"
+                "<p class=sub style='margin-top:16px'><a href=\"results.html\">See every result, and how the profit compares with what "
+                "the odds expected&nbsp;\u203a</a></p></div></section>")
     counts = {"all": len(allbets), "won": int(w), "lost": int(lo), "push": int(pu)}
     buttons = "".join(f'<button class=rfilt data-f={k}{" aria-pressed=true" if k == "all" else ""}>{lab}<span>{counts[k]}</span></button>'
                       for k, lab in (("all", "All"), ("won", "Won"), ("lost", "Lost"), ("push", "Push")) if k != "push" or pu)
