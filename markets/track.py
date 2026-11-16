@@ -462,11 +462,9 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
             + (f"<p class=note>{note.strip()}</p>" if full and note else "" if full else
                f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
                f"several hundred.{note}</p>")
-            + (f"<h3 class=tally id=rall>Every settled bet</h3>{filt}"
+            + (f"<h3 class=tally id=rall>Every settled bet</h3>{filt}{CHANCE_NOTE}"
                f"<div class=tablewrap><table class='bt rec2'><tr><th>Date</th><th>Bet</th><th class=num>Odds</th><th class=num>Chance</th>"
                f"<th class=num>Result on $100</th></tr>{rows_full}</table></div>"
-               f"<p class=note>Chance: how likely the bet was to win when it was listed. If that changed by the morning of the match, "
-               f"the new chance follows the arrow. Green: it went up, so the other sites moved toward the pick. Red: they moved away from it.</p>"
                f"<p class=rcount id=rcount></p><button class=rmore id=rmore hidden>Show more</button>{js}"
                + "<div class=chart-wrap style='margin:34px 0 6px'>" + profit_chart(g) + "</div>" if full else
                f"<h3 class=tally>Latest results</h3><div class=tablewrap><table class=rec><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th>"
@@ -509,10 +507,12 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
                  ".bt .pos{color:var(--good)}.bt .neg{color:var(--bad,#c5221f)}.bt .muted{color:var(--muted)}"
                  ".lw .pos,.best .pos{color:var(--good)}.lw .neg{color:var(--bad,#c5221f)}"
                  ".best .b{font-size:17px;font-weight:600;margin:6px 0 4px;line-height:1.3;color:var(--ink)}"
-                 ".stats.lw{grid-template-columns:repeat(3,1fr)}.lw .arr{color:var(--muted);font-weight:400}.lw .e{font:500 14px var(--sans);color:var(--muted);margin-left:8px;letter-spacing:0}"
+                 ".stats.lw{grid-template-columns:repeat(3,1fr)}.stats.lw2{grid-template-columns:repeat(2,1fr)}.lw .arr{color:var(--muted);font-weight:400}.lw .e{font:500 14px var(--sans);color:var(--muted);margin-left:8px;letter-spacing:0}"
                  "@media (max-width:640px){.lw .e{display:block;margin:2px 0 0;font-size:12px}.lw .stat .l{font-size:11.5px}}"
                  ".lwrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 0 4px}"
                  ".lwbtn{background:none;border:0;padding:0;font:inherit;font-size:15px;color:var(--link);cursor:pointer}"
+                 ".cnote{font-size:13px;color:var(--muted);margin:4px 0 10px;line-height:1.45}.cnote b{color:var(--ink2);font-weight:600}"
+                 ".cnote .pos{color:var(--good)}.cnote .neg{color:var(--bad,#c5221f)}"
                  ".lwall{margin-top:10px}.lwall td:first-child .muted{display:block;font-size:12px}"
                  ".best .b span{font-family:var(--mono);margin-left:6px}"
                  ".dots{display:flex;flex-wrap:wrap;gap:6px;margin:0}.dots i{font:600 12px var(--mono);font-style:normal;padding:3px 7px;border-radius:4px;background:var(--hair);color:var(--bg)}"
@@ -530,6 +530,9 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
                  ".bt.rec2 .pos{color:var(--good)}.bt.rec2 .neg{color:var(--bad,#c5221f)}"
                  ".bt.rec2 td:nth-child(1)::after,.bt.rec2 td:nth-child(3)::after{content:' \u00b7'}"
                  ".bt.rec2 td:nth-child(4){grid-column:3/5}.bt.rec2 td:nth-child(4)::after{content:' chance'}.bt.rec2 tr[hidden]{display:none}}")
+CHANCE_NOTE = ("<p class=cnote><b>Chance:</b> how likely each bet was to win, from all seven sites\u2019 odds with their margins removed. "
+               "An arrow shows how that changed by the morning of the match: <span class=pos>green</span> if it went up, "
+               "<span class=neg>red</span> if it went down.</p>")
 SETTLED = ["won", "lost", "push", "half won", "half lost"]
 
 
@@ -669,23 +672,24 @@ def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
                    for b, r, o in zip(w["bet"], w["result"], w["odds"]))
     rows = []
     for _, r in w.iterrows():
-        rows.append(f"<tr><td>{e(str(r['bet']))}<span class=muted>{e(str(r['match']))} \u00b7 {e(str(r['sites']))}</span></td>"
+        rows.append(f"<tr><td>{r['_ko']:%b %-d}</td><td>{e(str(r['bet']))}<span class=kind>{e(str(r['match']))} \u00b7 {e(str(r['sites']).split(',')[0].strip())}</span></td>"
                     f"<td class=num>{odds(r['odds'])}</td>{_chance(r)}"
                     f"<td class='num {'pos' if r['profit'] > 0 else 'neg' if r['profit'] < 0 else ''}'>"
                     f"{str(r['result']).capitalize()} {_usd(r['profit'])}</td></tr>")
-    table = ("<div class=tw><table class=bt><tr><th>Bet</th><th class=num>Odds</th><th class=num>Chance</th>"
+    table = ("<div class=tw><table class='bt rec2'><tr><th>Date</th><th>Bet</th><th class=num>Odds</th><th class=num>Chance</th>"
              f"<th class=num>Result</th></tr>{''.join(rows)}</table></div>")
     btn = ("this.parentNode.nextElementSibling.hidden=!this.parentNode.nextElementSibling.hidden;"
            "this.textContent=this.parentNode.nextElementSibling.hidden?'Show every bet \u203a':'Hide every bet'")
     return (f"<section class=section style='padding-top:26px;padding-bottom:0'><div class=wrap><h2>Last week.</h2>"
             f"<p class=sub>{start.strftime('%b %-d')} \u2013 {last.strftime('%b %-d')} \u00b7 {len(w)} bets settled</p>"
-            f"<div class='stats lw'><div class=stat><div class=v>{good} of {len(w)}</div><div class=l>still a good bet on match morning</div></div>"
-            f"<div class=stat><div class=v>{won} won<span class=e>expected {exp_won:.1f}</span></div><div class=l>out of {len(w)}</div></div>"
+            f"<div class='stats lw lw2'><div class=stat><div class=v>{won} won<span class=e>expected {exp_won:.1f}</span></div><div class=l>out of {len(w)}</div></div>"
             f"<div class=stat><div class='v {tone}'>{_usd(profit)}<span class=e>expected {_usd(exp_profit)}</span></div>"
             f"<div class=l>profit from $100 on each</div></div></div>"
+            f"<p class=cnote style='margin:10px 0 0'><b>{'All ' + str(good) if good == len(w) and good > 1 else f'{good} of {len(w)}'}</b> "
+            f"{'was' if good == 1 and len(w) == 1 else 'were'} still a good bet on the morning of the match, once the team news was in.</p>"
             f"<div class=lwrow><div class=dots aria-label='Each bet in kick-off order with its odds: green won, red lost'>{dots}</div>"
             f"<button type=button class=lwbtn onclick=\"{btn}\">Show every bet \u203a</button></div>"
-            f"<div class=lwall hidden>{table}</div></div></section>")
+            f"<div class=lwall hidden>{CHANCE_NOTE}{table}</div></div></section>")
 
 
 CSV_COLS = {"flagged_at": "listed_at", "kickoff": "kickoff", "league": "league", "match": "match", "bet": "bet",
