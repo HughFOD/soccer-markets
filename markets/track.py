@@ -385,6 +385,11 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
                 f"<p class=sub><b>{len(L)} bets recorded so far.</b> Results appear here once their matches finish."
                 + (f" So far, <b>{still}</b> of the bets re-checked before kick-off were still good value." if len(checked) else "")
                 + "</p></div></section>")
+    if not full:     # homepage: the record is in the boxes at the top; the details are on the Results page
+        return ("<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2>"
+                "<p class=sub>Every bet listed here is saved at the price first shown and settled after the match, assuming $100 on each.</p>"
+                "<p class=sub><a href=\"results.html\">See every result, and how the profit compares with what the odds expected&nbsp;›</a></p>"
+                "</div></section>")
     n, profit = len(g), g["profit"].sum()
     w, lo = g["result"].isin(["won", "half won"]).sum(), g["result"].isin(["lost", "half lost"]).sum()
     pu = (g["result"] == "push").sum()
@@ -688,7 +693,9 @@ def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
             f"{'was' if good == 1 and len(w) == 1 else 'were'} still a good bet on the morning of the match, once the team news was in.</p>"
             f"<div class=lwrow><div class=dots aria-label='Each bet in kick-off order with its odds: green won, red lost'>{dots}</div>"
             f"<button type=button class=lwbtn onclick=\"{btn}\">Show every bet \u203a</button></div>"
-            f"<div class=lwall hidden>{CHANCE_NOTE}{table}</div><div style='height:18px'></div></div></section>")
+            f"<div class=lwall hidden>{CHANCE_NOTE}{table}</div>"
+            f"<p class=cnote style='margin:12px 0 0'><a href=\"{week_file(start.tz_localize(None))}\">Every week \u203a</a></p>"
+            f"<div style='height:18px'></div></div></section>")
 
 
 CSV_COLS = {"flagged_at": "listed_at", "kickoff": "kickoff", "league": "league", "match": "match", "bet": "bet",
@@ -729,6 +736,74 @@ def held_up_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
             f"<div class=l>average expected return, when listed then on match morning</div></div></div>"
             f"<p class=note>The market moved {moved} the picks. Odds are checked once a day, early in the morning, usually about "
             f"{hours:.0f} hours before kick-off. Picks first listed on match morning have no second check, so they're left out.</p></div></section>")
+
+
+def _weeks(L: pd.DataFrame) -> pd.DataFrame:
+    """Settled bets with the Sunday (New York time) that starts their week."""
+    g = L[L["result"].isin(SETTLED)].copy()
+    ko = pd.to_datetime(g["kickoff"], utc=True).dt.tz_convert("America/New_York")
+    g["wk"] = pd.to_datetime(ko.dt.date) - pd.to_timedelta(((ko.dt.dayofweek + 1) % 7).values, unit="D")
+    return g
+
+
+def week_file(wk) -> str:
+    return f"week-{pd.Timestamp(wk):%Y-%m-%d}.html"
+
+
+def week_pages(L: pd.DataFrame, stamp: str) -> dict:
+    """docs/week-YYYY-MM-DD.html: one page per finished week (Sunday to Saturday), with a list of every week."""
+    from . import theme
+    from .site import CSS
+    g = _weeks(L)
+    today = pd.Timestamp.now(tz="America/New_York").tz_localize(None).normalize()
+    this_sunday = today - pd.Timedelta(days=(today.dayofweek + 1) % 7)
+    weeks = sorted(w for w in g["wk"].unique() if pd.Timestamp(w) < this_sunday)
+    if not weeks:
+        return {}
+    rows = ""
+    for wk in reversed(weeks):
+        G = g[g["wk"] == wk]
+        p, end = float(G["profit"].sum()), pd.Timestamp(wk) + pd.Timedelta(days=6)
+        rows += (f"<a class=wkrow href=\"{week_file(wk)}\" data-wk=\"{week_file(wk)}\"><span>{pd.Timestamp(wk):%b %-d} \u2013 {end:%b %-d}</span>"
+                 f"<span>{int(G['result'].isin(['won', 'half won']).sum())} of {len(G)} won</span>"
+                 f"<span class={'pos' if p >= 0 else 'neg'}>{_usd(p)}</span>"
+                 f"<span class=muted>expected {_usd(100 * float(G['edge'].sum()))}</span></a>")
+    css = (".wkrow{display:grid;grid-template-columns:1.3fr 1fr .8fr 1fr;gap:10px;padding:12px 4px;border-bottom:1px solid var(--hair);"
+           "color:inherit;text-decoration:none;font-size:15px}.wkrow span:nth-child(n+3){text-align:right;font-family:var(--mono)}"
+           ".wkrow.cur{font-weight:600}.wkrow .pos{color:var(--good)}.wkrow .neg{color:var(--bad,#c5221f)}"
+           ".wkrow .muted{color:var(--muted);font-size:13px}.wknav{display:flex;justify-content:space-between;margin:6px 0 0;font-size:15px}"
+           "@media (max-width:560px){.wkrow{grid-template-columns:1fr auto auto;font-size:14px}.wkrow span:nth-child(4){display:none}}")
+    out = {}
+    for i, wk in enumerate(weeks):
+        wk = pd.Timestamp(wk)
+        end = wk + pd.Timedelta(days=6)
+        G = g[g["wk"] == wk]
+        won, lost = int(G["result"].isin(["won", "half won"]).sum()), int(G["result"].isin(["lost", "half lost"]).sum())
+        body = last_week_html(L, (wk + pd.Timedelta(days=7)).tz_localize("America/New_York"))
+        body = body.replace("<h2>Last week.</h2>", "<h2>The week in numbers.</h2>", 1)
+        body = re.sub(r"<p class=sub>[^<]*bets? settled</p>", "", body, count=1)
+        body = body.replace("<div class=lwall hidden>", "<div class=lwall>", 1)
+        body = re.sub(r"<button type=button class=lwbtn.*?</button>", "", body, flags=re.S)
+        prev = (f"<a href=\"{week_file(weeks[i - 1])}\">\u2039 {pd.Timestamp(weeks[i - 1]):%b %-d} \u2013 "
+                f"{pd.Timestamp(weeks[i - 1]) + pd.Timedelta(days=6):%b %-d}</a>" if i else "<span></span>")
+        nxt = (f"<a href=\"{week_file(weeks[i + 1])}\">{pd.Timestamp(weeks[i + 1]):%b %-d} \u2013 "
+               f"{pd.Timestamp(weeks[i + 1]) + pd.Timedelta(days=6):%b %-d} \u203a</a>" if i + 1 < len(weeks) else "<span></span>")
+        lede = (f"{len(G)} bet{'s' if len(G) != 1 else ''} settled: {won} won, {lost} lost, {_usd(float(G['profit'].sum()))} "
+                f"from $100 on each. The odds expected {_usd(100 * float(G['edge'].sum()))}.")
+        rows_here = rows.replace(f"class=wkrow href=\"{week_file(wk)}\"", f"class='wkrow cur' href=\"{week_file(wk)}\"")
+        title = f"Week of {wk:%b %-d} \u2013 {end:%b %-d}"
+        out[week_file(wk)] = f"""<!doctype html><html lang=en><head>{theme.HEAD}
+{theme.meta(week_file(wk), f"{title} · Today's Soccer Bets", lede)}
+<style>{CSS}{BREAKDOWN_CSS}{css}</style></head><body>
+{theme.nav("results")}
+<section class=hero><div class=wrap><p class=eyebrow>Weekly recap</p><h1>{title}.</h1>
+<p class=lede>{lede}</p><div class=wknav>{prev}{nxt}</div></div></section>
+{body}
+<section class=section><div class=wrap><h2>Every week.</h2>{rows_here}
+<p class=sub style="margin-top:18px"><a href="results.html">All results ›</a></p></div></section>
+{theme.footer()}
+</body></html>"""
+    return out
 
 
 def results_page(L: pd.DataFrame, stamp: str) -> str:

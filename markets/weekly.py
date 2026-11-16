@@ -160,6 +160,16 @@ def run(raw_dir: Path = ROOT / "data" / "raw", fixtures: Path | None = None, out
         from . import about
         (docs / "about.html").write_text(about.build())
         (docs / "results.html").write_text(track.results_page(L, stamp))
+        for name, page_html in track.week_pages(L, stamp).items():
+            (docs / name).write_text(page_html)
+        try:   # the link preview picture; never stops the update
+            from . import og
+            g = L[L["result"].isin(track.SETTLED)]
+            og.build(docs / "og.png", sum(len(b) for _, b in days), len(M), board.shape[0],
+                     float(g["profit"].sum()) if len(g) else None, float(100 * g["edge"].sum()) if len(g) else None,
+                     pd.Timestamp.now(tz="America/New_York").strftime("%a %b %-d"))
+        except Exception as e:
+            print(f"  link preview not updated: {e}")
         track.csv_export(L, docs / "track-record.csv")
         print(f"{len(M)} matches across {board.shape[0]} sites, {int((M['flag'] != '').sum()) if len(M) else 0} flagged -> docs/index.html")
         return M

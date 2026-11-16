@@ -19,6 +19,7 @@ ET = ZoneInfo("America/New_York")
 REPO_URL = "https://github.com/HughFOD/soccer-markets"
 
 CSS = theme.CSS + """
+.bet-win{font-size:12px;color:var(--muted);margin-top:2px}
 .picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
 .pick{background:var(--bg2);border-radius:var(--r);padding:22px 22px 20px;display:flex;flex-direction:column;gap:4px}
 .pick .meta{font-size:13px;color:var(--muted)}
@@ -291,7 +292,7 @@ def days_html(days: list[tuple[str, list[dict]]]) -> str:
 <div class=bet-main><div class=bet-what>{e(b['bet'])}</div>
 <div class=bet-match>{e(b['match'])} · {e(b['league'])} · {b['ko'].strftime('%-I:%M %p')} ET</div>
 <div class=bet-why>Expected to win <b>{chance_pair(b['chance'], b['paid'])[0]}</b> of the time, paid as if <b>{chance_pair(b['chance'], b['paid'])[1]}</b></div>{moved_html(b)}</div>
-<div class=bet-where><div class=bet-odds>{b['odds'].replace('-', '−')}</div><div class=bet-site>{e(' or '.join(b['sites']))}</div></div>
+<div class=bet-where><div class=bet-odds>{b['odds'].replace('-', '−')}</div><div class=bet-win>$100 wins ${100 * (float(b['dec']) - 1):,.0f}</div><div class=bet-site>{e(' or '.join(b['sites']))}</div></div>
 <div class=bet-value><span class=edge>+${100 * b['edge']:.2f}</span><div class=bet-chance>expected per $100</div></div>
 {why_html(b)}</li>"""
                         for k, b in enumerate(bets, 1))
@@ -379,7 +380,7 @@ def build(M: pd.DataFrame, quotes: pd.DataFrame, board: pd.DataFrame, R: dict | 
 
 <section class=section id=best style="padding-bottom:0"><div class=wrap>
 <h2>Ranked by expected return.</h2>
-<p class=sub>Odds reflect each site’s implied probability plus its cut. By removing this cut and averaging the data across all {nw} sites, we estimate the true probability of an outcome. When a specific site offers higher payouts than this probability warrants, the wager appears below, ranked by value. The green figure represents your expected return per $100 wagered.</p>
+<p class=sub>Odds are each site’s estimate of how likely a result is, plus its profit margin. Remove each site’s margin, average all {nw}, and you get the most accurate estimate of each result’s true chance. When one site pays more than that chance deserves, the bet is listed here, ranked by how much it overpays. The green number is the expected profit per $100 bet.</p>
 <p class=note style="margin:-22px 0 22px">Kalshi and Polymarket odds are shown after their trading fee.</p>
 </div></section>
 
