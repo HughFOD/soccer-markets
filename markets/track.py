@@ -378,7 +378,7 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
     checked = L[pd.to_datetime(L["last_checked"], utc=True) > pd.to_datetime(L["flagged_at"], utc=True)]
     still = f"{100 * (checked['last_value'] > 0).mean():.0f}%" if len(checked) else "–"
     intro = (f"Every bet listed on this page since {start:%B %-d, %Y}, is saved at the price first shown. "
-             "Before kick-off it's checked again against the latest odds, and after the match it's settled "
+             "On the morning of the match it's checked again against the latest odds, and after the match it's settled "
              "from the final score. Profit assumes $100 on each bet.")
     if not len(g):
         return (f"<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>"
@@ -390,12 +390,12 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
     pu = (g["result"] == "push").sum()
     pbar = float((1 / g["odds"].astype(float)).mean())
     exp_won, exp_profit = float(g["chance"].astype(float).sum()), float(100 * g["edge"].astype(float).sum())
-    tiles_full = (f"<div class='stats lw'><div class=stat><div class=v>{w} won<span class=e>expected {exp_won:.1f}</span></div>"
-                  f"<div class=l>out of {n}{f', {pu} push' if pu else ''}</div></div>"
-                  f"<div class=stat><div class='v {'pos' if profit >= 0 else 'neg'}'>{_usd(profit)}<span class=e>expected {_usd(exp_profit)}</span></div>"
-                  f"<div class=l>profit from $100 on each</div></div>"
-                  f"<div class=stat><div class=v>{american(1 / pbar).replace('-', chr(8722))}</div><div class=l>average odds "
-                  f"({100 * pbar:.0f}% chance)</div></div></div>")
+    tiles_full = (f"<div class='stats lw'><div class=stat><div class=v>{w} of {n}</div>"
+                  f"<div class=l>won{f', {pu} push' if pu else ''}<span class=x>{exp_won:.1f} expected</span></div></div>"
+                  f"<div class=stat><div class='v {'pos' if profit >= 0 else 'neg'}'>{_usd(profit)}</div>"
+                  f"<div class=l>profit, $100 a bet<span class=x>{_usd(exp_profit)} expected</span></div></div>"
+                  f"<div class=stat><div class=v>{american(1 / pbar).replace('-', chr(8722))}</div><div class=l>average odds"
+                  f"<span class=x>a {100 * pbar:.0f}% chance</span></div></div></div>")
     tiles = (f"<div class=stats><div class=stat><div class=v>{w}–{lo}{f'–{pu}' if pu else ''}</div><div class=l>won–lost{'–push' if pu else ''}</div></div>"
              f"<div class=stat><div class=v>{_usd(profit)}</div><div class=l>profit from $100 on each ({100 * profit / (100 * n):+.1f}%)</div></div>"
              + (f"<div class=stat><div class=v>{_usd(100 * g['edge'].astype(float).sum())}</div><div class=l>expected profit when listed "
@@ -459,6 +459,7 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
             f"({other} bet{'' if other == 1 else 's'} so far)." if other else "")
     return (f"<section class=section style=padding-top:0><div class=wrap><h2>How the picks have done.</h2><p class=sub>{intro}</p>"
             f"{tiles_full if full else tiles}"
+            + ("<div class=chart-wrap style='margin:22px 0 6px'>" + profit_chart(g) + "</div>" if full else "")
             + (f"<p class=note>{note.strip()}</p>" if full and note else "" if full else
                f"<p class=note>Wins and losses swing a lot over a few dozen bets, so the profit figure means little until there are "
                f"several hundred.{note}</p>")
@@ -466,7 +467,7 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
                f"<div class=tablewrap><table class='bt rec2'><tr><th>Date</th><th>Bet</th><th class=num>Odds</th><th class=num>Chance</th>"
                f"<th class=num>Result on $100</th></tr>{rows_full}</table></div>"
                f"<p class=rcount id=rcount></p><button class=rmore id=rmore hidden>Show more</button>{js}"
-               + "<div class=chart-wrap style='margin:34px 0 6px'>" + profit_chart(g) + "</div>" if full else
+ if full else
                f"<h3 class=tally>Latest results</h3><div class=tablewrap><table class=rec><tr><th>Date</th><th>Bet</th><th>Site</th><th class=n>Odds</th>"
                f"<th class=n>Result</th><th class=n>Profit on $100</th></tr>{recent}</table></div>"
                f"<p class=sub style='margin-top:18px'><a href=\"results.html\">See all {len(allbets)} bets, and filter by won or lost&nbsp;›</a></p>")
@@ -474,30 +475,26 @@ def html_section(L: pd.DataFrame, full: bool = False) -> str:
 
 
 def profit_chart(g: pd.DataFrame) -> str:
-    """Running profit from $100 on every settled bet, against the profit the odds said to expect when listed."""
+    """Running profit from $100 on every settled bet, day by day, against the profit the odds said to expect."""
     from . import viz
-    g = g.sort_values("kickoff")
     if len(g) < 5:
         return ""
-    ko = pd.to_datetime(g["kickoff"], utc=True).dt.tz_convert("America/New_York")
-    actual = g["profit"].astype(float).cumsum().round(2).tolist()
-    expected = (100 * g["edge"].astype(float)).cumsum().round(2).tolist()
-    days = [f"{d:%b %-d}" for d in ko]
-    # a date label at the first bet of each day, skipping any that would sit too close to the last one shown
-    gap, last, ticks = max(1, len(days) // 10), -10 ** 9, []
-    for i, d in enumerate(days):
-        show = (i == 0 or d != days[i - 1]) and i - last >= gap
-        ticks.append(d if show else "")
-        last = i if show else last
-    n = len(g)
-    return viz.chart("profit", "Running profit, bet by bet",
-                     "Blue: actual profit from $100 on each settled bet, in kick-off order. "
-                     "Orange: expected profit, based on the odds when each bet was listed.",
-                     {"type": "line", "x": [str(i + 1) for i in range(n)], "ticks": ticks, "fmt": "usd", "zero": True,
+    day = pd.to_datetime(g["kickoff"], utc=True).dt.tz_convert("America/New_York").dt.date
+    by = pd.DataFrame({"day": pd.to_datetime(day.values), "a": g["profit"].astype(float).values,
+                       "e": 100 * g["edge"].astype(float).values}).groupby("day")[["a", "e"]].sum()
+    days = pd.date_range(by.index.min() - pd.Timedelta(days=1), by.index.max())       # start from $0 the day before
+    by = by.reindex(days, fill_value=0).cumsum()
+    actual, expected = by["a"].round(2).tolist(), by["e"].round(2).tolist()
+    labels = [f"{d:%b %-d}" for d in days]
+    step = max(1, round(len(days) / 6))
+    ticks = [lab if (len(days) - 1 - i) % step == 0 else "" for i, lab in enumerate(labels)]   # always label the last day
+    return viz.chart("profit", "Actual profit against expected",
+                     "Blue: what $100 on every bet has made. Orange: what the odds said to expect. The gap between them is luck.",
+                     {"type": "line", "x": labels, "ticks": ticks, "fmt": "usd", "zero": True,
                       "series": [{"name": f"actual {actual[-1]:+,.0f}".replace("+", "+$").replace("-", "−$"), "values": actual, "color": "a"},
                                  {"name": f"expected {expected[-1]:+,.0f}".replace("+", "+$").replace("-", "−$"), "values": expected, "color": "b"}]},
-                     viz._table(["After bet", "Actual profit", "Expected profit"],
-                                [[f"{i + 1} ({days[i]})", f"{actual[i]:+,.0f}", f"{expected[i]:+,.0f}"] for i in range(n)][::-1]))
+                     viz._table(["Day", "Actual profit", "Expected profit"],
+                                [[labels[i], f"{actual[i]:+,.0f}", f"{expected[i]:+,.0f}"] for i in range(len(days))][::-1]))
 
 
 BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0 18px}"
@@ -507,8 +504,8 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
                  ".bt .pos{color:var(--good)}.bt .neg{color:var(--bad,#c5221f)}.bt .muted{color:var(--muted)}"
                  ".lw .pos,.best .pos{color:var(--good)}.lw .neg{color:var(--bad,#c5221f)}"
                  ".best .b{font-size:17px;font-weight:600;margin:6px 0 4px;line-height:1.3;color:var(--ink)}"
-                 ".stats.lw{grid-template-columns:repeat(3,1fr)}.stats.lw2{grid-template-columns:repeat(2,1fr)}.lw .arr{color:var(--muted);font-weight:400}.lw .e{font:500 14px var(--sans);color:var(--muted);margin-left:8px;letter-spacing:0}"
-                 "@media (max-width:640px){.lw .e{display:block;margin:2px 0 0;font-size:12px}.lw .stat .l{font-size:11.5px}}"
+                 ".lw .x{display:block;color:var(--muted);font-size:12.5px;margin-top:3px}.stats.lw{grid-template-columns:repeat(3,1fr)}.stats.lw2{grid-template-columns:repeat(2,1fr)}.lw .arr{color:var(--muted);font-weight:400}.lw .e{font:500 14px var(--sans);color:var(--muted);margin-left:8px;letter-spacing:0}"
+                 "@media (max-width:640px){.stats.lw .stat .v{font-size:21px;white-space:nowrap}.lw .e{display:block;margin:2px 0 0;font-size:12px}.lw .stat .l{font-size:11.5px}}"
                  ".lwrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:12px 0 4px}"
                  ".lwbtn{background:none;border:0;padding:0;font:inherit;font-size:15px;color:var(--link);cursor:pointer}"
                  ".cnote{font-size:13px;color:var(--muted);margin:4px 0 10px;line-height:1.45}.cnote b{color:var(--ink2);font-weight:600}"
@@ -645,13 +642,15 @@ def _chance(r) -> str:
 
 
 def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
-    """Results page: the last seven days in one paragraph."""
+    """Results page: last week, Sunday to Saturday (New York time), so it's the same week all week."""
     g = L[L["result"].isin(SETTLED)].copy()
     if not len(g):
         return ""
     et = "America/New_York"
-    end = now.tz_convert(et).normalize()
-    start = end - pd.Timedelta(days=7)
+    today = now.tz_convert(et).normalize()
+    end = today - pd.Timedelta(days=(today.dayofweek + 1) % 7)       # this week's Sunday
+    end = end.tz_localize(None).tz_localize(et)                      # midnight, even across a clock change
+    start = (end.tz_localize(None) - pd.Timedelta(days=7)).tz_localize(et)
     ko = pd.to_datetime(g["kickoff"], utc=True).dt.tz_convert(et)
     w = g[(ko >= start) & (ko < end)]
     if not len(w):
@@ -682,14 +681,14 @@ def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
            "this.textContent=this.parentNode.nextElementSibling.hidden?'Show every bet \u203a':'Hide every bet'")
     return (f"<section class=section style='padding-top:26px;padding-bottom:0'><div class=wrap><h2>Last week.</h2>"
             f"<p class=sub>{start.strftime('%b %-d')} \u2013 {last.strftime('%b %-d')} \u00b7 {len(w)} bets settled</p>"
-            f"<div class='stats lw lw2'><div class=stat><div class=v>{won} won<span class=e>expected {exp_won:.1f}</span></div><div class=l>out of {len(w)}</div></div>"
-            f"<div class=stat><div class='v {tone}'>{_usd(profit)}<span class=e>expected {_usd(exp_profit)}</span></div>"
-            f"<div class=l>profit from $100 on each</div></div></div>"
+            f"<div class='stats lw lw2'><div class=stat><div class=v>{won} of {len(w)}</div><div class=l>won<span class=x>{exp_won:.1f} expected</span></div></div>"
+            f"<div class=stat><div class='v {tone}'>{_usd(profit)}</div>"
+            f"<div class=l>profit, $100 a bet<span class=x>{_usd(exp_profit)} expected</span></div></div></div>"
             f"<p class=cnote style='margin:10px 0 0'><b>{'All ' + str(good) if good == len(w) and good > 1 else f'{good} of {len(w)}'}</b> "
             f"{'was' if good == 1 and len(w) == 1 else 'were'} still a good bet on the morning of the match, once the team news was in.</p>"
             f"<div class=lwrow><div class=dots aria-label='Each bet in kick-off order with its odds: green won, red lost'>{dots}</div>"
             f"<button type=button class=lwbtn onclick=\"{btn}\">Show every bet \u203a</button></div>"
-            f"<div class=lwall hidden>{CHANCE_NOTE}{table}</div></div></section>")
+            f"<div class=lwall hidden>{CHANCE_NOTE}{table}</div><div style='height:18px'></div></div></section>")
 
 
 CSV_COLS = {"flagged_at": "listed_at", "kickoff": "kickoff", "league": "league", "match": "match", "bet": "bet",
