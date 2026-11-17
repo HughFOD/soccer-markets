@@ -522,8 +522,11 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
                  ".cnote .pos{color:var(--good)}.cnote .neg{color:var(--bad,#c5221f)}"
                  ".lwall{margin-top:10px}.lwall td:first-child .muted{display:block;font-size:12px}"
                  ".best .b span{font-family:var(--mono);margin-left:6px}"
-                 ".dots{display:flex;flex-wrap:wrap;gap:6px;margin:0}.dots i{font:600 12px var(--mono);font-style:normal;padding:3px 7px;border-radius:4px;background:var(--hair);color:var(--bg)}"
-                 ".dots i.w{background:var(--good)}.dots i.l{background:var(--bad,#c5221f)}"
+                 ".dots{display:flex;flex-wrap:wrap;gap:6px;margin:0}.dots button{font:600 12px var(--mono);border:0;cursor:pointer;padding:3px 7px;border-radius:4px;"
+                 "background:var(--hair);color:var(--bg);transition:transform .12s,filter .12s}.dots button:hover{transform:translateY(-1px);filter:brightness(1.12)}"
+                 ".dots button:focus-visible{outline:2px solid var(--link);outline-offset:2px}"
+                 "tr.hl td,.bt.rec2 tr.hl{background:color-mix(in srgb,var(--link) 24%,transparent)!important}"
+                 ".dots .w{background:var(--good)}.dots .l{background:var(--bad,#c5221f)}"
                  "@media (max-width:600px){.stats.hu{grid-template-columns:1fr}.stats.hu .e{display:inline}}"
                  ".bth{margin:16px 0 4px;font-size:16px}.tw{overflow-x:auto}.bt.odds td:first-child .muted{display:block;font-size:12px}"
                  "@media (max-width:600px){.bt{font-size:13px}.bt th,.bt td{padding:7px 6px}.bt th{font-size:11px;white-space:normal}"
@@ -537,6 +540,13 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
                  ".bt.rec2 .pos{color:var(--good)}.bt.rec2 .neg{color:var(--bad,#c5221f)}"
                  ".bt.rec2 td:nth-child(1)::after,.bt.rec2 td:nth-child(3)::after{content:' \u00b7'}"
                  ".bt.rec2 td:nth-child(4){grid-column:3/5}.bt.rec2 td:nth-child(4)::after{content:' chance'}.bt.rec2 tr[hidden]{display:none}}")
+# Tapping a square under "Last week" opens the table, scrolls to that bet and highlights it for a moment.
+DOTS_JS = ("<script>document.addEventListener('click',function(ev){var d=ev.target.closest&&ev.target.closest('.dots button');if(!d)return;"
+           "var sec=d.closest('section'),all=sec.querySelector('.lwall'),b=sec.querySelector('.lwbtn');"
+           "if(all&&all.hidden){all.hidden=false;if(b)b.textContent='Hide every bet'}"
+           "var tr=sec.querySelector('tr[data-i=\"'+d.dataset.i+'\"]');if(!tr)return;"
+           "tr.scrollIntoView({behavior:'smooth',block:'center'});tr.classList.add('hl');"
+           "setTimeout(function(){tr.classList.remove('hl')},1800)})</script>")
 CHANCE_NOTE = ("<p class=cnote><b>Chance:</b> how likely each bet was to win, from all seven sites\u2019 odds with their margins removed. "
                "An arrow shows how that changed by the morning of the match: <span class=pos>green</span> if it went up, "
                "<span class=neg>red</span> if it went down.</p>")
@@ -677,11 +687,11 @@ def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
     e = html.escape
     odds = lambda d: american(float(d)).replace("-", "\u2212")
     res = lambda r: "w" if r in ("won", "half won") else "l" if r in ("lost", "half lost") else "p"
-    dots = "".join(f"<i class={res(r)} title='{e(str(b))}: {r}'>{odds(o)}</i>"
-                   for b, r, o in zip(w["bet"], w["result"], w["odds"]))
+    dots = "".join(f"<button type=button class={res(r)} data-i={i} title='{e(str(b))}: {r}' aria-label='{e(str(b))}, {r}. Show this bet'>{odds(o)}</button>"
+                   for i, (b, r, o) in enumerate(zip(w["bet"], w["result"], w["odds"])))
     rows = []
-    for _, r in w.iterrows():
-        rows.append(f"<tr><td>{r['_ko']:%b %-d}</td><td>{e(str(r['bet']))}<span class=kind>{e(str(r['match']))} \u00b7 {e(str(r['sites']).split(',')[0].strip())}</span></td>"
+    for i, (_, r) in enumerate(w.iterrows()):
+        rows.append(f"<tr data-i={i}><td>{r['_ko']:%b %-d}</td><td>{e(str(r['bet']))}<span class=kind>{e(str(r['match']))} \u00b7 {e(str(r['sites']).split(',')[0].strip())}</span></td>"
                     f"<td class=num>{odds(r['odds'])}</td>{_chance(r)}"
                     f"<td class='num {'pos' if r['profit'] > 0 else 'neg' if r['profit'] < 0 else ''}'>"
                     f"{str(r['result']).capitalize()} {_usd(r['profit'])}</td></tr>")
@@ -700,7 +710,7 @@ def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
             f"<button type=button class=lwbtn onclick=\"{btn}\">Show every bet \u203a</button></div>"
             f"<div class=lwall hidden>{CHANCE_NOTE}{table}</div>"
             f"<p class=cnote style='margin:12px 0 0'><a href=\"{week_file(start.tz_localize(None))}\">Every week \u203a</a></p>"
-            f"<div style='height:18px'></div></div></section>")
+            f"<div style='height:18px'></div></div></section>{DOTS_JS}")
 
 
 CSV_COLS = {"flagged_at": "listed_at", "kickoff": "kickoff", "league": "league", "match": "match", "bet": "bet",
