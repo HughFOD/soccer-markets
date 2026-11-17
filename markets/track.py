@@ -520,6 +520,7 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
                  ".lwbtn{background:none;border:0;padding:0;font:inherit;font-size:15px;color:var(--link);cursor:pointer}"
                  ".cnote{font-size:13px;color:var(--muted);margin:4px 0 10px;line-height:1.45}.cnote b{color:var(--ink2);font-weight:600}"
                  ".cnote .pos{color:var(--good)}.cnote .neg{color:var(--bad,#c5221f)}"
+                 ".vd{display:block;font:12px var(--sans);color:var(--muted);margin-top:1px}"
                  ".lwall{margin-top:10px}.lwall td:first-child .muted{display:block;font-size:12px}"
                  ".best .b span{font-family:var(--mono);margin-left:6px}"
                  ".dots{display:flex;flex-wrap:wrap;gap:6px;margin:0}.dots button{font:600 12px var(--mono);border:0;cursor:pointer;padding:3px 7px;border-radius:4px;"
@@ -569,6 +570,21 @@ def bet_type(kind: str) -> str:
     return "Other"
 
 
+def _verdict(x: pd.DataFrame, min_n: int) -> str:
+    """Average profit per $100 with a plain-words verdict instead of a range: is the group ahead, behind, or is it
+    too early to tell (its 95% range, from resampling the bets, runs from a loss to a profit)?"""
+    from .efficiency import mean_ci
+    w = int(x["result"].isin(["won", "half won"]).sum())
+    lo = int(x["result"].isin(["lost", "half lost"]).sum())
+    if len(x) < min_n:
+        return "<span class=vd>too few bets</span>"
+    if w == 0 or lo == 0:
+        return f"{_usd(x['profit'].mean())}<span class=vd>no {'losses' if lo == 0 else 'wins'} yet</span>"
+    est, a, b = mean_ci(x["profit"].to_numpy(float))
+    word = "ahead so far" if a > 0 else "behind so far" if b < 0 else "too early to tell"
+    return f"{_usd(est)}<span class=vd>{word}</span>"
+
+
 def breakdown_html(L: pd.DataFrame, min_n: int = 5) -> str:
     """Results page: settled bets by the site that paid the best price and by kind of bet, with each
     group's return per $100 bet and its 95% range (bootstrap), so small groups aren't over-read."""
@@ -583,23 +599,18 @@ def breakdown_html(L: pd.DataFrame, min_n: int = 5) -> str:
         rows = []
         for name, x in sorted(g.groupby(col), key=lambda kv: -len(kv[1])):
             w = int(x["result"].isin(["won", "half won"]).sum()); lo = int(x["result"].isin(["lost", "half lost"]).sum())
-            if len(x) >= min_n and (w == 0 or lo == 0):
-                ret = f"{_usd(x['profit'].mean())} <span class=muted>(no {'losses' if lo == 0 else 'wins'} yet)</span>"
-            elif len(x) >= min_n:
-                est, a, b = mean_ci(x["profit"].to_numpy(float))
-                ret = f"{_usd(est)} <span class=muted>({_usd(a)} to {_usd(b)})</span>"
-            else:
-                ret = "<span class=muted>too few bets</span>"
+            ret = _verdict(x, min_n)
             cls = "pos" if x["profit"].sum() >= 0.5 else "neg" if x["profit"].sum() <= -0.5 else ""
             rows.append(f"<tr><td>{html.escape(str(name))}</td><td class=num>{len(x)}</td><td class=num>{w}–{lo}</td>"
                         f"<td class='num {cls}'>{_usd(x['profit'].sum())}</td><td class=num>{ret}</td></tr>")
         return (f"<div class=tw><table class=bt><tr><th>{head}</th><th class=num>Bets</th><th class=num>Won–lost</th>"
-                f"<th class=num>Profit</th><th class=num>Per $100 (95% range)</th></tr>{''.join(rows)}</table></div>")
+                f"<th class=num>Profit</th><th class=num>Per $100</th></tr>{''.join(rows)}</table></div>")
 
     return (f"<section class=section><div class=wrap><h2>By site, bet type and odds.</h2>"
-            f"<p class=sub>Settled bets grouped by the site that paid the best price, by kind of bet, and by the odds. The range shows "
-            f"how much each group's return could differ by luck alone: when it runs from a loss to a profit, the group "
-            f"hasn't shown anything yet. Groups with fewer than {min_n} bets, or with no losses yet, get no range: a range can't account for losses that haven't happened.</p>"
+            f"<p class=sub>Settled bets grouped by the site that paid the best price, by kind of bet, and by the odds. Per $100 is "
+            f"the average profit on each $100 bet. <b>Too early to tell</b> means the result could still be down to luck either way; "
+            f"a group only shows <b>ahead so far</b> or <b>behind so far</b> once it has enough bets for luck to be unlikely. "
+            f"Groups with fewer than {min_n} bets aren't judged.</p>"
             f"<h4 class=bth>By site</h4>{table('site', 'Site')}<h4 class=bth>By bet type</h4>{table('type', 'Bet type')}"
             f"{odds_table(g, min_n)}</div></section>")
 
@@ -632,18 +643,12 @@ def odds_table(g: pd.DataFrame, min_n: int = 5) -> str:
         exp_w = x["chance"].astype(float).sum()
         exp = 100 * x["edge"].astype(float).mean()
         lo = int(x["result"].isin(["lost", "half lost"]).sum())
-        if len(x) < min_n:
-            act = "<span class=muted>too few bets</span>"
-        elif w == 0 or lo == 0:
-            act = f"{_usd(x['profit'].mean())} <span class=muted>(no {'losses' if lo == 0 else 'wins'} yet)</span>"
-        else:
-            est, a, b = mean_ci(x["profit"].to_numpy(float))
-            act = f"{_usd(est)} <span class=muted>({_usd(a)} to {_usd(b)})</span>"
+        act = _verdict(x, min_n)
         rows.append(f"<tr><td>{name}<span class=muted>{label}</span></td><td class=num>{len(x)}</td>"
                     f"<td class=num>{w} <span class=muted>expected {exp_w:.0f}</span></td>"
                     f"<td class=num>{_usd(exp)}</td><td class=num>{act}</td></tr>")
     return (f"<h4 class=bth>By odds</h4><div class=tw><table class='bt odds'><tr><th>Odds</th><th class=num>Bets</th>"
-            f"<th class=num>Won</th><th class=num>Expected per $100</th><th class=num>Actual per $100 (95% range)</th></tr>"
+            f"<th class=num>Won</th><th class=num>Expected per $100</th><th class=num>Actual per $100</th></tr>"
             f"{''.join(rows)}</table></div>"
             f"<p class=note>Expected: what the odds and the consensus chance said each bet should return when it was listed. "
             f"The research found long shots are the most overpriced bets in general; this table shows over time whether that holds for these picks too. "
