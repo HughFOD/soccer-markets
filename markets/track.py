@@ -544,7 +544,7 @@ BREAKDOWN_CSS = (".bt{width:100%;border-collapse:collapse;font-size:14px;margin:
 # Tapping a square under "Last week" opens the table, scrolls to that bet and highlights it for a moment.
 DOTS_JS = ("<script>document.addEventListener('click',function(ev){var d=ev.target.closest&&ev.target.closest('.dots button');if(!d)return;"
            "var sec=d.closest('section'),all=sec.querySelector('.lwall'),b=sec.querySelector('.lwbtn');"
-           "if(all&&all.hidden){all.hidden=false;if(b)b.textContent='Hide every bet'}"
+           "if(all&&all.hidden){all.hidden=false;if(b)b.textContent=b.dataset.hide}"
            "var tr=sec.querySelector('tr[data-i=\"'+d.dataset.i+'\"]');if(!tr)return;"
            "tr.scrollIntoView({behavior:'smooth',block:'center'});tr.classList.add('hl');"
            "setTimeout(function(){tr.classList.remove('hl')},1800)})</script>")
@@ -704,7 +704,8 @@ def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
     table = ("<div class=tw><table class='bt rec2'><tr><th>Date</th><th>Bet</th><th class=num>Odds</th><th class=num>Chance</th>"
              f"<th class=num>Result</th></tr>{''.join(rows)}</table></div>")
     btn = ("this.parentNode.nextElementSibling.hidden=!this.parentNode.nextElementSibling.hidden;"
-           "this.textContent=this.parentNode.nextElementSibling.hidden?'Show every bet \u203a':'Hide every bet'")
+           "this.textContent=this.parentNode.nextElementSibling.hidden?this.dataset.show:this.dataset.hide")
+    noun = "the bet" if len(w) == 1 else f"the {len(w)} bets"
     return (f"<section class=section style='padding-top:26px;padding-bottom:0'><div class=wrap><h2>Last week.</h2>"
             f"<p class=sub>{start.strftime('%b %-d')} \u2013 {last.strftime('%b %-d')} \u00b7 {len(w)} bets settled</p>"
             f"<div class='stats lw lw2'><div class=stat><div class=v>{won} of {len(w)}</div><div class=l>won<span class=x>{exp_won:.1f} expected</span></div></div>"
@@ -713,7 +714,7 @@ def last_week_html(L: pd.DataFrame, now: pd.Timestamp) -> str:
             f"<p class=cnote style='margin:10px 0 0'><b>{'All ' + str(good) if good == len(w) and good > 1 else f'{good} of {len(w)}'}</b> "
             f"still beat what\u2019s expected on the morning of the match.</p>"
             f"<div class=lwrow><div class=dots aria-label='Each bet in kick-off order with its odds: green won, red lost'>{dots}</div>"
-            f"<button type=button class=lwbtn onclick=\"{btn}\">Show every bet \u203a</button></div>"
+            f"<button type=button class=lwbtn data-show=\"Show {noun} \u203a\" data-hide=\"Hide {noun}\" onclick=\"{btn}\">Show {noun} \u203a</button></div>"
             f"<div class=lwall hidden>{CHANCE_NOTE}{table}</div>"
             f"<p class=cnote style='margin:12px 0 0'><a href=\"{week_file(start.tz_localize(None))}\">Every week \u203a</a></p>"
             f"<div style='height:18px'></div></div></section>{DOTS_JS}")
