@@ -653,7 +653,8 @@ def odds_table(g: pd.DataFrame, min_n: int = 5) -> str:
             f"<p class=note>Expected: what the odds and the consensus chance said each bet should return when it was listed. "
             f"The research found long shots are the most overpriced bets in general; this table shows over time whether that holds for these picks too. "
             f"Most of these heavy favorites date from before {HEAVY_RULE:%B %-d}, when they only needed a small edge to be "
-            f"listed. Now they need at least $3 per $100.</p>")
+            f"listed. Now they need at least $3 per $100.</p>"
+            f"<p class=note>With this many groups, one can look ahead or behind by luck alone. Trust a verdict more if it holds as bets are added.</p>")
 
 
 def _chance(r) -> str:
