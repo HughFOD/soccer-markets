@@ -7,7 +7,7 @@ visitor picks one with the switch in the top bar (remembered on that device).
 """
 from __future__ import annotations
 
-REPO_URL = "https://github.com/HughFOD/soccer-markets"
+REPO_URL = "https://github.com/HughFOD/soccer-bet-predictor"
 SITE_URL = "https://todayssoccerbets.com"
 SITE_NAME = "Today's Soccer Bets"
 ICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E"

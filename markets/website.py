@@ -9,7 +9,7 @@ import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-REPO_URL = "https://github.com/HughFOD/soccer-markets"
+REPO_URL = "https://github.com/HughFOD/soccer-bet-predictor"
 CHARTS = ("bet_types", "fair_clv", "fair_weights", "fair_by_season", "calibration", "longshot", "margins", "line_moves", "value_bets", "soft_vs_sharp", "slope_by_season", "score_effects", "score_effect_checks")
 
 
