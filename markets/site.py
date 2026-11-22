@@ -16,7 +16,7 @@ from .fairprice import MAX_EDGE
 from .usbooks import SITES, THRESHOLD, american
 
 ET = ZoneInfo("America/New_York")
-REPO_URL = "https://github.com/HughFOD/soccer-bet-predictor"
+REPO_URL = "https://github.com/HughFOD/todays-soccer-bets"
 
 CSS = theme.CSS + """
 .bet-win{font-size:12px;color:var(--muted);margin-top:2px}
