@@ -10107,3 +10107,867 @@ fetched_at,id,league,kickoff,home,away,site,h,d,a
 2026-11-23T17:02-05:00,728a661f4b458bc738d816438d564525,Nations League,2027-03-25T19:45:00Z,Spain,France,betmgm,2.25,3.3,3.1
 2026-11-23T17:02-05:00,a9d059deec41f2362872f49049287aea,Nations League,2027-03-27T17:00:00Z,Norway,England,betmgm,2.95,3.5,2.3
 2026-11-23T17:02-05:00,12edfcb24921dde76db7adc9d66f5c1e,Nations League,2027-03-27T19:45:00Z,Netherlands,Portugal,betmgm,2.35,3.5,2.8
+2026-11-24T15:39-05:00,40d95e660c301c2d8a5a7a6317017b65,Premier League,2026-11-27T20:00:00Z,Nottingham Forest,Chelsea,fanatics,2.6,3.5,2.6
+2026-11-24T15:39-05:00,40d95e660c301c2d8a5a7a6317017b65,Premier League,2026-11-27T20:00:00Z,Nottingham Forest,Chelsea,draftkings,2.6,3.4,2.75
+2026-11-24T15:39-05:00,40d95e660c301c2d8a5a7a6317017b65,Premier League,2026-11-27T20:00:00Z,Nottingham Forest,Chelsea,fanduel,2.5,3.3,2.7
+2026-11-24T15:39-05:00,40d95e660c301c2d8a5a7a6317017b65,Premier League,2026-11-27T20:00:00Z,Nottingham Forest,Chelsea,betmgm,2.6,3.4,2.6
+2026-11-24T15:39-05:00,40d95e660c301c2d8a5a7a6317017b65,Premier League,2026-11-27T20:00:00Z,Nottingham Forest,Chelsea,williamhill_us,2.52,3.4,2.63
+2026-11-24T15:39-05:00,ab87184803a63f7b679f1d12b01c3271,Premier League,2026-11-28T15:00:00Z,Manchester United,Brentford,fanatics,2.1,3.8,3.2
+2026-11-24T15:39-05:00,ab87184803a63f7b679f1d12b01c3271,Premier League,2026-11-28T15:00:00Z,Manchester United,Brentford,draftkings,2.1,3.7,3.2
+2026-11-24T15:39-05:00,ab87184803a63f7b679f1d12b01c3271,Premier League,2026-11-28T15:00:00Z,Manchester United,Brentford,fanduel,2.1,3.7,3.1
+2026-11-24T15:39-05:00,ab87184803a63f7b679f1d12b01c3271,Premier League,2026-11-28T15:00:00Z,Manchester United,Brentford,betmgm,2.05,3.75,3.3
+2026-11-24T15:39-05:00,ab87184803a63f7b679f1d12b01c3271,Premier League,2026-11-28T15:00:00Z,Manchester United,Brentford,williamhill_us,2.05,3.7,3.2
+2026-11-24T15:39-05:00,0bc17a3c7d8153e72b94688960cc603a,Premier League,2026-11-28T15:00:00Z,Leeds United,Coventry City,fanatics,1.44,4.75,6.0
+2026-11-24T15:39-05:00,0bc17a3c7d8153e72b94688960cc603a,Premier League,2026-11-28T15:00:00Z,Leeds United,Coventry City,draftkings,1.48,4.5,6.0
+2026-11-24T15:39-05:00,0bc17a3c7d8153e72b94688960cc603a,Premier League,2026-11-28T15:00:00Z,Leeds United,Coventry City,fanduel,1.43,4.6,6.0
+2026-11-24T15:39-05:00,0bc17a3c7d8153e72b94688960cc603a,Premier League,2026-11-28T15:00:00Z,Leeds United,Coventry City,betmgm,1.5,4.6,5.75
+2026-11-24T15:39-05:00,0bc17a3c7d8153e72b94688960cc603a,Premier League,2026-11-28T15:00:00Z,Leeds United,Coventry City,williamhill_us,1.5,4.4,5.75
+2026-11-24T15:39-05:00,9d23f6ad21946dd258869ebc22236cf0,Premier League,2026-11-28T17:30:00Z,Ipswich Town,Aston Villa,fanatics,3.5,4.0,1.95
+2026-11-24T15:39-05:00,9d23f6ad21946dd258869ebc22236cf0,Premier League,2026-11-28T17:30:00Z,Ipswich Town,Aston Villa,draftkings,3.6,3.85,1.91
+2026-11-24T15:39-05:00,9d23f6ad21946dd258869ebc22236cf0,Premier League,2026-11-28T17:30:00Z,Ipswich Town,Aston Villa,fanduel,3.5,3.8,1.91
+2026-11-24T15:39-05:00,9d23f6ad21946dd258869ebc22236cf0,Premier League,2026-11-28T17:30:00Z,Ipswich Town,Aston Villa,betmgm,3.5,3.8,1.95
+2026-11-24T15:39-05:00,9d23f6ad21946dd258869ebc22236cf0,Premier League,2026-11-28T17:30:00Z,Ipswich Town,Aston Villa,williamhill_us,3.5,3.85,1.91
+2026-11-24T15:39-05:00,f45e9062c2f755b977c98d496c22697b,Premier League,2026-11-29T12:00:00Z,Everton,Liverpool,fanatics,3.8,3.6,1.95
+2026-11-24T15:39-05:00,f45e9062c2f755b977c98d496c22697b,Premier League,2026-11-29T12:00:00Z,Everton,Liverpool,draftkings,4.0,3.6,1.87
+2026-11-24T15:39-05:00,f45e9062c2f755b977c98d496c22697b,Premier League,2026-11-29T12:00:00Z,Everton,Liverpool,betmgm,3.8,3.7,1.91
+2026-11-24T15:39-05:00,f45e9062c2f755b977c98d496c22697b,Premier League,2026-11-29T12:00:00Z,Everton,Liverpool,fanduel,4.0,3.6,1.8
+2026-11-24T15:39-05:00,f45e9062c2f755b977c98d496c22697b,Premier League,2026-11-29T12:00:00Z,Everton,Liverpool,williamhill_us,3.85,3.65,1.85
+2026-11-24T15:39-05:00,56ea91809ff11d3a67557a21b3371cb9,Premier League,2026-11-29T14:05:00Z,Fulham,Bournemouth,fanatics,2.6,3.4,2.6
+2026-11-24T15:39-05:00,56ea91809ff11d3a67557a21b3371cb9,Premier League,2026-11-29T14:05:00Z,Fulham,Bournemouth,draftkings,2.65,3.45,2.55
+2026-11-24T15:39-05:00,56ea91809ff11d3a67557a21b3371cb9,Premier League,2026-11-29T14:05:00Z,Fulham,Bournemouth,betmgm,2.65,3.5,2.55
+2026-11-24T15:39-05:00,56ea91809ff11d3a67557a21b3371cb9,Premier League,2026-11-29T14:05:00Z,Fulham,Bournemouth,fanduel,2.6,3.4,2.55
+2026-11-24T15:39-05:00,56ea91809ff11d3a67557a21b3371cb9,Premier League,2026-11-29T14:05:00Z,Fulham,Bournemouth,williamhill_us,2.61,3.45,2.5
+2026-11-24T15:39-05:00,e9c2b74ecaafd494e3b2d8521b52216a,Premier League,2026-11-29T14:05:00Z,Brighton and Hove Albion,Newcastle United,fanatics,1.56,4.5,5.5
+2026-11-24T15:39-05:00,e9c2b74ecaafd494e3b2d8521b52216a,Premier League,2026-11-29T14:05:00Z,Brighton and Hove Albion,Newcastle United,draftkings,1.54,4.5,5.5
+2026-11-24T15:39-05:00,e9c2b74ecaafd494e3b2d8521b52216a,Premier League,2026-11-29T14:05:00Z,Brighton and Hove Albion,Newcastle United,betmgm,1.57,4.4,5.25
+2026-11-24T15:39-05:00,e9c2b74ecaafd494e3b2d8521b52216a,Premier League,2026-11-29T14:05:00Z,Brighton and Hove Albion,Newcastle United,fanduel,1.5,4.5,5.5
+2026-11-24T15:39-05:00,e9c2b74ecaafd494e3b2d8521b52216a,Premier League,2026-11-29T14:05:00Z,Brighton and Hove Albion,Newcastle United,williamhill_us,1.58,4.3,5.0
+2026-11-24T15:39-05:00,e12585885a7f135127f276b7f1ecdf89,Premier League,2026-11-29T14:05:00Z,Crystal Palace,Hull City,fanatics,1.87,3.8,4.0
+2026-11-24T15:39-05:00,e12585885a7f135127f276b7f1ecdf89,Premier League,2026-11-29T14:05:00Z,Crystal Palace,Hull City,draftkings,1.83,3.8,3.95
+2026-11-24T15:39-05:00,e12585885a7f135127f276b7f1ecdf89,Premier League,2026-11-29T14:05:00Z,Crystal Palace,Hull City,fanduel,1.77,3.8,4.0
+2026-11-24T15:39-05:00,e12585885a7f135127f276b7f1ecdf89,Premier League,2026-11-29T14:05:00Z,Crystal Palace,Hull City,betmgm,1.85,3.75,4.0
+2026-11-24T15:39-05:00,e12585885a7f135127f276b7f1ecdf89,Premier League,2026-11-29T14:05:00Z,Crystal Palace,Hull City,williamhill_us,1.8,3.75,4.0
+2026-11-24T15:39-05:00,09bb0ba9a9025d64fed410375c0c8f80,Premier League,2026-11-29T14:05:00Z,Sunderland,Tottenham Hotspur,fanatics,3.5,3.4,2.1
+2026-11-24T15:39-05:00,09bb0ba9a9025d64fed410375c0c8f80,Premier League,2026-11-29T14:05:00Z,Sunderland,Tottenham Hotspur,draftkings,3.55,3.35,2.1
+2026-11-24T15:39-05:00,09bb0ba9a9025d64fed410375c0c8f80,Premier League,2026-11-29T14:05:00Z,Sunderland,Tottenham Hotspur,fanduel,3.7,3.3,2.05
+2026-11-24T15:39-05:00,09bb0ba9a9025d64fed410375c0c8f80,Premier League,2026-11-29T14:05:00Z,Sunderland,Tottenham Hotspur,betmgm,3.5,3.4,2.1
+2026-11-24T15:39-05:00,09bb0ba9a9025d64fed410375c0c8f80,Premier League,2026-11-29T14:05:00Z,Sunderland,Tottenham Hotspur,williamhill_us,3.45,3.4,2.09
+2026-11-24T15:39-05:00,d20ede55e54ed7b55fdc36ca373727c0,Premier League,2026-11-29T16:30:00Z,Arsenal,Manchester City,fanatics,1.95,3.6,3.6
+2026-11-24T15:39-05:00,d20ede55e54ed7b55fdc36ca373727c0,Premier League,2026-11-29T16:30:00Z,Arsenal,Manchester City,draftkings,1.95,3.75,3.6
+2026-11-24T15:39-05:00,d20ede55e54ed7b55fdc36ca373727c0,Premier League,2026-11-29T16:30:00Z,Arsenal,Manchester City,fanduel,1.95,3.7,3.5
+2026-11-24T15:39-05:00,d20ede55e54ed7b55fdc36ca373727c0,Premier League,2026-11-29T16:30:00Z,Arsenal,Manchester City,betmgm,1.93,3.7,3.7
+2026-11-24T15:39-05:00,d20ede55e54ed7b55fdc36ca373727c0,Premier League,2026-11-29T16:30:00Z,Arsenal,Manchester City,williamhill_us,1.91,3.65,3.55
+2026-11-24T15:39-05:00,c7aff6bfea3ca1c4b177694977831b85,Premier League,2026-12-01T20:00:00Z,Coventry City,Ipswich Town,fanatics,2.3,3.6,2.9
+2026-11-24T15:39-05:00,c7aff6bfea3ca1c4b177694977831b85,Premier League,2026-12-01T20:00:00Z,Coventry City,Ipswich Town,fanduel,2.25,3.5,2.95
+2026-11-24T15:39-05:00,c7aff6bfea3ca1c4b177694977831b85,Premier League,2026-12-01T20:00:00Z,Coventry City,Ipswich Town,draftkings,2.25,3.6,3.0
+2026-11-24T15:39-05:00,836ad618789e171f7357649ce8e62b49,Premier League,2026-12-02T19:30:00Z,Chelsea,Crystal Palace,fanduel,1.59,4.4,4.7
+2026-11-24T15:39-05:00,836ad618789e171f7357649ce8e62b49,Premier League,2026-12-02T19:30:00Z,Chelsea,Crystal Palace,fanatics,1.62,4.3,4.75
+2026-11-24T15:39-05:00,836ad618789e171f7357649ce8e62b49,Premier League,2026-12-02T19:30:00Z,Chelsea,Crystal Palace,draftkings,1.65,4.3,4.6
+2026-11-24T15:39-05:00,4bd9a6fe4abb6774b3e8700b3dbe8d00,Premier League,2026-12-02T19:30:00Z,Hull City,Nottingham Forest,fanduel,3.9,3.6,1.87
+2026-11-24T15:39-05:00,4bd9a6fe4abb6774b3e8700b3dbe8d00,Premier League,2026-12-02T19:30:00Z,Hull City,Nottingham Forest,fanatics,3.8,3.5,1.95
+2026-11-24T15:39-05:00,4bd9a6fe4abb6774b3e8700b3dbe8d00,Premier League,2026-12-02T19:30:00Z,Hull City,Nottingham Forest,draftkings,3.9,3.6,1.91
+2026-11-24T15:39-05:00,10abd18165c999264777913e42c9f96c,Premier League,2026-12-02T19:30:00Z,Manchester City,Leeds United,fanduel,1.53,4.5,5.4
+2026-11-24T15:39-05:00,10abd18165c999264777913e42c9f96c,Premier League,2026-12-02T19:30:00Z,Manchester City,Leeds United,fanatics,1.53,4.5,5.5
+2026-11-24T15:39-05:00,10abd18165c999264777913e42c9f96c,Premier League,2026-12-02T19:30:00Z,Manchester City,Leeds United,draftkings,1.54,4.5,5.25
+2026-11-24T15:39-05:00,9629fcc970336d106d144eaa25cec853,Premier League,2026-12-02T19:30:00Z,Liverpool,Sunderland,fanduel,1.42,4.7,6.0
+2026-11-24T15:39-05:00,9629fcc970336d106d144eaa25cec853,Premier League,2026-12-02T19:30:00Z,Liverpool,Sunderland,fanatics,1.44,4.75,6.5
+2026-11-24T15:39-05:00,9629fcc970336d106d144eaa25cec853,Premier League,2026-12-02T19:30:00Z,Liverpool,Sunderland,draftkings,1.48,4.6,6.0
+2026-11-24T15:39-05:00,5f5235df01a384e23ff224101ff175e1,Premier League,2026-12-02T20:15:00Z,Brentford,Arsenal,fanduel,4.3,3.8,1.74
+2026-11-24T15:39-05:00,5f5235df01a384e23ff224101ff175e1,Premier League,2026-12-02T20:15:00Z,Brentford,Arsenal,fanatics,4.5,3.8,1.77
+2026-11-24T15:39-05:00,5f5235df01a384e23ff224101ff175e1,Premier League,2026-12-02T20:15:00Z,Brentford,Arsenal,draftkings,4.2,3.75,1.8
+2026-11-24T15:39-05:00,2198fb9aab762e9e1c8c6af4113a1d31,Premier League,2026-12-02T20:15:00Z,Aston Villa,Everton,fanduel,1.95,3.6,3.6
+2026-11-24T15:39-05:00,2198fb9aab762e9e1c8c6af4113a1d31,Premier League,2026-12-02T20:15:00Z,Aston Villa,Everton,fanatics,2.0,3.6,3.6
+2026-11-24T15:39-05:00,2198fb9aab762e9e1c8c6af4113a1d31,Premier League,2026-12-02T20:15:00Z,Aston Villa,Everton,draftkings,2.0,3.6,3.6
+2026-11-24T15:39-05:00,28546d4aefd5efb320c2d2ceee11b66d,Premier League,2026-12-02T20:15:00Z,Bournemouth,Brighton and Hove Albion,fanduel,2.35,3.5,2.75
+2026-11-24T15:39-05:00,28546d4aefd5efb320c2d2ceee11b66d,Premier League,2026-12-02T20:15:00Z,Bournemouth,Brighton and Hove Albion,fanatics,2.45,3.5,2.75
+2026-11-24T15:39-05:00,28546d4aefd5efb320c2d2ceee11b66d,Premier League,2026-12-02T20:15:00Z,Bournemouth,Brighton and Hove Albion,draftkings,2.45,3.55,2.75
+2026-11-24T15:39-05:00,0c405290d0f977236962e55ba90c2c04,Premier League,2026-12-02T20:15:00Z,Newcastle United,Manchester United,fanatics,2.5,3.8,2.45
+2026-11-24T15:39-05:00,0c405290d0f977236962e55ba90c2c04,Premier League,2026-12-02T20:15:00Z,Newcastle United,Manchester United,fanduel,2.55,3.8,2.45
+2026-11-24T15:39-05:00,0c405290d0f977236962e55ba90c2c04,Premier League,2026-12-02T20:15:00Z,Newcastle United,Manchester United,draftkings,2.55,3.8,2.5
+2026-11-24T15:39-05:00,0c1ccc010b185ada698661a21316696c,Premier League,2026-12-03T20:00:00Z,Tottenham Hotspur,Fulham,fanduel,1.8,3.8,4.0
+2026-11-24T15:39-05:00,0c1ccc010b185ada698661a21316696c,Premier League,2026-12-03T20:00:00Z,Tottenham Hotspur,Fulham,fanatics,1.83,3.8,4.1
+2026-11-24T15:39-05:00,0c1ccc010b185ada698661a21316696c,Premier League,2026-12-03T20:00:00Z,Tottenham Hotspur,Fulham,draftkings,1.83,3.7,3.9
+2026-11-24T15:39-05:00,40d95e660c301c2d8a5a7a6317017b65,Premier League,2026-11-27T20:00:00Z,Nottingham Forest,Chelsea,kalshi,2.5206,3.2866,2.7355
+2026-11-24T15:39-05:00,40d95e660c301c2d8a5a7a6317017b65,Premier League,2026-11-27T20:00:00Z,Nottingham Forest,Chelsea,polymarket,2.5509,3.3317,2.7699
+2026-11-24T15:39-05:00,ab87184803a63f7b679f1d12b01c3271,Premier League,2026-11-28T15:00:00Z,Manchester United,Brentford,kalshi,2.0911,3.6603,3.1745
+2026-11-24T15:39-05:00,ab87184803a63f7b679f1d12b01c3271,Premier League,2026-11-28T15:00:00Z,Manchester United,Brentford,polymarket,2.113,3.7126,3.2174
+2026-11-24T15:39-05:00,0bc17a3c7d8153e72b94688960cc603a,Premier League,2026-11-28T15:00:00Z,Leeds United,Coventry City,kalshi,1.4845,4.5106,6.2954
+2026-11-24T15:39-05:00,0bc17a3c7d8153e72b94688960cc603a,Premier League,2026-11-28T15:00:00Z,Leeds United,Coventry City,polymarket,1.4659,4.5791,6.3981
+2026-11-24T15:39-05:00,9d23f6ad21946dd258869ebc22236cf0,Premier League,2026-11-28T17:30:00Z,Ipswich Town,Aston Villa,kalshi,3.5202,3.8005,1.9324
+2026-11-24T15:39-05:00,9d23f6ad21946dd258869ebc22236cf0,Premier League,2026-11-28T17:30:00Z,Ipswich Town,Aston Villa,polymarket,3.5698,3.8554,1.9512
+2026-11-24T15:39-05:00,f45e9062c2f755b977c98d496c22697b,Premier League,2026-11-29T12:00:00Z,Everton,Liverpool,kalshi,4.3144,3.6603,1.8297
+2026-11-24T15:39-05:00,f45e9062c2f755b977c98d496c22697b,Premier League,2026-11-29T12:00:00Z,Everton,Liverpool,polymarket,4.3792,3.7126,1.8465
+2026-11-24T15:39-05:00,56ea91809ff11d3a67557a21b3371cb9,Premier League,2026-11-29T14:05:00Z,Fulham,Bournemouth,kalshi,2.7355,3.3987,2.5206
+2026-11-24T15:39-05:00,56ea91809ff11d3a67557a21b3371cb9,Premier League,2026-11-29T14:05:00Z,Fulham,Bournemouth,polymarket,2.7699,3.446,2.5509
+2026-11-24T15:39-05:00,e9c2b74ecaafd494e3b2d8521b52216a,Premier League,2026-11-29T14:05:00Z,Brighton and Hove Albion,Newcastle United,kalshi,1.5497,4.5106,5.5572
+2026-11-24T15:39-05:00,e9c2b74ecaafd494e3b2d8521b52216a,Premier League,2026-11-29T14:05:00Z,Brighton and Hove Albion,Newcastle United,polymarket,1.561,4.3792,5.341
+2026-11-24T15:39-05:00,e12585885a7f135127f276b7f1ecdf89,Premier League,2026-11-29T14:05:00Z,Crystal Palace,Hull City,kalshi,1.8577,3.6603,3.9593
+2026-11-24T15:39-05:00,e12585885a7f135127f276b7f1ecdf89,Premier League,2026-11-29T14:05:00Z,Crystal Palace,Hull City,polymarket,1.8751,3.7126,4.0173
+2026-11-24T15:39-05:00,09bb0ba9a9025d64fed410375c0c8f80,Premier League,2026-11-29T14:05:00Z,Sunderland,Tottenham Hotspur,kalshi,3.6603,3.2866,2.0537
+2026-11-24T15:39-05:00,09bb0ba9a9025d64fed410375c0c8f80,Premier League,2026-11-29T14:05:00Z,Sunderland,Tottenham Hotspur,polymarket,3.7126,3.3317,2.075
+2026-11-24T15:39-05:00,d20ede55e54ed7b55fdc36ca373727c0,Premier League,2026-11-29T16:30:00Z,Arsenal,Manchester City,kalshi,1.9697,3.6603,3.5202
+2026-11-24T15:39-05:00,d20ede55e54ed7b55fdc36ca373727c0,Premier League,2026-11-29T16:30:00Z,Arsenal,Manchester City,polymarket,1.9893,3.7126,3.5698
+2026-11-24T15:39-05:00,c7aff6bfea3ca1c4b177694977831b85,Premier League,2026-12-01T20:00:00Z,Coventry City,Ipswich Town,kalshi,2.2405,3.5202,2.9783
+2026-11-24T15:39-05:00,c7aff6bfea3ca1c4b177694977831b85,Premier League,2026-12-01T20:00:00Z,Coventry City,Ipswich Town,polymarket,2.2653,3.5698,3.0175
+2026-11-24T15:39-05:00,836ad618789e171f7357649ce8e62b49,Premier League,2026-12-02T19:30:00Z,Chelsea,Crystal Palace,kalshi,1.5964,4.3144,4.7348
+2026-11-24T15:39-05:00,4bd9a6fe4abb6774b3e8700b3dbe8d00,Premier League,2026-12-02T19:30:00Z,Hull City,Nottingham Forest,kalshi,4.1275,3.5202,1.8577
+2026-11-24T15:39-05:00,10abd18165c999264777913e42c9f96c,Premier League,2026-12-02T19:30:00Z,Manchester City,Leeds United,kalshi,1.5497,4.5106,5.2581
+2026-11-24T15:39-05:00,9629fcc970336d106d144eaa25cec853,Premier League,2026-12-02T19:30:00Z,Liverpool,Sunderland,kalshi,1.4565,4.7348,6.2954
+2026-11-24T15:39-05:00,5f5235df01a384e23ff224101ff175e1,Premier League,2026-12-02T20:15:00Z,Brentford,Arsenal,kalshi,4.3144,3.8005,1.7924
+2026-11-24T15:39-05:00,2198fb9aab762e9e1c8c6af4113a1d31,Premier League,2026-12-02T20:15:00Z,Aston Villa,Everton,kalshi,1.9697,3.6603,3.6603
+2026-11-24T15:39-05:00,28546d4aefd5efb320c2d2ceee11b66d,Premier League,2026-12-02T20:15:00Z,Bournemouth,Brighton and Hove Albion,kalshi,2.3992,3.5202,2.7355
+2026-11-24T15:39-05:00,0c405290d0f977236962e55ba90c2c04,Premier League,2026-12-02T20:15:00Z,Newcastle United,Manchester United,kalshi,2.5206,3.8005,2.4553
+2026-11-24T15:39-05:00,0c1ccc010b185ada698661a21316696c,Premier League,2026-12-03T20:00:00Z,Tottenham Hotspur,Fulham,kalshi,1.8297,3.8005,4.1275
+2026-11-24T15:39-05:00,92c74d2f4a4275568feff8072ed15e73,Championship,2026-11-24T19:45:00Z,Bristol City,Wrexham AFC,fanatics,7.5,3.6,1.5
+2026-11-24T15:39-05:00,92c74d2f4a4275568feff8072ed15e73,Championship,2026-11-24T19:45:00Z,Bristol City,Wrexham AFC,fanduel,8.0,3.6,1.48
+2026-11-24T15:39-05:00,92c74d2f4a4275568feff8072ed15e73,Championship,2026-11-24T19:45:00Z,Bristol City,Wrexham AFC,draftkings,8.0,3.5,1.51
+2026-11-24T15:39-05:00,92c74d2f4a4275568feff8072ed15e73,Championship,2026-11-24T19:45:00Z,Bristol City,Wrexham AFC,betmgm,8.5,3.5,1.48
+2026-11-24T15:39-05:00,ae887a08eef3ff58053488dbddde28a3,Championship,2026-11-24T19:45:00Z,Cardiff City,Preston North End,fanatics,6.0,4.5,1.44
+2026-11-24T15:39-05:00,ae887a08eef3ff58053488dbddde28a3,Championship,2026-11-24T19:45:00Z,Cardiff City,Preston North End,fanduel,7.0,4.6,1.42
+2026-11-24T15:39-05:00,ae887a08eef3ff58053488dbddde28a3,Championship,2026-11-24T19:45:00Z,Cardiff City,Preston North End,draftkings,8.0,4.9,1.36
+2026-11-24T15:39-05:00,ae887a08eef3ff58053488dbddde28a3,Championship,2026-11-24T19:45:00Z,Cardiff City,Preston North End,betmgm,6.0,4.6,1.43
+2026-11-24T15:39-05:00,6d21b6408d1f1c42def270b7f1ae5b21,Championship,2026-11-24T19:45:00Z,Charlton Athletic,Lincoln City,fanatics,1.07,11.0,31.0
+2026-11-24T15:39-05:00,6d21b6408d1f1c42def270b7f1ae5b21,Championship,2026-11-24T19:45:00Z,Charlton Athletic,Lincoln City,draftkings,1.06,10.5,36.0
+2026-11-24T15:39-05:00,6d21b6408d1f1c42def270b7f1ae5b21,Championship,2026-11-24T19:45:00Z,Charlton Athletic,Lincoln City,fanduel,1.07,10.5,31.0
+2026-11-24T15:39-05:00,6d21b6408d1f1c42def270b7f1ae5b21,Championship,2026-11-24T19:45:00Z,Charlton Athletic,Lincoln City,betmgm,1.07,10.5,31.0
+2026-11-24T15:39-05:00,e239a6d57b2cf15091f673c2448fbf4f,Championship,2026-11-24T19:45:00Z,Middlesbrough,Swansea City,fanatics,1.67,3.2,6.0
+2026-11-24T15:39-05:00,e239a6d57b2cf15091f673c2448fbf4f,Championship,2026-11-24T19:45:00Z,Middlesbrough,Swansea City,fanduel,1.69,3.0,6.0
+2026-11-24T15:39-05:00,e239a6d57b2cf15091f673c2448fbf4f,Championship,2026-11-24T19:45:00Z,Middlesbrough,Swansea City,draftkings,1.74,2.95,6.0
+2026-11-24T15:39-05:00,e239a6d57b2cf15091f673c2448fbf4f,Championship,2026-11-24T19:45:00Z,Middlesbrough,Swansea City,betmgm,1.71,2.95,6.25
+2026-11-24T15:39-05:00,cbb9284b5d072d869a395ba3ffb8bbff,Championship,2026-11-24T19:45:00Z,Norwich City,Queens Park Rangers,fanduel,5.3,3.2,1.71
+2026-11-24T15:39-05:00,cbb9284b5d072d869a395ba3ffb8bbff,Championship,2026-11-24T19:45:00Z,Norwich City,Queens Park Rangers,fanatics,4.3,3.3,1.8
+2026-11-24T15:39-05:00,cbb9284b5d072d869a395ba3ffb8bbff,Championship,2026-11-24T19:45:00Z,Norwich City,Queens Park Rangers,draftkings,5.0,3.2,1.8
+2026-11-24T15:39-05:00,cbb9284b5d072d869a395ba3ffb8bbff,Championship,2026-11-24T19:45:00Z,Norwich City,Queens Park Rangers,betmgm,5.0,3.2,1.74
+2026-11-24T15:39-05:00,c2ca2ce56eb3bccf1a5de2d0ccc2207f,Championship,2026-11-24T19:45:00Z,Portsmouth,West Ham United,fanatics,2.0,3.0,3.8
+2026-11-24T15:39-05:00,c2ca2ce56eb3bccf1a5de2d0ccc2207f,Championship,2026-11-24T19:45:00Z,Portsmouth,West Ham United,fanduel,2.1,3.0,3.9
+2026-11-24T15:39-05:00,c2ca2ce56eb3bccf1a5de2d0ccc2207f,Championship,2026-11-24T19:45:00Z,Portsmouth,West Ham United,draftkings,2.1,3.0,3.9
+2026-11-24T15:39-05:00,c2ca2ce56eb3bccf1a5de2d0ccc2207f,Championship,2026-11-24T19:45:00Z,Portsmouth,West Ham United,betmgm,2.0,2.9,4.1
+2026-11-24T15:39-05:00,031162fd89aa3c1fd39e523b3c82d35a,Championship,2026-11-24T19:50:00Z,Sheffield United,Southampton,fanatics,5.75,3.4,1.61
+2026-11-24T15:39-05:00,031162fd89aa3c1fd39e523b3c82d35a,Championship,2026-11-24T19:50:00Z,Sheffield United,Southampton,fanduel,6.0,3.4,1.61
+2026-11-24T15:39-05:00,031162fd89aa3c1fd39e523b3c82d35a,Championship,2026-11-24T19:50:00Z,Sheffield United,Southampton,draftkings,6.5,3.3,1.65
+2026-11-24T15:39-05:00,031162fd89aa3c1fd39e523b3c82d35a,Championship,2026-11-24T19:50:00Z,Sheffield United,Southampton,betmgm,6.0,3.3,1.62
+2026-11-24T15:39-05:00,018856cb75135463eb1972d978339023,Championship,2026-11-24T20:00:00Z,Wolverhampton Wanderers,Derby County,fanatics,1.11,7.5,21.0
+2026-11-24T15:39-05:00,018856cb75135463eb1972d978339023,Championship,2026-11-24T20:00:00Z,Wolverhampton Wanderers,Derby County,fanduel,1.11,8.0,23.0
+2026-11-24T15:39-05:00,018856cb75135463eb1972d978339023,Championship,2026-11-24T20:00:00Z,Wolverhampton Wanderers,Derby County,draftkings,1.12,7.0,29.0
+2026-11-24T15:39-05:00,018856cb75135463eb1972d978339023,Championship,2026-11-24T20:00:00Z,Wolverhampton Wanderers,Derby County,betmgm,1.12,7.75,23.0
+2026-11-24T15:39-05:00,61d1126751ba67227ac2819624e98342,Championship,2026-11-25T19:45:00Z,Burnley,Birmingham City,fanduel,2.75,3.4,2.5
+2026-11-24T15:39-05:00,61d1126751ba67227ac2819624e98342,Championship,2026-11-25T19:45:00Z,Burnley,Birmingham City,fanatics,2.75,3.5,2.4
+2026-11-24T15:39-05:00,61d1126751ba67227ac2819624e98342,Championship,2026-11-25T19:45:00Z,Burnley,Birmingham City,betmgm,2.7,3.5,2.45
+2026-11-24T15:39-05:00,61d1126751ba67227ac2819624e98342,Championship,2026-11-25T19:45:00Z,Burnley,Birmingham City,draftkings,2.7,3.6,2.5
+2026-11-24T15:39-05:00,0eb7f35d744c1cebeb53be32f50e1e2d,Championship,2026-11-25T19:45:00Z,Watford,Blackburn Rovers,fanduel,2.5,3.3,2.7
+2026-11-24T15:39-05:00,0eb7f35d744c1cebeb53be32f50e1e2d,Championship,2026-11-25T19:45:00Z,Watford,Blackburn Rovers,fanatics,2.5,3.5,2.65
+2026-11-24T15:39-05:00,0eb7f35d744c1cebeb53be32f50e1e2d,Championship,2026-11-25T19:45:00Z,Watford,Blackburn Rovers,draftkings,2.55,3.55,2.7
+2026-11-24T15:39-05:00,9dfe9df3ad88c453e3572872bf500488,Championship,2026-11-25T19:45:00Z,Bolton Wanderers,West Bromwich Albion,fanatics,3.4,3.6,2.0
+2026-11-24T15:39-05:00,9dfe9df3ad88c453e3572872bf500488,Championship,2026-11-25T19:45:00Z,Bolton Wanderers,West Bromwich Albion,fanduel,3.5,3.6,2.0
+2026-11-24T15:39-05:00,9dfe9df3ad88c453e3572872bf500488,Championship,2026-11-25T19:45:00Z,Bolton Wanderers,West Bromwich Albion,draftkings,3.55,3.7,2.0
+2026-11-24T15:39-05:00,9dfe9df3ad88c453e3572872bf500488,Championship,2026-11-25T19:45:00Z,Bolton Wanderers,West Bromwich Albion,betmgm,3.4,3.6,2.05
+2026-11-24T15:39-05:00,77dfddf6dea97d5ecb5e2463b29fe67e,Championship,2026-11-25T20:00:00Z,Stoke City,Millwall,fanatics,2.25,3.3,3.2
+2026-11-24T15:39-05:00,77dfddf6dea97d5ecb5e2463b29fe67e,Championship,2026-11-25T20:00:00Z,Stoke City,Millwall,fanduel,2.25,3.2,3.1
+2026-11-24T15:39-05:00,77dfddf6dea97d5ecb5e2463b29fe67e,Championship,2026-11-25T20:00:00Z,Stoke City,Millwall,draftkings,2.3,3.35,3.15
+2026-11-24T15:39-05:00,77dfddf6dea97d5ecb5e2463b29fe67e,Championship,2026-11-25T20:00:00Z,Stoke City,Millwall,betmgm,2.25,3.4,3.2
+2026-11-24T15:39-05:00,32b8e3ea76d9d8b2b36577063d40862e,Championship,2026-11-27T20:00:00Z,Southampton,Middlesbrough,betmgm,2.75,3.8,2.3
+2026-11-24T15:39-05:00,32b8e3ea76d9d8b2b36577063d40862e,Championship,2026-11-27T20:00:00Z,Southampton,Middlesbrough,fanduel,2.75,3.8,2.25
+2026-11-24T15:39-05:00,32b8e3ea76d9d8b2b36577063d40862e,Championship,2026-11-27T20:00:00Z,Southampton,Middlesbrough,fanatics,2.75,3.8,2.3
+2026-11-24T15:39-05:00,a1d96ec37a8b7022ef39a7755a655243,Championship,2026-11-28T12:30:00Z,Blackburn Rovers,Charlton Athletic,betmgm,1.83,3.7,4.2
+2026-11-24T15:39-05:00,a1d96ec37a8b7022ef39a7755a655243,Championship,2026-11-28T12:30:00Z,Blackburn Rovers,Charlton Athletic,fanduel,1.8,3.6,4.1
+2026-11-24T15:39-05:00,a1d96ec37a8b7022ef39a7755a655243,Championship,2026-11-28T12:30:00Z,Blackburn Rovers,Charlton Athletic,fanatics,1.83,3.6,4.3
+2026-11-24T15:39-05:00,d2bc2d3b4a81177cb6b86f4add6ff81f,Championship,2026-11-28T12:30:00Z,Lincoln City,Wolverhampton Wanderers,betmgm,5.0,4.0,1.65
+2026-11-24T15:39-05:00,d2bc2d3b4a81177cb6b86f4add6ff81f,Championship,2026-11-28T12:30:00Z,Lincoln City,Wolverhampton Wanderers,fanduel,4.9,4.0,1.61
+2026-11-24T15:39-05:00,d2bc2d3b4a81177cb6b86f4add6ff81f,Championship,2026-11-28T12:30:00Z,Lincoln City,Wolverhampton Wanderers,fanatics,5.25,4.1,1.62
+2026-11-24T15:39-05:00,d47bc722be164b3a733434e89f224654,Championship,2026-11-28T12:30:00Z,Preston North End,Norwich City,betmgm,4.6,4.2,1.65
+2026-11-24T15:39-05:00,d47bc722be164b3a733434e89f224654,Championship,2026-11-28T12:30:00Z,Preston North End,Norwich City,fanduel,4.5,4.2,1.62
+2026-11-24T15:39-05:00,d47bc722be164b3a733434e89f224654,Championship,2026-11-28T12:30:00Z,Preston North End,Norwich City,fanatics,4.75,4.3,1.62
+2026-11-24T15:39-05:00,15fc58a442321c2a85f7a814466c0ab9,Championship,2026-11-28T15:00:00Z,Birmingham City,Bolton Wanderers,betmgm,1.48,4.6,6.0
+2026-11-24T15:39-05:00,15fc58a442321c2a85f7a814466c0ab9,Championship,2026-11-28T15:00:00Z,Birmingham City,Bolton Wanderers,fanduel,1.43,4.6,6.0
+2026-11-24T15:39-05:00,15fc58a442321c2a85f7a814466c0ab9,Championship,2026-11-28T15:00:00Z,Birmingham City,Bolton Wanderers,fanatics,1.48,4.75,6.0
+2026-11-24T15:39-05:00,b67372e7107fdd259a978e614711e657,Championship,2026-11-28T15:00:00Z,West Bromwich Albion,Bristol City,betmgm,1.77,3.8,4.4
+2026-11-24T15:39-05:00,b67372e7107fdd259a978e614711e657,Championship,2026-11-28T15:00:00Z,West Bromwich Albion,Bristol City,fanduel,1.69,3.8,4.5
+2026-11-24T15:39-05:00,b67372e7107fdd259a978e614711e657,Championship,2026-11-28T15:00:00Z,West Bromwich Albion,Bristol City,fanatics,1.77,3.8,4.5
+2026-11-24T15:39-05:00,3f93526d7c8e0ca84734aea60c13900a,Championship,2026-11-28T15:00:00Z,Millwall,Burnley,betmgm,2.25,3.7,2.95
+2026-11-24T15:39-05:00,3f93526d7c8e0ca84734aea60c13900a,Championship,2026-11-28T15:00:00Z,Millwall,Burnley,fanduel,2.2,3.7,3.0
+2026-11-24T15:39-05:00,3f93526d7c8e0ca84734aea60c13900a,Championship,2026-11-28T15:00:00Z,Millwall,Burnley,fanatics,2.2,3.8,3.0
+2026-11-24T15:39-05:00,82ef491ed2f8399e4ccec9f5d8315cee,Championship,2026-11-28T15:00:00Z,Derby County,Watford,fanduel,2.15,3.5,3.2
+2026-11-24T15:39-05:00,82ef491ed2f8399e4ccec9f5d8315cee,Championship,2026-11-28T15:00:00Z,Derby County,Watford,fanatics,2.1,3.6,3.3
+2026-11-24T15:39-05:00,9cd8c682c6864b59a7f1a58964083e08,Championship,2026-11-28T15:00:00Z,Wrexham AFC,Portsmouth,betmgm,1.95,3.4,3.9
+2026-11-24T15:39-05:00,9cd8c682c6864b59a7f1a58964083e08,Championship,2026-11-28T15:00:00Z,Wrexham AFC,Portsmouth,fanduel,1.95,3.5,3.8
+2026-11-24T15:39-05:00,9cd8c682c6864b59a7f1a58964083e08,Championship,2026-11-28T15:00:00Z,Wrexham AFC,Portsmouth,fanatics,1.95,3.5,3.8
+2026-11-24T15:39-05:00,dc42f49649c5329c2c47f94fc4ca0c89,Championship,2026-11-28T15:00:00Z,Queens Park Rangers,Sheffield United,betmgm,2.1,3.6,3.3
+2026-11-24T15:39-05:00,dc42f49649c5329c2c47f94fc4ca0c89,Championship,2026-11-28T15:00:00Z,Queens Park Rangers,Sheffield United,fanduel,2.1,3.6,3.2
+2026-11-24T15:39-05:00,dc42f49649c5329c2c47f94fc4ca0c89,Championship,2026-11-28T15:00:00Z,Queens Park Rangers,Sheffield United,fanatics,2.1,3.6,3.3
+2026-11-24T15:39-05:00,c836236766f7859e3c1d61caa581abe1,Championship,2026-11-28T15:00:00Z,West Ham United,Stoke City,betmgm,1.54,4.33,5.5
+2026-11-24T15:39-05:00,c836236766f7859e3c1d61caa581abe1,Championship,2026-11-28T15:00:00Z,West Ham United,Stoke City,fanduel,1.5,4.5,5.4
+2026-11-24T15:39-05:00,c836236766f7859e3c1d61caa581abe1,Championship,2026-11-28T15:00:00Z,West Ham United,Stoke City,fanatics,1.56,4.5,5.25
+2026-11-24T15:39-05:00,bcf1bfc44adf70bf134bd132c4a5ba87,Championship,2026-11-29T12:00:00Z,Swansea City,Cardiff City,betmgm,1.93,3.8,3.7
+2026-11-24T15:39-05:00,bcf1bfc44adf70bf134bd132c4a5ba87,Championship,2026-11-29T12:00:00Z,Swansea City,Cardiff City,fanduel,1.95,3.9,3.4
+2026-11-24T15:39-05:00,bcf1bfc44adf70bf134bd132c4a5ba87,Championship,2026-11-29T12:00:00Z,Swansea City,Cardiff City,fanatics,1.91,3.8,3.6
+2026-11-24T15:39-05:00,92c74d2f4a4275568feff8072ed15e73,Championship,2026-11-24T19:45:00Z,Bristol City,Wrexham AFC,kalshi,8.5569,3.6603,1.5218
+2026-11-24T15:39-05:00,ae887a08eef3ff58053488dbddde28a3,Championship,2026-11-24T19:45:00Z,Cardiff City,Preston North End,kalshi,7.8467,4.9778,1.4005
+2026-11-24T15:39-05:00,6d21b6408d1f1c42def270b7f1ae5b21,Championship,2026-11-24T19:45:00Z,Charlton Athletic,Lincoln City,kalshi,1.0837,13.4166,46.7902
+2026-11-24T15:39-05:00,e239a6d57b2cf15091f673c2448fbf4f,Championship,2026-11-24T19:45:00Z,Middlesbrough,Swansea City,kalshi,1.699,3.1745,6.7346
+2026-11-24T15:39-05:00,cbb9284b5d072d869a395ba3ffb8bbff,Championship,2026-11-24T19:45:00Z,Norwich City,Queens Park Rangers,kalshi,4.9778,3.3987,1.7924
+2026-11-24T15:39-05:00,c2ca2ce56eb3bccf1a5de2d0ccc2207f,Championship,2026-11-24T19:45:00Z,Portsmouth,West Ham United,kalshi,2.0911,2.9783,4.1275
+2026-11-24T15:39-05:00,031162fd89aa3c1fd39e523b3c82d35a,Championship,2026-11-24T19:50:00Z,Sheffield United,Southampton,kalshi,6.2954,3.3987,1.643
+2026-11-24T15:39-05:00,018856cb75135463eb1972d978339023,Championship,2026-11-24T20:00:00Z,Wolverhampton Wanderers,Derby County,kalshi,1.1303,8.5569,31.2108
+2026-11-24T15:39-05:00,61d1126751ba67227ac2819624e98342,Championship,2026-11-25T19:45:00Z,Burnley,Birmingham City,kalshi,2.8102,3.3987,2.4553
+2026-11-24T15:39-05:00,0eb7f35d744c1cebeb53be32f50e1e2d,Championship,2026-11-25T19:45:00Z,Watford,Blackburn Rovers,kalshi,2.5206,3.3987,2.6607
+2026-11-24T15:39-05:00,9dfe9df3ad88c453e3572872bf500488,Championship,2026-11-25T19:45:00Z,Bolton Wanderers,West Bromwich Albion,kalshi,3.5202,3.6603,2.0071
+2026-11-24T15:39-05:00,77dfddf6dea97d5ecb5e2463b29fe67e,Championship,2026-11-25T20:00:00Z,Stoke City,Millwall,kalshi,2.2872,3.2866,3.1745
+2026-11-24T15:39-05:00,32b8e3ea76d9d8b2b36577063d40862e,Championship,2026-11-27T20:00:00Z,Southampton,Middlesbrough,kalshi,2.8943,3.8005,2.2872
+2026-11-24T15:39-05:00,a1d96ec37a8b7022ef39a7755a655243,Championship,2026-11-28T12:30:00Z,Blackburn Rovers,Charlton Athletic,kalshi,1.7924,3.3987,3.9593
+2026-11-24T15:39-05:00,d2bc2d3b4a81177cb6b86f4add6ff81f,Championship,2026-11-28T12:30:00Z,Lincoln City,Wolverhampton Wanderers,kalshi,4.7348,3.9593,1.5964
+2026-11-24T15:39-05:00,d47bc722be164b3a733434e89f224654,Championship,2026-11-28T12:30:00Z,Preston North End,Norwich City,kalshi,4.7348,4.1275,1.643
+2026-11-24T15:39-05:00,15fc58a442321c2a85f7a814466c0ab9,Championship,2026-11-28T15:00:00Z,Birmingham City,Bolton Wanderers,kalshi,1.4378,4.5106,5.9029
+2026-11-24T15:39-05:00,b67372e7107fdd259a978e614711e657,Championship,2026-11-28T15:00:00Z,West Bromwich Albion,Bristol City,kalshi,1.7364,3.3987,4.7348
+2026-11-24T15:39-05:00,3f93526d7c8e0ca84734aea60c13900a,Championship,2026-11-28T15:00:00Z,Millwall,Burnley,kalshi,2.1378,3.5202,2.8102
+2026-11-24T15:39-05:00,82ef491ed2f8399e4ccec9f5d8315cee,Championship,2026-11-28T15:00:00Z,Derby County,Watford,kalshi,2.0537,3.1745,2.9783
+2026-11-24T15:39-05:00,9cd8c682c6864b59a7f1a58964083e08,Championship,2026-11-28T15:00:00Z,Wrexham AFC,Portsmouth,kalshi,1.9697,3.2866,3.8005
+2026-11-24T15:39-05:00,dc42f49649c5329c2c47f94fc4ca0c89,Championship,2026-11-28T15:00:00Z,Queens Park Rangers,Sheffield United,kalshi,2.0071,3.3987,3.3987
+2026-11-24T15:39-05:00,c836236766f7859e3c1d61caa581abe1,Championship,2026-11-28T15:00:00Z,West Ham United,Stoke City,kalshi,1.5031,4.7348,4.9778
+2026-11-24T15:39-05:00,bcf1bfc44adf70bf134bd132c4a5ba87,Championship,2026-11-29T12:00:00Z,Swansea City,Cardiff City,kalshi,1.9697,3.9593,3.1745
+2026-11-24T15:39-05:00,80c92a163a81b69fef76530221e2edd0,La Liga,2026-11-27T20:00:00Z,Levante,Real Racing Club de Santander,draftkings,2.1,3.9,3.2
+2026-11-24T15:39-05:00,80c92a163a81b69fef76530221e2edd0,La Liga,2026-11-27T20:00:00Z,Levante,Real Racing Club de Santander,fanatics,2.1,3.8,3.1
+2026-11-24T15:39-05:00,80c92a163a81b69fef76530221e2edd0,La Liga,2026-11-27T20:00:00Z,Levante,Real Racing Club de Santander,fanduel,2.05,3.8,3.1
+2026-11-24T15:39-05:00,80c92a163a81b69fef76530221e2edd0,La Liga,2026-11-27T20:00:00Z,Levante,Real Racing Club de Santander,betmgm,2.05,3.9,3.2
+2026-11-24T15:39-05:00,c81520b9a9794749cfdab57f89bdeb16,La Liga,2026-11-28T13:00:00Z,Real Betis,Rayo Vallecano,draftkings,1.57,4.4,5.25
+2026-11-24T15:39-05:00,c81520b9a9794749cfdab57f89bdeb16,La Liga,2026-11-28T13:00:00Z,Real Betis,Rayo Vallecano,fanatics,1.57,4.3,5.25
+2026-11-24T15:39-05:00,c81520b9a9794749cfdab57f89bdeb16,La Liga,2026-11-28T13:00:00Z,Real Betis,Rayo Vallecano,betmgm,1.57,4.4,5.25
+2026-11-24T15:39-05:00,c81520b9a9794749cfdab57f89bdeb16,La Liga,2026-11-28T13:00:00Z,Real Betis,Rayo Vallecano,fanduel,1.57,4.1,5.2
+2026-11-24T15:39-05:00,33d92dabbd2606dfe9d31058f7b20cc8,La Liga,2026-11-28T15:15:00Z,Málaga,Athletic Bilbao,draftkings,4.5,3.75,1.74
+2026-11-24T15:39-05:00,33d92dabbd2606dfe9d31058f7b20cc8,La Liga,2026-11-28T15:15:00Z,Málaga,Athletic Bilbao,fanatics,4.5,3.8,1.77
+2026-11-24T15:39-05:00,33d92dabbd2606dfe9d31058f7b20cc8,La Liga,2026-11-28T15:15:00Z,Málaga,Athletic Bilbao,fanduel,4.6,3.7,1.71
+2026-11-24T15:39-05:00,33d92dabbd2606dfe9d31058f7b20cc8,La Liga,2026-11-28T15:15:00Z,Málaga,Athletic Bilbao,betmgm,4.5,3.75,1.74
+2026-11-24T15:39-05:00,40236ab976955345ebd1edb72abf6b22,La Liga,2026-11-28T17:30:00Z,Elche CF,Atlético Madrid,draftkings,6.0,4.6,1.49
+2026-11-24T15:39-05:00,40236ab976955345ebd1edb72abf6b22,La Liga,2026-11-28T17:30:00Z,Elche CF,Atlético Madrid,fanatics,6.0,4.5,1.5
+2026-11-24T15:39-05:00,40236ab976955345ebd1edb72abf6b22,La Liga,2026-11-28T17:30:00Z,Elche CF,Atlético Madrid,fanduel,6.0,4.6,1.42
+2026-11-24T15:39-05:00,40236ab976955345ebd1edb72abf6b22,La Liga,2026-11-28T17:30:00Z,Elche CF,Atlético Madrid,betmgm,5.75,4.6,1.5
+2026-11-24T15:39-05:00,c99772cba1418e72f2eded26e4afeb59,La Liga,2026-11-28T20:00:00Z,Real Madrid,Alavés,draftkings,1.15,8.5,14.0
+2026-11-24T15:39-05:00,c99772cba1418e72f2eded26e4afeb59,La Liga,2026-11-28T20:00:00Z,Real Madrid,Alavés,fanatics,1.16,8.0,15.0
+2026-11-24T15:39-05:00,c99772cba1418e72f2eded26e4afeb59,La Liga,2026-11-28T20:00:00Z,Real Madrid,Alavés,fanduel,1.12,8.0,13.0
+2026-11-24T15:39-05:00,c99772cba1418e72f2eded26e4afeb59,La Liga,2026-11-28T20:00:00Z,Real Madrid,Alavés,betmgm,1.16,8.0,14.0
+2026-11-24T15:39-05:00,1ab9541320cecbe9f043565fd4a141e0,La Liga,2026-11-29T13:00:00Z,Valencia,CA Osasuna,draftkings,2.1,3.2,3.6
+2026-11-24T15:39-05:00,1ab9541320cecbe9f043565fd4a141e0,La Liga,2026-11-29T13:00:00Z,Valencia,CA Osasuna,fanduel,2.1,3.2,3.6
+2026-11-24T15:39-05:00,1ab9541320cecbe9f043565fd4a141e0,La Liga,2026-11-29T13:00:00Z,Valencia,CA Osasuna,fanatics,2.15,3.3,3.5
+2026-11-24T15:39-05:00,1ab9541320cecbe9f043565fd4a141e0,La Liga,2026-11-29T13:00:00Z,Valencia,CA Osasuna,betmgm,2.1,3.25,3.5
+2026-11-24T15:39-05:00,69fc06d019491be2aa1bf69b8f8041e3,La Liga,2026-11-29T15:15:00Z,Deportivo La Coruña,Barcelona,draftkings,8.5,7.0,1.25
+2026-11-24T15:39-05:00,69fc06d019491be2aa1bf69b8f8041e3,La Liga,2026-11-29T15:15:00Z,Deportivo La Coruña,Barcelona,fanatics,9.0,7.0,1.25
+2026-11-24T15:39-05:00,69fc06d019491be2aa1bf69b8f8041e3,La Liga,2026-11-29T15:15:00Z,Deportivo La Coruña,Barcelona,betmgm,8.0,7.0,1.29
+2026-11-24T15:39-05:00,69fc06d019491be2aa1bf69b8f8041e3,La Liga,2026-11-29T15:15:00Z,Deportivo La Coruña,Barcelona,fanduel,9.5,7.0,1.2
+2026-11-24T15:39-05:00,20c78c2ef75c4a6d7f4af81dd32e97cd,La Liga,2026-11-29T17:30:00Z,Celta Vigo,Villarreal,draftkings,2.7,3.5,2.5
+2026-11-24T15:39-05:00,20c78c2ef75c4a6d7f4af81dd32e97cd,La Liga,2026-11-29T17:30:00Z,Celta Vigo,Villarreal,fanatics,2.65,3.5,2.5
+2026-11-24T15:39-05:00,20c78c2ef75c4a6d7f4af81dd32e97cd,La Liga,2026-11-29T17:30:00Z,Celta Vigo,Villarreal,betmgm,2.65,3.5,2.5
+2026-11-24T15:39-05:00,20c78c2ef75c4a6d7f4af81dd32e97cd,La Liga,2026-11-29T17:30:00Z,Celta Vigo,Villarreal,fanduel,2.7,3.5,2.45
+2026-11-24T15:39-05:00,f892ea6d5eca105c36ca9468b12857f2,La Liga,2026-11-29T20:00:00Z,Real Sociedad,Sevilla,draftkings,2.15,3.65,3.15
+2026-11-24T15:39-05:00,f892ea6d5eca105c36ca9468b12857f2,La Liga,2026-11-29T20:00:00Z,Real Sociedad,Sevilla,fanatics,2.1,3.6,3.2
+2026-11-24T15:39-05:00,f892ea6d5eca105c36ca9468b12857f2,La Liga,2026-11-29T20:00:00Z,Real Sociedad,Sevilla,betmgm,2.15,3.6,3.2
+2026-11-24T15:39-05:00,f892ea6d5eca105c36ca9468b12857f2,La Liga,2026-11-29T20:00:00Z,Real Sociedad,Sevilla,fanduel,2.1,3.6,3.1
+2026-11-24T15:39-05:00,b648a7246af1d3a839b0fcd212849a7c,La Liga,2026-11-30T20:00:00Z,Espanyol,Getafe,draftkings,2.1,3.15,3.8
+2026-11-24T15:39-05:00,b648a7246af1d3a839b0fcd212849a7c,La Liga,2026-11-30T20:00:00Z,Espanyol,Getafe,fanatics,2.1,3.2,3.8
+2026-11-24T15:39-05:00,b648a7246af1d3a839b0fcd212849a7c,La Liga,2026-11-30T20:00:00Z,Espanyol,Getafe,fanduel,2.05,3.1,3.9
+2026-11-24T15:39-05:00,b648a7246af1d3a839b0fcd212849a7c,La Liga,2026-11-30T20:00:00Z,Espanyol,Getafe,betmgm,2.1,3.2,3.75
+2026-11-24T15:39-05:00,dc10f5ff4125d724e0fbfe7efe6d86aa,La Liga,2026-12-02T18:00:00Z,Real Sociedad,Real Madrid,fanatics,6.0,5.25,1.42
+2026-11-24T15:39-05:00,dc10f5ff4125d724e0fbfe7efe6d86aa,La Liga,2026-12-02T18:00:00Z,Real Sociedad,Real Madrid,fanduel,6.0,5.2,1.42
+2026-11-24T15:39-05:00,b8a455b28ca30fd95640228161c7c5c5,La Liga,2026-12-02T20:30:00Z,Barcelona,Atlético Madrid,fanatics,1.36,5.5,6.5
+2026-11-24T15:39-05:00,b8a455b28ca30fd95640228161c7c5c5,La Liga,2026-12-02T20:30:00Z,Barcelona,Atlético Madrid,fanduel,1.33,5.6,6.5
+2026-11-24T15:39-05:00,ae879dadcd548f1a496b6751b4d85bff,La Liga,2026-12-04T20:00:00Z,Alavés,Espanyol,fanatics,1.91,3.5,4.1
+2026-11-24T15:39-05:00,ae879dadcd548f1a496b6751b4d85bff,La Liga,2026-12-04T20:00:00Z,Alavés,Espanyol,fanduel,1.8,3.5,4.1
+2026-11-24T15:39-05:00,48c892928774ec33befa04f76c52cb4a,La Liga,2026-12-05T13:00:00Z,Real Racing Club de Santander,Deportivo La Coruña,fanatics,2.35,3.5,2.85
+2026-11-24T15:39-05:00,48c892928774ec33befa04f76c52cb4a,La Liga,2026-12-05T13:00:00Z,Real Racing Club de Santander,Deportivo La Coruña,fanduel,2.4,3.4,2.8
+2026-11-24T15:39-05:00,188e30796d25595e117480df1cfb19b8,La Liga,2026-12-05T15:15:00Z,Rayo Vallecano,Levante,fanatics,1.83,3.8,4.1
+2026-11-24T15:39-05:00,188e30796d25595e117480df1cfb19b8,La Liga,2026-12-05T15:15:00Z,Rayo Vallecano,Levante,fanduel,1.77,3.8,4.0
+2026-11-24T15:39-05:00,378d4432ce400c83859123281c1189de,La Liga,2026-12-05T17:30:00Z,Villarreal,Real Sociedad,fanatics,1.71,4.3,4.1
+2026-11-24T15:39-05:00,378d4432ce400c83859123281c1189de,La Liga,2026-12-05T17:30:00Z,Villarreal,Real Sociedad,fanduel,1.67,4.4,4.2
+2026-11-24T15:39-05:00,a6378d2226c38068085412dcfe6ed2c9,La Liga,2026-12-05T20:00:00Z,Barcelona,Celta Vigo,fanatics,1.09,12.0,19.0
+2026-11-24T15:39-05:00,a6378d2226c38068085412dcfe6ed2c9,La Liga,2026-12-05T20:00:00Z,Barcelona,Celta Vigo,fanduel,1.08,11.0,16.0
+2026-11-24T15:39-05:00,b3ecf4f05571a5c613459857c9b3f7b0,La Liga,2026-12-06T13:00:00Z,CA Osasuna,Elche CF,fanduel,2.05,3.5,3.3
+2026-11-24T15:39-05:00,b3ecf4f05571a5c613459857c9b3f7b0,La Liga,2026-12-06T13:00:00Z,CA Osasuna,Elche CF,fanatics,2.1,3.6,3.3
+2026-11-24T15:39-05:00,59e9722830fbf906910c1526eddf110c,La Liga,2026-12-06T15:15:00Z,Athletic Bilbao,Real Madrid,fanatics,4.75,4.3,1.67
+2026-11-24T15:39-05:00,59e9722830fbf906910c1526eddf110c,La Liga,2026-12-06T15:15:00Z,Athletic Bilbao,Real Madrid,fanduel,4.7,4.3,1.59
+2026-11-24T15:39-05:00,93deed2cc6f80d75270abbb13437c51c,La Liga,2026-12-06T17:30:00Z,Getafe,Valencia,fanatics,2.35,3.1,3.3
+2026-11-24T15:39-05:00,93deed2cc6f80d75270abbb13437c51c,La Liga,2026-12-06T17:30:00Z,Getafe,Valencia,fanduel,2.35,3.0,3.3
+2026-11-24T15:39-05:00,24d5861f7f820bd4e070deaaa063fac9,La Liga,2026-12-06T20:00:00Z,Atlético Madrid,Real Betis,fanatics,1.67,4.1,4.75
+2026-11-24T15:39-05:00,24d5861f7f820bd4e070deaaa063fac9,La Liga,2026-12-06T20:00:00Z,Atlético Madrid,Real Betis,fanduel,1.59,4.3,4.7
+2026-11-24T15:39-05:00,dce7c3c907eb304c1884dc9f87ecda2f,La Liga,2026-12-07T20:00:00Z,Sevilla,Málaga,fanduel,1.4,4.5,6.5
+2026-11-24T15:39-05:00,dce7c3c907eb304c1884dc9f87ecda2f,La Liga,2026-12-07T20:00:00Z,Sevilla,Málaga,fanatics,1.44,4.5,6.5
+2026-11-24T15:39-05:00,80c92a163a81b69fef76530221e2edd0,La Liga,2026-11-27T20:00:00Z,Levante,Real Racing Club de Santander,kalshi,2.0537,3.8005,3.1745
+2026-11-24T15:39-05:00,c81520b9a9794749cfdab57f89bdeb16,La Liga,2026-11-28T13:00:00Z,Real Betis,Rayo Vallecano,kalshi,1.5964,4.3144,5.2581
+2026-11-24T15:39-05:00,33d92dabbd2606dfe9d31058f7b20cc8,La Liga,2026-11-28T15:15:00Z,Málaga,Athletic Bilbao,kalshi,4.9778,3.8005,1.7364
+2026-11-24T15:39-05:00,40236ab976955345ebd1edb72abf6b22,La Liga,2026-11-28T17:30:00Z,Elche CF,Atlético Madrid,kalshi,6.2954,4.7348,1.4845
+2026-11-24T15:39-05:00,c99772cba1418e72f2eded26e4afeb59,La Liga,2026-11-28T20:00:00Z,Real Madrid,Alavés,kalshi,1.1489,9.4073,15.6408
+2026-11-24T15:39-05:00,1ab9541320cecbe9f043565fd4a141e0,La Liga,2026-11-29T13:00:00Z,Valencia,CA Osasuna,kalshi,2.1378,3.2866,3.6603
+2026-11-24T15:39-05:00,69fc06d019491be2aa1bf69b8f8041e3,La Liga,2026-11-29T15:15:00Z,Deportivo La Coruña,Barcelona,kalshi,10.4447,7.2486,1.2327
+2026-11-24T15:39-05:00,20c78c2ef75c4a6d7f4af81dd32e97cd,La Liga,2026-11-29T17:30:00Z,Celta Vigo,Villarreal,kalshi,2.6607,3.3987,2.4553
+2026-11-24T15:39-05:00,f892ea6d5eca105c36ca9468b12857f2,La Liga,2026-11-29T20:00:00Z,Real Sociedad,Sevilla,kalshi,2.0911,3.6603,3.1745
+2026-11-24T15:39-05:00,b648a7246af1d3a839b0fcd212849a7c,La Liga,2026-11-30T20:00:00Z,Espanyol,Getafe,kalshi,2.0071,3.0811,4.1275
+2026-11-24T15:39-05:00,dc10f5ff4125d724e0fbfe7efe6d86aa,La Liga,2026-12-02T18:00:00Z,Real Sociedad,Real Madrid,kalshi,6.2954,5.2581,1.4378
+2026-11-24T15:39-05:00,b8a455b28ca30fd95640228161c7c5c5,La Liga,2026-12-02T20:30:00Z,Barcelona,Atlético Madrid,kalshi,1.4005,5.5572,6.2954
+2026-11-24T15:39-05:00,ae879dadcd548f1a496b6751b4d85bff,La Liga,2026-12-04T20:00:00Z,Alavés,Espanyol,kalshi,1.895,3.3987,3.9593
+2026-11-24T15:39-05:00,48c892928774ec33befa04f76c52cb4a,La Liga,2026-12-05T13:00:00Z,Real Racing Club de Santander,Deportivo La Coruña,kalshi,2.3432,3.3987,2.8943
+2026-11-24T15:39-05:00,188e30796d25595e117480df1cfb19b8,La Liga,2026-12-05T15:15:00Z,Rayo Vallecano,Levante,kalshi,1.8297,3.8005,3.9593
+2026-11-24T15:39-05:00,378d4432ce400c83859123281c1189de,La Liga,2026-12-05T17:30:00Z,Villarreal,Real Sociedad,kalshi,1.7364,4.3144,3.9593
+2026-11-24T15:39-05:00,a6378d2226c38068085412dcfe6ed2c9,La Liga,2026-12-05T20:00:00Z,Barcelona,Celta Vigo,kalshi,1.1117,11.7437,18.7529
+2026-11-24T15:39-05:00,b3ecf4f05571a5c613459857c9b3f7b0,La Liga,2026-12-06T13:00:00Z,CA Osasuna,Elche CF,kalshi,2.0537,3.5202,3.3987
+2026-11-24T15:39-05:00,59e9722830fbf906910c1526eddf110c,La Liga,2026-12-06T15:15:00Z,Athletic Bilbao,Real Madrid,kalshi,4.7348,4.3144,1.6244
+2026-11-24T15:39-05:00,93deed2cc6f80d75270abbb13437c51c,La Liga,2026-12-06T17:30:00Z,Getafe,Valencia,kalshi,2.3432,2.8943,3.2866
+2026-11-24T15:39-05:00,24d5861f7f820bd4e070deaaa063fac9,La Liga,2026-12-06T20:00:00Z,Atlético Madrid,Real Betis,kalshi,1.6244,4.1275,4.5106
+2026-11-24T15:39-05:00,dce7c3c907eb304c1884dc9f87ecda2f,La Liga,2026-12-07T20:00:00Z,Sevilla,Málaga,kalshi,1.4565,4.3144,6.2954
+2026-11-24T15:39-05:00,698f4a7967ead89e10205a68ceb4bda4,Bundesliga,2026-11-27T19:30:00Z,Werder Bremen,Borussia Monchengladbach,draftkings,1.69,4.2,4.0
+2026-11-24T15:39-05:00,698f4a7967ead89e10205a68ceb4bda4,Bundesliga,2026-11-27T19:30:00Z,Werder Bremen,Borussia Monchengladbach,betmgm,1.74,4.2,4.1
+2026-11-24T15:39-05:00,698f4a7967ead89e10205a68ceb4bda4,Bundesliga,2026-11-27T19:30:00Z,Werder Bremen,Borussia Monchengladbach,fanduel,1.69,4.3,4.1
+2026-11-24T15:39-05:00,698f4a7967ead89e10205a68ceb4bda4,Bundesliga,2026-11-27T19:30:00Z,Werder Bremen,Borussia Monchengladbach,fanatics,1.77,4.1,4.1
+2026-11-24T15:39-05:00,698f4a7967ead89e10205a68ceb4bda4,Bundesliga,2026-11-27T19:30:00Z,Werder Bremen,Borussia Monchengladbach,williamhill_us,1.74,4.05,4.0
+2026-11-24T15:39-05:00,2c30e2ebaf6c30aaa4e3fb56cffa6a29,Bundesliga,2026-11-28T14:30:00Z,1. FC Köln,Elversberg,draftkings,1.95,3.65,3.25
+2026-11-24T15:39-05:00,2c30e2ebaf6c30aaa4e3fb56cffa6a29,Bundesliga,2026-11-28T14:30:00Z,1. FC Köln,Elversberg,betmgm,2.0,3.8,3.4
+2026-11-24T15:39-05:00,2c30e2ebaf6c30aaa4e3fb56cffa6a29,Bundesliga,2026-11-28T14:30:00Z,1. FC Köln,Elversberg,fanduel,1.95,3.8,3.4
+2026-11-24T15:39-05:00,2c30e2ebaf6c30aaa4e3fb56cffa6a29,Bundesliga,2026-11-28T14:30:00Z,1. FC Köln,Elversberg,fanatics,1.95,4.0,3.4
+2026-11-24T15:39-05:00,2c30e2ebaf6c30aaa4e3fb56cffa6a29,Bundesliga,2026-11-28T14:30:00Z,1. FC Köln,Elversberg,williamhill_us,1.93,3.75,3.35
+2026-11-24T15:39-05:00,3b025a029f51fbeb9580a178d0612f50,Bundesliga,2026-11-28T14:30:00Z,Hamburger SV,Bayern Munich,draftkings,8.5,6.5,1.22
+2026-11-24T15:39-05:00,3b025a029f51fbeb9580a178d0612f50,Bundesliga,2026-11-28T14:30:00Z,Hamburger SV,Bayern Munich,betmgm,9.0,6.75,1.27
+2026-11-24T15:39-05:00,3b025a029f51fbeb9580a178d0612f50,Bundesliga,2026-11-28T14:30:00Z,Hamburger SV,Bayern Munich,fanduel,8.5,7.5,1.18
+2026-11-24T15:39-05:00,3b025a029f51fbeb9580a178d0612f50,Bundesliga,2026-11-28T14:30:00Z,Hamburger SV,Bayern Munich,fanatics,9.5,6.5,1.25
+2026-11-24T15:39-05:00,3b025a029f51fbeb9580a178d0612f50,Bundesliga,2026-11-28T14:30:00Z,Hamburger SV,Bayern Munich,williamhill_us,8.5,6.5,1.26
+2026-11-24T15:39-05:00,f84a9da7eedd0ca11a28a1a7a8edddc7,Bundesliga,2026-11-28T14:30:00Z,SC Paderborn,FC Schalke 04,draftkings,2.35,3.3,2.75
+2026-11-24T15:39-05:00,f84a9da7eedd0ca11a28a1a7a8edddc7,Bundesliga,2026-11-28T14:30:00Z,SC Paderborn,FC Schalke 04,betmgm,2.35,3.5,2.88
+2026-11-24T15:39-05:00,f84a9da7eedd0ca11a28a1a7a8edddc7,Bundesliga,2026-11-28T14:30:00Z,SC Paderborn,FC Schalke 04,fanduel,2.4,3.5,2.8
+2026-11-24T15:39-05:00,f84a9da7eedd0ca11a28a1a7a8edddc7,Bundesliga,2026-11-28T14:30:00Z,SC Paderborn,FC Schalke 04,fanatics,2.4,3.5,2.75
+2026-11-24T15:39-05:00,f84a9da7eedd0ca11a28a1a7a8edddc7,Bundesliga,2026-11-28T14:30:00Z,SC Paderborn,FC Schalke 04,williamhill_us,2.31,3.45,2.85
+2026-11-24T15:39-05:00,365e1a00908ab1cd5a51a53ede2b86b2,Bundesliga,2026-11-28T14:30:00Z,FSV Mainz 05,Union Berlin,draftkings,1.47,4.4,5.5
+2026-11-24T15:39-05:00,365e1a00908ab1cd5a51a53ede2b86b2,Bundesliga,2026-11-28T14:30:00Z,FSV Mainz 05,Union Berlin,betmgm,1.5,4.6,5.75
+2026-11-24T15:39-05:00,365e1a00908ab1cd5a51a53ede2b86b2,Bundesliga,2026-11-28T14:30:00Z,FSV Mainz 05,Union Berlin,fanduel,1.48,4.6,5.8
+2026-11-24T15:39-05:00,365e1a00908ab1cd5a51a53ede2b86b2,Bundesliga,2026-11-28T14:30:00Z,FSV Mainz 05,Union Berlin,fanatics,1.5,4.75,5.75
+2026-11-24T15:39-05:00,365e1a00908ab1cd5a51a53ede2b86b2,Bundesliga,2026-11-28T14:30:00Z,FSV Mainz 05,Union Berlin,williamhill_us,1.5,4.5,5.5
+2026-11-24T15:39-05:00,5d838190a8f5932d7fcfbcc26bacdd9c,Bundesliga,2026-11-28T17:30:00Z,VfB Stuttgart,Eintracht Frankfurt,draftkings,1.69,4.4,3.7
+2026-11-24T15:39-05:00,5d838190a8f5932d7fcfbcc26bacdd9c,Bundesliga,2026-11-28T17:30:00Z,VfB Stuttgart,Eintracht Frankfurt,betmgm,1.74,4.5,3.9
+2026-11-24T15:39-05:00,5d838190a8f5932d7fcfbcc26bacdd9c,Bundesliga,2026-11-28T17:30:00Z,VfB Stuttgart,Eintracht Frankfurt,fanduel,1.69,4.6,3.8
+2026-11-24T15:39-05:00,5d838190a8f5932d7fcfbcc26bacdd9c,Bundesliga,2026-11-28T17:30:00Z,VfB Stuttgart,Eintracht Frankfurt,fanatics,1.74,4.5,3.8
+2026-11-24T15:39-05:00,5d838190a8f5932d7fcfbcc26bacdd9c,Bundesliga,2026-11-28T17:30:00Z,VfB Stuttgart,Eintracht Frankfurt,williamhill_us,1.72,4.4,3.8
+2026-11-24T15:39-05:00,2aa9aa95157eb36fed45135c995cdd80,Bundesliga,2026-11-29T14:30:00Z,SC Freiburg,RB Leipzig,draftkings,2.6,3.65,2.3
+2026-11-24T15:39-05:00,2aa9aa95157eb36fed45135c995cdd80,Bundesliga,2026-11-29T14:30:00Z,SC Freiburg,RB Leipzig,betmgm,2.65,3.8,2.38
+2026-11-24T15:39-05:00,2aa9aa95157eb36fed45135c995cdd80,Bundesliga,2026-11-29T14:30:00Z,SC Freiburg,RB Leipzig,fanatics,2.6,3.8,2.4
+2026-11-24T15:39-05:00,2aa9aa95157eb36fed45135c995cdd80,Bundesliga,2026-11-29T14:30:00Z,SC Freiburg,RB Leipzig,fanduel,2.65,3.8,2.35
+2026-11-24T15:39-05:00,2aa9aa95157eb36fed45135c995cdd80,Bundesliga,2026-11-29T14:30:00Z,SC Freiburg,RB Leipzig,williamhill_us,2.64,3.8,2.33
+2026-11-24T15:39-05:00,98dc79e39433bb4c59bf9753e35a5cdf,Bundesliga,2026-11-29T16:30:00Z,TSG Hoffenheim,Augsburg,draftkings,1.69,4.4,3.75
+2026-11-24T15:39-05:00,98dc79e39433bb4c59bf9753e35a5cdf,Bundesliga,2026-11-29T16:30:00Z,TSG Hoffenheim,Augsburg,betmgm,1.71,4.4,4.0
+2026-11-24T15:39-05:00,98dc79e39433bb4c59bf9753e35a5cdf,Bundesliga,2026-11-29T16:30:00Z,TSG Hoffenheim,Augsburg,fanatics,1.69,4.5,4.1
+2026-11-24T15:39-05:00,98dc79e39433bb4c59bf9753e35a5cdf,Bundesliga,2026-11-29T16:30:00Z,TSG Hoffenheim,Augsburg,fanduel,1.65,4.7,3.9
+2026-11-24T15:39-05:00,98415e21c147d701bd81e70b1af0f3a7,Bundesliga,2026-11-29T18:30:00Z,Borussia Dortmund,Bayer Leverkusen,draftkings,2.05,3.8,2.95
+2026-11-24T15:39-05:00,98415e21c147d701bd81e70b1af0f3a7,Bundesliga,2026-11-29T18:30:00Z,Borussia Dortmund,Bayer Leverkusen,betmgm,2.15,3.8,3.0
+2026-11-24T15:39-05:00,98415e21c147d701bd81e70b1af0f3a7,Bundesliga,2026-11-29T18:30:00Z,Borussia Dortmund,Bayer Leverkusen,fanatics,2.1,4.0,3.0
+2026-11-24T15:39-05:00,98415e21c147d701bd81e70b1af0f3a7,Bundesliga,2026-11-29T18:30:00Z,Borussia Dortmund,Bayer Leverkusen,fanduel,2.1,3.9,3.0
+2026-11-24T15:39-05:00,98415e21c147d701bd81e70b1af0f3a7,Bundesliga,2026-11-29T18:30:00Z,Borussia Dortmund,Bayer Leverkusen,williamhill_us,2.06,3.85,3.0
+2026-11-24T15:39-05:00,4535d59d6670cc8342d5e6b40ce76fb4,Bundesliga,2026-12-04T19:30:00Z,Bayern Munich,SC Paderborn,betmgm,1.07,14.5,26.0
+2026-11-24T15:39-05:00,4535d59d6670cc8342d5e6b40ce76fb4,Bundesliga,2026-12-04T19:30:00Z,Bayern Munich,SC Paderborn,fanduel,1.04,16.0,23.0
+2026-11-24T15:39-05:00,4535d59d6670cc8342d5e6b40ce76fb4,Bundesliga,2026-12-04T19:30:00Z,Bayern Munich,SC Paderborn,fanatics,1.06,16.0,26.0
+2026-11-24T15:39-05:00,4535d59d6670cc8342d5e6b40ce76fb4,Bundesliga,2026-12-04T19:30:00Z,Bayern Munich,SC Paderborn,draftkings,1.03,13.0,17.0
+2026-11-24T15:39-05:00,5089643216359c9456d425930e6c57d9,Bundesliga,2026-12-05T14:30:00Z,Augsburg,1. FC Köln,betmgm,2.15,4.0,2.9
+2026-11-24T15:39-05:00,5089643216359c9456d425930e6c57d9,Bundesliga,2026-12-05T14:30:00Z,Augsburg,1. FC Köln,fanatics,2.15,4.0,2.9
+2026-11-24T15:39-05:00,5089643216359c9456d425930e6c57d9,Bundesliga,2026-12-05T14:30:00Z,Augsburg,1. FC Köln,fanduel,2.15,4.0,2.9
+2026-11-24T15:39-05:00,5089643216359c9456d425930e6c57d9,Bundesliga,2026-12-05T14:30:00Z,Augsburg,1. FC Köln,draftkings,2.1,3.75,2.75
+2026-11-24T15:39-05:00,a7ef7acc0225e0ff03816f515299f248,Bundesliga,2026-12-05T14:30:00Z,Bayer Leverkusen,Borussia Monchengladbach,betmgm,1.33,6.25,7.5
+2026-11-24T15:39-05:00,a7ef7acc0225e0ff03816f515299f248,Bundesliga,2026-12-05T14:30:00Z,Bayer Leverkusen,Borussia Monchengladbach,fanatics,1.29,6.0,8.0
+2026-11-24T15:39-05:00,a7ef7acc0225e0ff03816f515299f248,Bundesliga,2026-12-05T14:30:00Z,Bayer Leverkusen,Borussia Monchengladbach,fanduel,1.27,6.0,8.0
+2026-11-24T15:39-05:00,a7ef7acc0225e0ff03816f515299f248,Bundesliga,2026-12-05T14:30:00Z,Bayer Leverkusen,Borussia Monchengladbach,draftkings,1.26,5.75,7.5
+2026-11-24T15:39-05:00,cd71180a378c01105112f52d2764b922,Bundesliga,2026-12-05T14:30:00Z,RB Leipzig,FSV Mainz 05,fanduel,1.53,4.7,4.8
+2026-11-24T15:39-05:00,cd71180a378c01105112f52d2764b922,Bundesliga,2026-12-05T14:30:00Z,RB Leipzig,FSV Mainz 05,fanatics,1.57,4.75,4.75
+2026-11-24T15:39-05:00,cd71180a378c01105112f52d2764b922,Bundesliga,2026-12-05T14:30:00Z,RB Leipzig,FSV Mainz 05,betmgm,1.61,4.5,4.75
+2026-11-24T15:39-05:00,cd71180a378c01105112f52d2764b922,Bundesliga,2026-12-05T14:30:00Z,RB Leipzig,FSV Mainz 05,draftkings,1.53,4.4,4.5
+2026-11-24T15:39-05:00,08bc048e18105e5b3e41fae5d67a0500,Bundesliga,2026-12-05T14:30:00Z,Union Berlin,Hamburger SV,fanduel,2.45,3.6,2.65
+2026-11-24T15:39-05:00,08bc048e18105e5b3e41fae5d67a0500,Bundesliga,2026-12-05T14:30:00Z,Union Berlin,Hamburger SV,betmgm,2.45,3.6,2.65
+2026-11-24T15:39-05:00,08bc048e18105e5b3e41fae5d67a0500,Bundesliga,2026-12-05T14:30:00Z,Union Berlin,Hamburger SV,fanatics,2.45,3.6,2.65
+2026-11-24T15:39-05:00,08bc048e18105e5b3e41fae5d67a0500,Bundesliga,2026-12-05T14:30:00Z,Union Berlin,Hamburger SV,draftkings,2.4,3.45,2.55
+2026-11-24T15:39-05:00,2d1c66b6eb335336d2dd0739e090ed37,Bundesliga,2026-12-05T14:30:00Z,SC Freiburg,TSG Hoffenheim,fanduel,2.1,3.8,3.1
+2026-11-24T15:39-05:00,2d1c66b6eb335336d2dd0739e090ed37,Bundesliga,2026-12-05T14:30:00Z,SC Freiburg,TSG Hoffenheim,fanatics,2.1,4.0,3.1
+2026-11-24T15:39-05:00,2d1c66b6eb335336d2dd0739e090ed37,Bundesliga,2026-12-05T14:30:00Z,SC Freiburg,TSG Hoffenheim,betmgm,2.1,3.8,3.1
+2026-11-24T15:39-05:00,2d1c66b6eb335336d2dd0739e090ed37,Bundesliga,2026-12-05T14:30:00Z,SC Freiburg,TSG Hoffenheim,draftkings,2.05,3.65,2.95
+2026-11-24T15:39-05:00,550c0c298df8a95f8c64eba817ec8f55,Bundesliga,2026-12-05T17:30:00Z,Eintracht Frankfurt,Werder Bremen,fanduel,2.05,4.0,3.1
+2026-11-24T15:39-05:00,550c0c298df8a95f8c64eba817ec8f55,Bundesliga,2026-12-05T17:30:00Z,Eintracht Frankfurt,Werder Bremen,fanatics,2.05,4.0,3.1
+2026-11-24T15:39-05:00,550c0c298df8a95f8c64eba817ec8f55,Bundesliga,2026-12-05T17:30:00Z,Eintracht Frankfurt,Werder Bremen,betmgm,2.0,4.0,3.2
+2026-11-24T15:39-05:00,550c0c298df8a95f8c64eba817ec8f55,Bundesliga,2026-12-05T17:30:00Z,Eintracht Frankfurt,Werder Bremen,draftkings,2.0,3.75,2.95
+2026-11-24T15:39-05:00,cd4d6b19f7f06ffc538fbbb6984fb4c4,Bundesliga,2026-12-06T14:30:00Z,FC Schalke 04,Borussia Dortmund,fanduel,4.3,4.0,1.71
+2026-11-24T15:39-05:00,cd4d6b19f7f06ffc538fbbb6984fb4c4,Bundesliga,2026-12-06T14:30:00Z,FC Schalke 04,Borussia Dortmund,fanatics,4.3,4.1,1.74
+2026-11-24T15:39-05:00,cd4d6b19f7f06ffc538fbbb6984fb4c4,Bundesliga,2026-12-06T14:30:00Z,FC Schalke 04,Borussia Dortmund,betmgm,4.33,3.9,1.74
+2026-11-24T15:39-05:00,cd4d6b19f7f06ffc538fbbb6984fb4c4,Bundesliga,2026-12-06T14:30:00Z,FC Schalke 04,Borussia Dortmund,draftkings,4.1,3.75,1.69
+2026-11-24T15:39-05:00,a1b1684ab8d51cc6692d6337106459ce,Bundesliga,2026-12-06T16:30:00Z,Elversberg,VfB Stuttgart,fanduel,3.6,4.4,1.8
+2026-11-24T15:39-05:00,a1b1684ab8d51cc6692d6337106459ce,Bundesliga,2026-12-06T16:30:00Z,Elversberg,VfB Stuttgart,fanatics,3.6,4.3,1.87
+2026-11-24T15:39-05:00,a1b1684ab8d51cc6692d6337106459ce,Bundesliga,2026-12-06T16:30:00Z,Elversberg,VfB Stuttgart,betmgm,3.6,4.2,1.85
+2026-11-24T15:39-05:00,a1b1684ab8d51cc6692d6337106459ce,Bundesliga,2026-12-06T16:30:00Z,Elversberg,VfB Stuttgart,draftkings,3.4,4.0,1.8
+2026-11-24T15:39-05:00,698f4a7967ead89e10205a68ceb4bda4,Bundesliga,2026-11-27T19:30:00Z,Werder Bremen,Borussia Monchengladbach,kalshi,1.7364,4.3144,4.1275
+2026-11-24T15:39-05:00,2c30e2ebaf6c30aaa4e3fb56cffa6a29,Bundesliga,2026-11-28T14:30:00Z,1. FC Köln,Elversberg,kalshi,1.9697,3.8005,3.3987
+2026-11-24T15:39-05:00,3b025a029f51fbeb9580a178d0612f50,Bundesliga,2026-11-28T14:30:00Z,Hamburger SV,Bayern Munich,kalshi,10.4447,7.8467,1.2327
+2026-11-24T15:39-05:00,f84a9da7eedd0ca11a28a1a7a8edddc7,Bundesliga,2026-11-28T14:30:00Z,SC Paderborn,FC Schalke 04,kalshi,2.4553,3.2866,2.7355
+2026-11-24T15:39-05:00,365e1a00908ab1cd5a51a53ede2b86b2,Bundesliga,2026-11-28T14:30:00Z,FSV Mainz 05,Union Berlin,kalshi,1.4845,4.5106,5.9029
+2026-11-24T15:39-05:00,5d838190a8f5932d7fcfbcc26bacdd9c,Bundesliga,2026-11-28T17:30:00Z,VfB Stuttgart,Eintracht Frankfurt,kalshi,1.7644,4.5106,3.6603
+2026-11-24T15:39-05:00,2aa9aa95157eb36fed45135c995cdd80,Bundesliga,2026-11-29T14:30:00Z,SC Freiburg,RB Leipzig,kalshi,2.7355,3.8005,2.3432
+2026-11-24T15:39-05:00,98dc79e39433bb4c59bf9753e35a5cdf,Bundesliga,2026-11-29T16:30:00Z,TSG Hoffenheim,Augsburg,kalshi,1.699,4.5106,3.9593
+2026-11-24T15:39-05:00,98415e21c147d701bd81e70b1af0f3a7,Bundesliga,2026-11-29T18:30:00Z,Borussia Dortmund,Bayer Leverkusen,kalshi,2.0911,3.8005,2.9783
+2026-11-24T15:39-05:00,4535d59d6670cc8342d5e6b40ce76fb4,Bundesliga,2026-12-04T19:30:00Z,Bayern Munich,SC Paderborn,kalshi,1.0837,15.6408,23.4258
+2026-11-24T15:39-05:00,5089643216359c9456d425930e6c57d9,Bundesliga,2026-12-05T14:30:00Z,Augsburg,1. FC Köln,kalshi,2.1378,3.8005,2.8102
+2026-11-24T15:39-05:00,a7ef7acc0225e0ff03816f515299f248,Bundesliga,2026-12-05T14:30:00Z,Bayer Leverkusen,Borussia Monchengladbach,kalshi,1.298,6.7346,8.5569
+2026-11-24T15:39-05:00,cd71180a378c01105112f52d2764b922,Bundesliga,2026-12-05T14:30:00Z,RB Leipzig,FSV Mainz 05,kalshi,1.5684,4.7348,4.7348
+2026-11-24T15:39-05:00,08bc048e18105e5b3e41fae5d67a0500,Bundesliga,2026-12-05T14:30:00Z,Union Berlin,Hamburger SV,kalshi,2.3992,3.5202,2.586
+2026-11-24T15:39-05:00,2d1c66b6eb335336d2dd0739e090ed37,Bundesliga,2026-12-05T14:30:00Z,SC Freiburg,TSG Hoffenheim,kalshi,2.0537,3.8005,3.0811
+2026-11-24T15:39-05:00,550c0c298df8a95f8c64eba817ec8f55,Bundesliga,2026-12-05T17:30:00Z,Eintracht Frankfurt,Werder Bremen,kalshi,2.0537,3.9593,2.9783
+2026-11-24T15:39-05:00,cd4d6b19f7f06ffc538fbbb6984fb4c4,Bundesliga,2026-12-06T14:30:00Z,FC Schalke 04,Borussia Dortmund,kalshi,4.3144,3.9593,1.7364
+2026-11-24T15:39-05:00,a1b1684ab8d51cc6692d6337106459ce,Bundesliga,2026-12-06T16:30:00Z,Elversberg,VfB Stuttgart,kalshi,3.6603,4.3144,1.8297
+2026-11-24T15:39-05:00,e9a663f13e7503c0ac20a54804338b60,Serie A,2026-11-27T19:45:00Z,Venezia,Bologna,draftkings,3.35,3.2,2.15
+2026-11-24T15:39-05:00,e9a663f13e7503c0ac20a54804338b60,Serie A,2026-11-27T19:45:00Z,Venezia,Bologna,fanatics,3.4,3.3,2.2
+2026-11-24T15:39-05:00,e9a663f13e7503c0ac20a54804338b60,Serie A,2026-11-27T19:45:00Z,Venezia,Bologna,fanduel,3.4,3.2,2.15
+2026-11-24T15:39-05:00,e9a663f13e7503c0ac20a54804338b60,Serie A,2026-11-27T19:45:00Z,Venezia,Bologna,betmgm,3.4,3.3,2.15
+2026-11-24T15:39-05:00,e9a663f13e7503c0ac20a54804338b60,Serie A,2026-11-27T19:45:00Z,Venezia,Bologna,williamhill_us,3.35,3.3,2.09
+2026-11-24T15:39-05:00,af3432ca724da03d38f0ff4e62045e4c,Serie A,2026-11-28T14:00:00Z,Frosinone,Parma,draftkings,1.5,4.6,4.8
+2026-11-24T15:39-05:00,af3432ca724da03d38f0ff4e62045e4c,Serie A,2026-11-28T14:00:00Z,Frosinone,Parma,fanatics,1.53,4.75,5.25
+2026-11-24T15:39-05:00,af3432ca724da03d38f0ff4e62045e4c,Serie A,2026-11-28T14:00:00Z,Frosinone,Parma,betmgm,1.53,4.6,5.25
+2026-11-24T15:39-05:00,af3432ca724da03d38f0ff4e62045e4c,Serie A,2026-11-28T14:00:00Z,Frosinone,Parma,fanduel,1.48,4.7,5.6
+2026-11-24T15:39-05:00,af3432ca724da03d38f0ff4e62045e4c,Serie A,2026-11-28T14:00:00Z,Frosinone,Parma,williamhill_us,1.53,4.5,5.25
+2026-11-24T15:39-05:00,aec86b479e922f437ba228b9a9d74da1,Serie A,2026-11-28T17:00:00Z,Torino,Lazio,draftkings,3.3,3.3,2.05
+2026-11-24T15:39-05:00,aec86b479e922f437ba228b9a9d74da1,Serie A,2026-11-28T17:00:00Z,Torino,Lazio,fanatics,3.4,3.4,2.1
+2026-11-24T15:39-05:00,aec86b479e922f437ba228b9a9d74da1,Serie A,2026-11-28T17:00:00Z,Torino,Lazio,fanduel,3.5,3.4,2.05
+2026-11-24T15:39-05:00,aec86b479e922f437ba228b9a9d74da1,Serie A,2026-11-28T17:00:00Z,Torino,Lazio,betmgm,3.4,3.4,2.1
+2026-11-24T15:39-05:00,aec86b479e922f437ba228b9a9d74da1,Serie A,2026-11-28T17:00:00Z,Torino,Lazio,williamhill_us,3.45,3.4,2.05
+2026-11-24T15:39-05:00,f128c19fa7af43e30dbe3c373e7bc27e,Serie A,2026-11-28T19:45:00Z,Inter Milan,Genoa,draftkings,1.29,5.0,8.0
+2026-11-24T15:39-05:00,f128c19fa7af43e30dbe3c373e7bc27e,Serie A,2026-11-28T19:45:00Z,Inter Milan,Genoa,fanatics,1.31,5.5,9.0
+2026-11-24T15:39-05:00,f128c19fa7af43e30dbe3c373e7bc27e,Serie A,2026-11-28T19:45:00Z,Inter Milan,Genoa,fanduel,1.29,5.6,8.0
+2026-11-24T15:39-05:00,f128c19fa7af43e30dbe3c373e7bc27e,Serie A,2026-11-28T19:45:00Z,Inter Milan,Genoa,betmgm,1.35,5.25,8.5
+2026-11-24T15:39-05:00,f128c19fa7af43e30dbe3c373e7bc27e,Serie A,2026-11-28T19:45:00Z,Inter Milan,Genoa,williamhill_us,1.31,5.25,8.5
+2026-11-24T15:39-05:00,d3d47b94324eb7cde85bd93993437d1c,Serie A,2026-11-29T11:30:00Z,Udinese,Fiorentina,draftkings,2.95,3.4,2.2
+2026-11-24T15:39-05:00,d3d47b94324eb7cde85bd93993437d1c,Serie A,2026-11-29T11:30:00Z,Udinese,Fiorentina,fanatics,3.0,3.5,2.25
+2026-11-24T15:39-05:00,d3d47b94324eb7cde85bd93993437d1c,Serie A,2026-11-29T11:30:00Z,Udinese,Fiorentina,betmgm,3.1,3.6,2.2
+2026-11-24T15:39-05:00,d3d47b94324eb7cde85bd93993437d1c,Serie A,2026-11-29T11:30:00Z,Udinese,Fiorentina,fanduel,3.0,3.5,2.2
+2026-11-24T15:39-05:00,d3d47b94324eb7cde85bd93993437d1c,Serie A,2026-11-29T11:30:00Z,Udinese,Fiorentina,williamhill_us,3.05,3.5,2.16
+2026-11-24T15:39-05:00,dc63586a1b1d938a461d71bf5b36d982,Serie A,2026-11-29T14:00:00Z,Sassuolo,Napoli,draftkings,4.3,4.1,1.62
+2026-11-24T15:39-05:00,dc63586a1b1d938a461d71bf5b36d982,Serie A,2026-11-29T14:00:00Z,Sassuolo,Napoli,fanatics,4.5,4.1,1.69
+2026-11-24T15:39-05:00,dc63586a1b1d938a461d71bf5b36d982,Serie A,2026-11-29T14:00:00Z,Sassuolo,Napoli,betmgm,4.6,4.1,1.69
+2026-11-24T15:39-05:00,dc63586a1b1d938a461d71bf5b36d982,Serie A,2026-11-29T14:00:00Z,Sassuolo,Napoli,fanduel,4.6,4.4,1.61
+2026-11-24T15:39-05:00,dc63586a1b1d938a461d71bf5b36d982,Serie A,2026-11-29T14:00:00Z,Sassuolo,Napoli,williamhill_us,4.5,4.05,1.66
+2026-11-24T15:39-05:00,c979bd4559d2d81a8e2fe8f2d4aec376,Serie A,2026-11-29T17:00:00Z,AS Roma,Monza,draftkings,1.19,6.5,10.0
+2026-11-24T15:39-05:00,c979bd4559d2d81a8e2fe8f2d4aec376,Serie A,2026-11-29T17:00:00Z,AS Roma,Monza,fanduel,1.18,7.5,10.5
+2026-11-24T15:39-05:00,c979bd4559d2d81a8e2fe8f2d4aec376,Serie A,2026-11-29T17:00:00Z,AS Roma,Monza,fanatics,1.18,7.5,12.0
+2026-11-24T15:39-05:00,c979bd4559d2d81a8e2fe8f2d4aec376,Serie A,2026-11-29T17:00:00Z,AS Roma,Monza,betmgm,1.21,7.75,10.5
+2026-11-24T15:39-05:00,c979bd4559d2d81a8e2fe8f2d4aec376,Serie A,2026-11-29T17:00:00Z,AS Roma,Monza,williamhill_us,1.2,7.0,11.0
+2026-11-24T15:39-05:00,3876ad367184af2f8fc04a544fc894aa,Serie A,2026-11-29T19:45:00Z,Como,Juventus,draftkings,2.0,3.4,3.3
+2026-11-24T15:39-05:00,3876ad367184af2f8fc04a544fc894aa,Serie A,2026-11-29T19:45:00Z,Como,Juventus,fanatics,2.1,3.5,3.4
+2026-11-24T15:39-05:00,3876ad367184af2f8fc04a544fc894aa,Serie A,2026-11-29T19:45:00Z,Como,Juventus,fanduel,2.05,3.4,3.5
+2026-11-24T15:39-05:00,3876ad367184af2f8fc04a544fc894aa,Serie A,2026-11-29T19:45:00Z,Como,Juventus,betmgm,2.1,3.5,3.4
+2026-11-24T15:39-05:00,3876ad367184af2f8fc04a544fc894aa,Serie A,2026-11-29T19:45:00Z,Como,Juventus,williamhill_us,2.07,3.5,3.3
+2026-11-24T15:39-05:00,f1d2a6064d1452074570bbc656d36a20,Serie A,2026-11-30T17:30:00Z,Lecce,Atalanta BC,draftkings,3.45,3.65,1.91
+2026-11-24T15:39-05:00,f1d2a6064d1452074570bbc656d36a20,Serie A,2026-11-30T17:30:00Z,Lecce,Atalanta BC,fanatics,3.5,3.8,1.95
+2026-11-24T15:39-05:00,f1d2a6064d1452074570bbc656d36a20,Serie A,2026-11-30T17:30:00Z,Lecce,Atalanta BC,fanduel,3.6,3.8,1.91
+2026-11-24T15:39-05:00,f1d2a6064d1452074570bbc656d36a20,Serie A,2026-11-30T17:30:00Z,Lecce,Atalanta BC,betmgm,3.6,3.75,1.95
+2026-11-24T15:39-05:00,f1d2a6064d1452074570bbc656d36a20,Serie A,2026-11-30T17:30:00Z,Lecce,Atalanta BC,williamhill_us,3.7,3.65,1.91
+2026-11-24T15:39-05:00,3d57da6bdb20b65145bc2479ee5f2ae7,Serie A,2026-11-30T19:45:00Z,Cagliari,AC Milan,draftkings,4.5,3.7,1.67
+2026-11-24T15:39-05:00,3d57da6bdb20b65145bc2479ee5f2ae7,Serie A,2026-11-30T19:45:00Z,Cagliari,AC Milan,fanatics,4.75,3.8,1.71
+2026-11-24T15:39-05:00,3d57da6bdb20b65145bc2479ee5f2ae7,Serie A,2026-11-30T19:45:00Z,Cagliari,AC Milan,fanduel,4.8,3.9,1.61
+2026-11-24T15:39-05:00,3d57da6bdb20b65145bc2479ee5f2ae7,Serie A,2026-11-30T19:45:00Z,Cagliari,AC Milan,betmgm,4.6,3.9,1.71
+2026-11-24T15:39-05:00,3d57da6bdb20b65145bc2479ee5f2ae7,Serie A,2026-11-30T19:45:00Z,Cagliari,AC Milan,williamhill_us,4.6,3.8,1.69
+2026-11-24T15:39-05:00,7a3763ed676aa657abff78f841bb851c,Serie A,2026-12-04T19:45:00Z,Bologna,AS Roma,fanatics,4.0,3.6,1.87
+2026-11-24T15:39-05:00,7a3763ed676aa657abff78f841bb851c,Serie A,2026-12-04T19:45:00Z,Bologna,AS Roma,fanduel,3.9,3.8,1.83
+2026-11-24T15:39-05:00,a57d8cacc423d2a63545b240790dcdba,Serie A,2026-12-05T14:00:00Z,Monza,Como,fanatics,6.0,4.3,1.5
+2026-11-24T15:39-05:00,a57d8cacc423d2a63545b240790dcdba,Serie A,2026-12-05T14:00:00Z,Monza,Como,fanduel,6.0,4.4,1.48
+2026-11-24T15:39-05:00,11e1b8546651036ec5c70eb8e91bb622,Serie A,2026-12-05T17:00:00Z,Frosinone,Inter Milan,fanatics,5.75,5.5,1.4
+2026-11-24T15:39-05:00,7d32e6e9bbd769e7d505467971c4d7ca,Serie A,2026-12-05T19:45:00Z,Napoli,Lecce,fanatics,1.36,5.0,8.0
+2026-11-24T15:39-05:00,7d32e6e9bbd769e7d505467971c4d7ca,Serie A,2026-12-05T19:45:00Z,Napoli,Lecce,fanduel,1.31,5.3,7.5
+2026-11-24T15:39-05:00,388c70bbc3bc49af4a2245b4caebd730,Serie A,2026-12-06T11:30:00Z,Genoa,Torino,fanatics,2.3,3.2,3.2
+2026-11-24T15:39-05:00,388c70bbc3bc49af4a2245b4caebd730,Serie A,2026-12-06T11:30:00Z,Genoa,Torino,fanduel,2.25,3.2,3.2
+2026-11-24T15:39-05:00,7b643abf36a551631acaae1f1a8e01f6,Serie A,2026-12-06T14:00:00Z,Lazio,Atalanta BC,fanatics,1.95,3.8,3.6
+2026-11-24T15:39-05:00,7b643abf36a551631acaae1f1a8e01f6,Serie A,2026-12-06T14:00:00Z,Lazio,Atalanta BC,fanduel,1.91,3.8,3.5
+2026-11-24T15:39-05:00,7c5bfc26c8bcf7406d9ef8aa7dda19f1,Serie A,2026-12-06T17:00:00Z,Juventus,Udinese,fanatics,1.36,5.0,8.0
+2026-11-24T15:39-05:00,7c5bfc26c8bcf7406d9ef8aa7dda19f1,Serie A,2026-12-06T17:00:00Z,Juventus,Udinese,fanduel,1.3,5.1,8.0
+2026-11-24T15:39-05:00,c392b1fa1b32963c5daf3a415a0dfc2a,Serie A,2026-12-06T19:45:00Z,AC Milan,Parma,fanduel,1.2,6.5,10.5
+2026-11-24T15:39-05:00,c392b1fa1b32963c5daf3a415a0dfc2a,Serie A,2026-12-06T19:45:00Z,AC Milan,Parma,fanatics,1.22,6.5,11.5
+2026-11-24T15:39-05:00,b179b898dfd55412a2e75dfe42752adc,Serie A,2026-12-07T17:30:00Z,Venezia,Sassuolo,fanduel,2.25,3.5,3.0
+2026-11-24T15:39-05:00,b179b898dfd55412a2e75dfe42752adc,Serie A,2026-12-07T17:30:00Z,Venezia,Sassuolo,fanatics,2.25,3.5,3.0
+2026-11-24T15:39-05:00,e14f8c52d44db0f33abb0c108145fb09,Serie A,2026-12-07T19:45:00Z,Fiorentina,Cagliari,fanduel,1.59,4.1,5.0
+2026-11-24T15:39-05:00,e14f8c52d44db0f33abb0c108145fb09,Serie A,2026-12-07T19:45:00Z,Fiorentina,Cagliari,fanatics,1.62,4.1,5.25
+2026-11-24T15:39-05:00,e9a663f13e7503c0ac20a54804338b60,Serie A,2026-11-27T19:45:00Z,Venezia,Bologna,kalshi,3.3987,3.1745,2.1845
+2026-11-24T15:39-05:00,af3432ca724da03d38f0ff4e62045e4c,Serie A,2026-11-28T14:00:00Z,Frosinone,Parma,kalshi,1.5218,4.7348,5.5572
+2026-11-24T15:39-05:00,aec86b479e922f437ba228b9a9d74da1,Serie A,2026-11-28T17:00:00Z,Torino,Lazio,kalshi,3.5202,3.3987,2.0537
+2026-11-24T15:39-05:00,f128c19fa7af43e30dbe3c373e7bc27e,Serie A,2026-11-28T19:45:00Z,Inter Milan,Genoa,kalshi,1.3073,5.5572,9.4073
+2026-11-24T15:39-05:00,d3d47b94324eb7cde85bd93993437d1c,Serie A,2026-11-29T11:30:00Z,Udinese,Fiorentina,kalshi,2.9783,3.3987,2.2872
+2026-11-24T15:39-05:00,dc63586a1b1d938a461d71bf5b36d982,Serie A,2026-11-29T14:00:00Z,Sassuolo,Napoli,kalshi,4.5106,4.3144,1.671
+2026-11-24T15:39-05:00,c979bd4559d2d81a8e2fe8f2d4aec376,Serie A,2026-11-29T17:00:00Z,AS Roma,Monza,kalshi,1.2141,7.2486,11.7437
+2026-11-24T15:39-05:00,3876ad367184af2f8fc04a544fc894aa,Serie A,2026-11-29T19:45:00Z,Como,Juventus,kalshi,2.0071,3.5202,3.5202
+2026-11-24T15:39-05:00,f1d2a6064d1452074570bbc656d36a20,Serie A,2026-11-30T17:30:00Z,Lecce,Atalanta BC,kalshi,3.6603,3.8005,1.895
+2026-11-24T15:39-05:00,3d57da6bdb20b65145bc2479ee5f2ae7,Serie A,2026-11-30T19:45:00Z,Cagliari,AC Milan,kalshi,4.9778,3.8005,1.699
+2026-11-24T15:39-05:00,7a3763ed676aa657abff78f841bb851c,Serie A,2026-12-04T19:45:00Z,Bologna,AS Roma,kalshi,3.9593,3.8005,1.8577
+2026-11-24T15:39-05:00,a57d8cacc423d2a63545b240790dcdba,Serie A,2026-12-05T14:00:00Z,Monza,Como,kalshi,6.2954,4.3144,1.5031
+2026-11-24T15:39-05:00,11e1b8546651036ec5c70eb8e91bb622,Serie A,2026-12-05T17:00:00Z,Frosinone,Inter Milan,kalshi,5.9029,5.5572,1.4378
+2026-11-24T15:39-05:00,7d32e6e9bbd769e7d505467971c4d7ca,Serie A,2026-12-05T19:45:00Z,Napoli,Lecce,kalshi,1.3632,5.2581,8.5569
+2026-11-24T15:39-05:00,388c70bbc3bc49af4a2245b4caebd730,Serie A,2026-12-06T11:30:00Z,Genoa,Torino,kalshi,2.2405,3.1745,3.1745
+2026-11-24T15:39-05:00,7b643abf36a551631acaae1f1a8e01f6,Serie A,2026-12-06T14:00:00Z,Lazio,Atalanta BC,kalshi,1.895,3.8005,3.6603
+2026-11-24T15:39-05:00,7c5bfc26c8bcf7406d9ef8aa7dda19f1,Serie A,2026-12-06T17:00:00Z,Juventus,Udinese,kalshi,1.3819,4.9778,8.5569
+2026-11-24T15:39-05:00,c392b1fa1b32963c5daf3a415a0dfc2a,Serie A,2026-12-06T19:45:00Z,AC Milan,Parma,kalshi,1.2514,6.2954,13.4166
+2026-11-24T15:39-05:00,b179b898dfd55412a2e75dfe42752adc,Serie A,2026-12-07T17:30:00Z,Venezia,Sassuolo,kalshi,2.2405,3.3987,2.9783
+2026-11-24T15:39-05:00,e14f8c52d44db0f33abb0c108145fb09,Serie A,2026-12-07T19:45:00Z,Fiorentina,Cagliari,kalshi,1.6244,3.9593,4.9778
+2026-11-24T15:39-05:00,02ff879cf54f6d1fec2664efee0431db,Ligue 1,2026-11-27T19:45:00Z,Brest,Paris FC,draftkings,3.3,3.4,2.2
+2026-11-24T15:39-05:00,02ff879cf54f6d1fec2664efee0431db,Ligue 1,2026-11-27T19:45:00Z,Brest,Paris FC,fanatics,3.2,3.4,2.15
+2026-11-24T15:39-05:00,02ff879cf54f6d1fec2664efee0431db,Ligue 1,2026-11-27T19:45:00Z,Brest,Paris FC,fanduel,3.2,3.3,2.2
+2026-11-24T15:39-05:00,02ff879cf54f6d1fec2664efee0431db,Ligue 1,2026-11-27T19:45:00Z,Brest,Paris FC,betmgm,3.2,3.5,2.2
+2026-11-24T15:39-05:00,02ff879cf54f6d1fec2664efee0431db,Ligue 1,2026-11-27T19:45:00Z,Brest,Paris FC,williamhill_us,3.15,3.4,2.16
+2026-11-24T15:39-05:00,24b99950496c624f7124922fc1bda8bd,Ligue 1,2026-11-28T16:15:00Z,Angers,RC Lens,draftkings,4.5,4.1,1.69
+2026-11-24T15:39-05:00,24b99950496c624f7124922fc1bda8bd,Ligue 1,2026-11-28T16:15:00Z,Angers,RC Lens,fanatics,4.5,4.1,1.69
+2026-11-24T15:39-05:00,24b99950496c624f7124922fc1bda8bd,Ligue 1,2026-11-28T16:15:00Z,Angers,RC Lens,fanduel,4.4,4.0,1.69
+2026-11-24T15:39-05:00,24b99950496c624f7124922fc1bda8bd,Ligue 1,2026-11-28T16:15:00Z,Angers,RC Lens,betmgm,4.4,4.0,1.71
+2026-11-24T15:39-05:00,24b99950496c624f7124922fc1bda8bd,Ligue 1,2026-11-28T16:15:00Z,Angers,RC Lens,williamhill_us,4.3,4.0,1.71
+2026-11-24T15:39-05:00,f96c1137c9d3f7e2e691275a2988fa1d,Ligue 1,2026-11-28T19:45:00Z,Le Havre,Strasbourg,draftkings,3.05,3.6,2.2
+2026-11-24T15:39-05:00,f96c1137c9d3f7e2e691275a2988fa1d,Ligue 1,2026-11-28T19:45:00Z,Le Havre,Strasbourg,fanatics,2.9,3.6,2.2
+2026-11-24T15:39-05:00,f96c1137c9d3f7e2e691275a2988fa1d,Ligue 1,2026-11-28T19:45:00Z,Le Havre,Strasbourg,fanduel,2.95,3.6,2.25
+2026-11-24T15:39-05:00,f96c1137c9d3f7e2e691275a2988fa1d,Ligue 1,2026-11-28T19:45:00Z,Le Havre,Strasbourg,betmgm,3.0,3.6,2.2
+2026-11-24T15:39-05:00,f96c1137c9d3f7e2e691275a2988fa1d,Ligue 1,2026-11-28T19:45:00Z,Le Havre,Strasbourg,williamhill_us,2.95,3.65,2.19
+2026-11-24T15:39-05:00,aaa86a483888836242da663a46957894,Ligue 1,2026-11-28T19:45:00Z,Le Mans FC,Lille,draftkings,3.75,3.35,2.0
+2026-11-24T15:39-05:00,aaa86a483888836242da663a46957894,Ligue 1,2026-11-28T19:45:00Z,Le Mans FC,Lille,fanatics,3.8,3.4,1.95
+2026-11-24T15:39-05:00,aaa86a483888836242da663a46957894,Ligue 1,2026-11-28T19:45:00Z,Le Mans FC,Lille,fanduel,3.8,3.4,2.0
+2026-11-24T15:39-05:00,aaa86a483888836242da663a46957894,Ligue 1,2026-11-28T19:45:00Z,Le Mans FC,Lille,betmgm,3.8,3.4,1.98
+2026-11-24T15:39-05:00,aaa86a483888836242da663a46957894,Ligue 1,2026-11-28T19:45:00Z,Le Mans FC,Lille,williamhill_us,3.65,3.4,1.94
+2026-11-24T15:39-05:00,12002f6f804a122db48271ff05be03c0,Ligue 1,2026-11-28T19:45:00Z,Paris Saint Germain,Lorient,draftkings,1.2,7.0,11.0
+2026-11-24T15:39-05:00,12002f6f804a122db48271ff05be03c0,Ligue 1,2026-11-28T19:45:00Z,Paris Saint Germain,Lorient,fanatics,1.22,7.0,11.5
+2026-11-24T15:39-05:00,12002f6f804a122db48271ff05be03c0,Ligue 1,2026-11-28T19:45:00Z,Paris Saint Germain,Lorient,fanduel,1.18,7.5,10.5
+2026-11-24T15:39-05:00,12002f6f804a122db48271ff05be03c0,Ligue 1,2026-11-28T19:45:00Z,Paris Saint Germain,Lorient,betmgm,1.22,6.75,11.5
+2026-11-24T15:39-05:00,12002f6f804a122db48271ff05be03c0,Ligue 1,2026-11-28T19:45:00Z,Paris Saint Germain,Lorient,williamhill_us,1.23,6.25,11.0
+2026-11-24T15:39-05:00,e9a1243fbfbc6f58d0e0522eb07ea9a1,Ligue 1,2026-11-28T19:45:00Z,Nice,Troyes,draftkings,1.65,4.2,4.7
+2026-11-24T15:39-05:00,e9a1243fbfbc6f58d0e0522eb07ea9a1,Ligue 1,2026-11-28T19:45:00Z,Nice,Troyes,fanduel,1.62,4.1,4.6
+2026-11-24T15:39-05:00,e9a1243fbfbc6f58d0e0522eb07ea9a1,Ligue 1,2026-11-28T19:45:00Z,Nice,Troyes,fanatics,1.67,4.1,4.75
+2026-11-24T15:39-05:00,e9a1243fbfbc6f58d0e0522eb07ea9a1,Ligue 1,2026-11-28T19:45:00Z,Nice,Troyes,betmgm,1.69,4.1,4.6
+2026-11-24T15:39-05:00,e9a1243fbfbc6f58d0e0522eb07ea9a1,Ligue 1,2026-11-28T19:45:00Z,Nice,Troyes,williamhill_us,1.63,4.0,4.75
+2026-11-24T15:39-05:00,a370db12aaff183a94f8e9a6acb6d4c9,Ligue 1,2026-11-29T14:00:00Z,Auxerre,Marseille,draftkings,3.8,3.9,1.87
+2026-11-24T15:39-05:00,a370db12aaff183a94f8e9a6acb6d4c9,Ligue 1,2026-11-29T14:00:00Z,Auxerre,Marseille,fanatics,3.8,4.0,1.83
+2026-11-24T15:39-05:00,a370db12aaff183a94f8e9a6acb6d4c9,Ligue 1,2026-11-29T14:00:00Z,Auxerre,Marseille,betmgm,3.8,3.9,1.85
+2026-11-24T15:39-05:00,a370db12aaff183a94f8e9a6acb6d4c9,Ligue 1,2026-11-29T14:00:00Z,Auxerre,Marseille,fanduel,3.8,3.9,1.8
+2026-11-24T15:39-05:00,a370db12aaff183a94f8e9a6acb6d4c9,Ligue 1,2026-11-29T14:00:00Z,Auxerre,Marseille,williamhill_us,3.8,3.8,1.83
+2026-11-24T15:39-05:00,71c08940a73e9f42d503449f052a1bdf,Ligue 1,2026-11-29T16:15:00Z,Toulouse,Rennes,fanatics,2.5,3.6,2.5
+2026-11-24T15:39-05:00,71c08940a73e9f42d503449f052a1bdf,Ligue 1,2026-11-29T16:15:00Z,Toulouse,Rennes,betmgm,2.55,3.6,2.55
+2026-11-24T15:39-05:00,71c08940a73e9f42d503449f052a1bdf,Ligue 1,2026-11-29T16:15:00Z,Toulouse,Rennes,fanduel,2.5,3.6,2.55
+2026-11-24T15:39-05:00,71c08940a73e9f42d503449f052a1bdf,Ligue 1,2026-11-29T16:15:00Z,Toulouse,Rennes,williamhill_us,2.48,3.65,2.54
+2026-11-24T15:39-05:00,ca8aa566e27e1d05b47e8151b2066f9a,Ligue 1,2026-11-29T19:45:00Z,Lyon,AS Monaco,draftkings,2.4,3.3,3.0
+2026-11-24T15:39-05:00,ca8aa566e27e1d05b47e8151b2066f9a,Ligue 1,2026-11-29T19:45:00Z,Lyon,AS Monaco,fanatics,2.3,3.4,2.9
+2026-11-24T15:39-05:00,ca8aa566e27e1d05b47e8151b2066f9a,Ligue 1,2026-11-29T19:45:00Z,Lyon,AS Monaco,betmgm,2.35,3.4,2.95
+2026-11-24T15:39-05:00,ca8aa566e27e1d05b47e8151b2066f9a,Ligue 1,2026-11-29T19:45:00Z,Lyon,AS Monaco,fanduel,2.35,3.3,3.0
+2026-11-24T15:39-05:00,ca8aa566e27e1d05b47e8151b2066f9a,Ligue 1,2026-11-29T19:45:00Z,Lyon,AS Monaco,williamhill_us,2.34,3.4,2.91
+2026-11-24T15:39-05:00,2d7a5b011f0c4376e6b5ecf66eb23c38,Ligue 1,2026-12-04T19:45:00Z,Toulouse,Paris Saint Germain,fanatics,5.5,5.0,1.5
+2026-11-24T15:39-05:00,2d7a5b011f0c4376e6b5ecf66eb23c38,Ligue 1,2026-12-04T19:45:00Z,Toulouse,Paris Saint Germain,fanduel,5.6,4.9,1.43
+2026-11-24T15:39-05:00,0664eb46841c1e73a465bfca504b9b54,Ligue 1,2026-12-05T16:15:00Z,Lille,Auxerre,fanatics,1.5,4.3,6.0
+2026-11-24T15:39-05:00,0664eb46841c1e73a465bfca504b9b54,Ligue 1,2026-12-05T16:15:00Z,Lille,Auxerre,fanduel,1.48,4.3,6.0
+2026-11-24T15:39-05:00,2d7cee4a6e6a6632dd46f252c9e379f2,Ligue 1,2026-12-05T19:45:00Z,AS Monaco,Angers,fanatics,1.29,5.5,9.0
+2026-11-24T15:39-05:00,2d7cee4a6e6a6632dd46f252c9e379f2,Ligue 1,2026-12-05T19:45:00Z,AS Monaco,Angers,fanduel,1.28,5.8,8.0
+2026-11-24T15:39-05:00,162927041eba2297840966c6f7955053,Ligue 1,2026-12-05T19:45:00Z,RC Lens,Le Havre,fanatics,1.42,4.75,6.5
+2026-11-24T15:39-05:00,162927041eba2297840966c6f7955053,Ligue 1,2026-12-05T19:45:00Z,RC Lens,Le Havre,fanduel,1.4,4.9,6.0
+2026-11-24T15:39-05:00,ebe354c9e9e99226e30939d97baeca99,Ligue 1,2026-12-05T19:45:00Z,Paris FC,Le Mans FC,fanatics,1.42,4.75,7.0
+2026-11-24T15:39-05:00,ebe354c9e9e99226e30939d97baeca99,Ligue 1,2026-12-05T19:45:00Z,Paris FC,Le Mans FC,fanduel,1.42,4.8,6.5
+2026-11-24T15:39-05:00,219b1f7a6a968c14cb9777d7b994cdb9,Ligue 1,2026-12-05T19:45:00Z,Strasbourg,Lorient,fanatics,2.1,3.4,3.5
+2026-11-24T15:39-05:00,219b1f7a6a968c14cb9777d7b994cdb9,Ligue 1,2026-12-05T19:45:00Z,Strasbourg,Lorient,fanduel,2.05,3.4,3.5
+2026-11-24T15:39-05:00,f518a80f5839eb0ed1dbb7a3a786b5ce,Ligue 1,2026-12-06T14:00:00Z,Troyes,Lyon,fanduel,3.7,3.7,1.91
+2026-11-24T15:39-05:00,f518a80f5839eb0ed1dbb7a3a786b5ce,Ligue 1,2026-12-06T14:00:00Z,Troyes,Lyon,fanatics,3.6,3.8,1.91
+2026-11-24T15:39-05:00,3160c4ebce077755037d4ff63025fca5,Ligue 1,2026-12-06T16:15:00Z,Rennes,Brest,fanatics,1.77,4.1,4.3
+2026-11-24T15:39-05:00,3160c4ebce077755037d4ff63025fca5,Ligue 1,2026-12-06T16:15:00Z,Rennes,Brest,fanduel,1.71,4.0,4.1
+2026-11-24T15:39-05:00,2c07c0c3ca22cd045e140f4054b91323,Ligue 1,2026-12-06T19:45:00Z,Marseille,Nice,fanatics,1.91,4.0,3.5
+2026-11-24T15:39-05:00,2c07c0c3ca22cd045e140f4054b91323,Ligue 1,2026-12-06T19:45:00Z,Marseille,Nice,fanduel,1.87,4.0,3.5
+2026-11-24T15:39-05:00,02ff879cf54f6d1fec2664efee0431db,Ligue 1,2026-11-27T19:45:00Z,Brest,Paris FC,kalshi,3.2866,3.2866,2.1378
+2026-11-24T15:39-05:00,24b99950496c624f7124922fc1bda8bd,Ligue 1,2026-11-28T16:15:00Z,Angers,RC Lens,kalshi,4.5106,3.9593,1.699
+2026-11-24T15:39-05:00,f96c1137c9d3f7e2e691275a2988fa1d,Ligue 1,2026-11-28T19:45:00Z,Le Havre,Strasbourg,kalshi,3.0811,3.5202,2.1845
+2026-11-24T15:39-05:00,aaa86a483888836242da663a46957894,Ligue 1,2026-11-28T19:45:00Z,Le Mans FC,Lille,kalshi,3.8005,3.2866,2.0537
+2026-11-24T15:39-05:00,12002f6f804a122db48271ff05be03c0,Ligue 1,2026-11-28T19:45:00Z,Paris Saint Germain,Lorient,kalshi,1.2048,7.8467,11.7437
+2026-11-24T15:39-05:00,e9a1243fbfbc6f58d0e0522eb07ea9a1,Ligue 1,2026-11-28T19:45:00Z,Nice,Troyes,kalshi,1.671,4.1275,4.7348
+2026-11-24T15:39-05:00,a370db12aaff183a94f8e9a6acb6d4c9,Ligue 1,2026-11-29T14:00:00Z,Auxerre,Marseille,kalshi,3.6603,3.8005,1.895
+2026-11-24T15:39-05:00,71c08940a73e9f42d503449f052a1bdf,Ligue 1,2026-11-29T16:15:00Z,Toulouse,Rennes,kalshi,2.5206,3.5202,2.586
+2026-11-24T15:39-05:00,ca8aa566e27e1d05b47e8151b2066f9a,Ligue 1,2026-11-29T19:45:00Z,Lyon,AS Monaco,kalshi,2.3992,3.1745,2.9783
+2026-11-24T15:39-05:00,2d7a5b011f0c4376e6b5ecf66eb23c38,Ligue 1,2026-12-04T19:45:00Z,Toulouse,Paris Saint Germain,kalshi,5.5572,4.7348,1.4845
+2026-11-24T15:39-05:00,0664eb46841c1e73a465bfca504b9b54,Ligue 1,2026-12-05T16:15:00Z,Lille,Auxerre,kalshi,1.5218,4.3144,6.2954
+2026-11-24T15:39-05:00,2d7cee4a6e6a6632dd46f252c9e379f2,Ligue 1,2026-12-05T19:45:00Z,AS Monaco,Angers,kalshi,1.3073,5.9029,9.4073
+2026-11-24T15:39-05:00,162927041eba2297840966c6f7955053,Ligue 1,2026-12-05T19:45:00Z,RC Lens,Le Havre,kalshi,1.4565,4.7348,6.2954
+2026-11-24T15:39-05:00,ebe354c9e9e99226e30939d97baeca99,Ligue 1,2026-12-05T19:45:00Z,Paris FC,Le Mans FC,kalshi,1.4378,4.7348,6.7346
+2026-11-24T15:39-05:00,219b1f7a6a968c14cb9777d7b994cdb9,Ligue 1,2026-12-05T19:45:00Z,Strasbourg,Lorient,kalshi,2.0537,3.2866,3.5202
+2026-11-24T15:39-05:00,f518a80f5839eb0ed1dbb7a3a786b5ce,Ligue 1,2026-12-06T14:00:00Z,Troyes,Lyon,kalshi,3.6603,3.6603,1.9324
+2026-11-24T15:39-05:00,3160c4ebce077755037d4ff63025fca5,Ligue 1,2026-12-06T16:15:00Z,Rennes,Brest,kalshi,1.7364,4.1275,4.1275
+2026-11-24T15:39-05:00,2c07c0c3ca22cd045e140f4054b91323,Ligue 1,2026-12-06T19:45:00Z,Marseille,Nice,kalshi,1.895,3.9593,3.3987
+2026-11-24T15:39-05:00,aee4e3c225603397ab52de3d066b566b,Champions League,2026-11-24T20:00:00Z,Arsenal,Borussia Dortmund,fanatics,1.18,6.5,16.0
+2026-11-24T15:39-05:00,aee4e3c225603397ab52de3d066b566b,Champions League,2026-11-24T20:00:00Z,Arsenal,Borussia Dortmund,draftkings,1.19,6.5,17.0
+2026-11-24T15:39-05:00,aee4e3c225603397ab52de3d066b566b,Champions League,2026-11-24T20:00:00Z,Arsenal,Borussia Dortmund,betmgm,1.21,5.75,14.5
+2026-11-24T15:39-05:00,aee4e3c225603397ab52de3d066b566b,Champions League,2026-11-24T20:00:00Z,Arsenal,Borussia Dortmund,fanduel,1.18,6.0,14.0
+2026-11-24T15:39-05:00,aee4e3c225603397ab52de3d066b566b,Champions League,2026-11-24T20:00:00Z,Arsenal,Borussia Dortmund,williamhill_us,1.21,5.5,13.0
+2026-11-24T15:39-05:00,3fb5e4a792cf34a0459efcb79a11a785,Champions League,2026-11-24T20:00:00Z,Real Madrid,PSV Eindhoven,fanatics,1.77,4.1,4.1
+2026-11-24T15:39-05:00,3fb5e4a792cf34a0459efcb79a11a785,Champions League,2026-11-24T20:00:00Z,Real Madrid,PSV Eindhoven,draftkings,1.69,3.9,4.8
+2026-11-24T15:39-05:00,3fb5e4a792cf34a0459efcb79a11a785,Champions League,2026-11-24T20:00:00Z,Real Madrid,PSV Eindhoven,betmgm,1.67,4.4,3.9
+2026-11-24T15:39-05:00,3fb5e4a792cf34a0459efcb79a11a785,Champions League,2026-11-24T20:00:00Z,Real Madrid,PSV Eindhoven,fanduel,1.65,4.1,4.4
+2026-11-24T15:39-05:00,3fb5e4a792cf34a0459efcb79a11a785,Champions League,2026-11-24T20:00:00Z,Real Madrid,PSV Eindhoven,williamhill_us,1.71,4.0,4.2
+2026-11-24T15:39-05:00,aea973c122c91837c15e066c757c747f,Champions League,2026-11-24T20:00:00Z,RB Leipzig,RC Lens,fanatics,1.02,19.0,61.0
+2026-11-24T15:39-05:00,aea973c122c91837c15e066c757c747f,Champions League,2026-11-24T20:00:00Z,RB Leipzig,RC Lens,draftkings,1.02,19.0,51.0
+2026-11-24T15:39-05:00,aea973c122c91837c15e066c757c747f,Champions League,2026-11-24T20:00:00Z,RB Leipzig,RC Lens,betmgm,1.02,20.0,51.0
+2026-11-24T15:39-05:00,aea973c122c91837c15e066c757c747f,Champions League,2026-11-24T20:00:00Z,RB Leipzig,RC Lens,fanduel,1.02,17.0,61.0
+2026-11-24T15:39-05:00,aea973c122c91837c15e066c757c747f,Champions League,2026-11-24T20:00:00Z,RB Leipzig,RC Lens,williamhill_us,1.02,23.0,51.0
+2026-11-24T15:39-05:00,8e93849b4c1ccbf1c207836d5c470150,Champions League,2026-11-24T20:00:00Z,ŠK Slovan Bratislava,Real Betis,fanatics,6.0,3.6,1.62
+2026-11-24T15:39-05:00,8e93849b4c1ccbf1c207836d5c470150,Champions League,2026-11-24T20:00:00Z,ŠK Slovan Bratislava,Real Betis,draftkings,6.0,3.6,1.62
+2026-11-24T15:39-05:00,8e93849b4c1ccbf1c207836d5c470150,Champions League,2026-11-24T20:00:00Z,ŠK Slovan Bratislava,Real Betis,betmgm,5.0,3.4,1.69
+2026-11-24T15:39-05:00,8e93849b4c1ccbf1c207836d5c470150,Champions League,2026-11-24T20:00:00Z,ŠK Slovan Bratislava,Real Betis,fanduel,5.7,3.4,1.65
+2026-11-24T15:39-05:00,8e93849b4c1ccbf1c207836d5c470150,Champions League,2026-11-24T20:00:00Z,ŠK Slovan Bratislava,Real Betis,williamhill_us,5.25,3.5,1.65
+2026-11-24T15:39-05:00,9a2ebad454db4ab3d53b89e96c79847a,Champions League,2026-11-24T20:01:00Z,Feyenoord,Porto,fanatics,7.0,4.0,1.53
+2026-11-24T15:39-05:00,9a2ebad454db4ab3d53b89e96c79847a,Champions League,2026-11-24T20:01:00Z,Feyenoord,Porto,draftkings,7.0,4.2,1.48
+2026-11-24T15:39-05:00,9a2ebad454db4ab3d53b89e96c79847a,Champions League,2026-11-24T20:01:00Z,Feyenoord,Porto,betmgm,7.5,3.9,1.43
+2026-11-24T15:39-05:00,9a2ebad454db4ab3d53b89e96c79847a,Champions League,2026-11-24T20:01:00Z,Feyenoord,Porto,fanduel,7.5,4.2,1.4
+2026-11-24T15:39-05:00,9a2ebad454db4ab3d53b89e96c79847a,Champions League,2026-11-24T20:01:00Z,Feyenoord,Porto,williamhill_us,6.0,4.0,1.5
+2026-11-24T15:39-05:00,b9f00a4d399ec661e733857c9d5fb2dc,Champions League,2026-11-24T20:01:00Z,Manchester City,Napoli,fanatics,1.4,4.5,8.0
+2026-11-24T15:39-05:00,b9f00a4d399ec661e733857c9d5fb2dc,Champions League,2026-11-24T20:01:00Z,Manchester City,Napoli,draftkings,1.36,4.6,9.5
+2026-11-24T15:39-05:00,b9f00a4d399ec661e733857c9d5fb2dc,Champions League,2026-11-24T20:01:00Z,Manchester City,Napoli,betmgm,1.4,4.33,7.5
+2026-11-24T15:39-05:00,b9f00a4d399ec661e733857c9d5fb2dc,Champions League,2026-11-24T20:01:00Z,Manchester City,Napoli,fanduel,1.34,4.5,8.0
+2026-11-24T15:39-05:00,b9f00a4d399ec661e733857c9d5fb2dc,Champions League,2026-11-24T20:01:00Z,Manchester City,Napoli,williamhill_us,1.36,4.4,8.5
+2026-11-24T15:39-05:00,ba719e378ac366262013bdb51a06aa6f,Champions League,2026-11-24T20:02:00Z,Como,AEK Athens,fanatics,1.42,4.3,8.0
+2026-11-24T15:39-05:00,ba719e378ac366262013bdb51a06aa6f,Champions League,2026-11-24T20:02:00Z,Como,AEK Athens,draftkings,1.39,4.4,9.0
+2026-11-24T15:39-05:00,ba719e378ac366262013bdb51a06aa6f,Champions League,2026-11-24T20:02:00Z,Como,AEK Athens,betmgm,1.4,4.4,7.25
+2026-11-24T15:39-05:00,ba719e378ac366262013bdb51a06aa6f,Champions League,2026-11-24T20:02:00Z,Como,AEK Athens,fanduel,1.42,4.2,8.0
+2026-11-24T15:39-05:00,ba719e378ac366262013bdb51a06aa6f,Champions League,2026-11-24T20:02:00Z,Como,AEK Athens,williamhill_us,1.38,4.4,8.0
+2026-11-24T15:39-05:00,e6fa007f93e0cef004be920f96ee95ba,Champions League,2026-11-25T17:45:00Z,Sabah FK,Barcelona,fanatics,21.0,14.0,1.07
+2026-11-24T15:39-05:00,e6fa007f93e0cef004be920f96ee95ba,Champions League,2026-11-25T17:45:00Z,Sabah FK,Barcelona,draftkings,21.0,13.0,1.08
+2026-11-24T15:39-05:00,e6fa007f93e0cef004be920f96ee95ba,Champions League,2026-11-25T17:45:00Z,Sabah FK,Barcelona,betmgm,16.0,11.5,1.11
+2026-11-24T15:39-05:00,e6fa007f93e0cef004be920f96ee95ba,Champions League,2026-11-25T17:45:00Z,Sabah FK,Barcelona,fanduel,23.0,15.0,1.07
+2026-11-24T15:39-05:00,e6fa007f93e0cef004be920f96ee95ba,Champions League,2026-11-25T17:45:00Z,Sabah FK,Barcelona,williamhill_us,23.0,11.0,1.06
+2026-11-24T15:39-05:00,a7c87fac9e9cbcfc02ad0e0b29ca89e2,Champions League,2026-11-25T17:45:00Z,Slavia Praha,Villarreal,fanatics,3.0,4.0,2.1
+2026-11-24T15:39-05:00,a7c87fac9e9cbcfc02ad0e0b29ca89e2,Champions League,2026-11-25T17:45:00Z,Slavia Praha,Villarreal,draftkings,3.0,3.9,2.15
+2026-11-24T15:39-05:00,a7c87fac9e9cbcfc02ad0e0b29ca89e2,Champions League,2026-11-25T17:45:00Z,Slavia Praha,Villarreal,betmgm,3.0,3.6,2.15
+2026-11-24T15:39-05:00,a7c87fac9e9cbcfc02ad0e0b29ca89e2,Champions League,2026-11-25T17:45:00Z,Slavia Praha,Villarreal,fanduel,3.0,3.9,2.2
+2026-11-24T15:39-05:00,a7c87fac9e9cbcfc02ad0e0b29ca89e2,Champions League,2026-11-25T17:45:00Z,Slavia Praha,Villarreal,williamhill_us,3.0,3.7,2.1
+2026-11-24T15:39-05:00,14007bc0605bce3bd164b132254ba24c,Champions League,2026-11-25T20:00:00Z,Paris Saint Germain,AS Roma,fanatics,1.42,5.25,6.0
+2026-11-24T15:39-05:00,14007bc0605bce3bd164b132254ba24c,Champions League,2026-11-25T20:00:00Z,Paris Saint Germain,AS Roma,draftkings,1.44,5.0,6.5
+2026-11-24T15:39-05:00,14007bc0605bce3bd164b132254ba24c,Champions League,2026-11-25T20:00:00Z,Paris Saint Germain,AS Roma,betmgm,1.44,5.0,5.5
+2026-11-24T15:39-05:00,14007bc0605bce3bd164b132254ba24c,Champions League,2026-11-25T20:00:00Z,Paris Saint Germain,AS Roma,fanduel,1.45,5.0,6.0
+2026-11-24T15:39-05:00,14007bc0605bce3bd164b132254ba24c,Champions League,2026-11-25T20:00:00Z,Paris Saint Germain,AS Roma,williamhill_us,1.43,4.8,6.0
+2026-11-24T15:39-05:00,b1af6789fe6db7aab18a2945ce56f035,Champions League,2026-11-25T20:00:00Z,Atlético Madrid,Viking FK,fanatics,1.1,11.0,21.0
+2026-11-24T15:39-05:00,b1af6789fe6db7aab18a2945ce56f035,Champions League,2026-11-25T20:00:00Z,Atlético Madrid,Viking FK,draftkings,1.1,11.0,21.0
+2026-11-24T15:39-05:00,b1af6789fe6db7aab18a2945ce56f035,Champions League,2026-11-25T20:00:00Z,Atlético Madrid,Viking FK,betmgm,1.12,9.5,18.0
+2026-11-24T15:39-05:00,b1af6789fe6db7aab18a2945ce56f035,Champions League,2026-11-25T20:00:00Z,Atlético Madrid,Viking FK,fanduel,1.1,10.5,21.0
+2026-11-24T15:39-05:00,b1af6789fe6db7aab18a2945ce56f035,Champions League,2026-11-25T20:00:00Z,Atlético Madrid,Viking FK,williamhill_us,1.07,10.0,23.0
+2026-11-24T15:39-05:00,0ee2cfddf20153779cd2cc3e1f1f879f,Champions League,2026-11-25T20:00:00Z,Lille,Bayern Munich,fanatics,5.0,4.15,1.62
+2026-11-24T15:39-05:00,0ee2cfddf20153779cd2cc3e1f1f879f,Champions League,2026-11-25T20:00:00Z,Lille,Bayern Munich,draftkings,4.7,4.1,1.69
+2026-11-24T15:39-05:00,0ee2cfddf20153779cd2cc3e1f1f879f,Champions League,2026-11-25T20:00:00Z,Lille,Bayern Munich,betmgm,4.6,4.0,1.65
+2026-11-24T15:39-05:00,0ee2cfddf20153779cd2cc3e1f1f879f,Champions League,2026-11-25T20:00:00Z,Lille,Bayern Munich,fanduel,5.1,4.0,1.65
+2026-11-24T15:39-05:00,0ee2cfddf20153779cd2cc3e1f1f879f,Champions League,2026-11-25T20:00:00Z,Lille,Bayern Munich,williamhill_us,4.8,4.0,1.62
+2026-11-24T15:39-05:00,99459b90f3e732106e09585bf94b36b4,Champions League,2026-11-25T20:00:00Z,Club Brugge,Liverpool,fanatics,4.3,4.75,1.62
+2026-11-24T15:39-05:00,99459b90f3e732106e09585bf94b36b4,Champions League,2026-11-25T20:00:00Z,Club Brugge,Liverpool,draftkings,4.4,4.7,1.65
+2026-11-24T15:39-05:00,99459b90f3e732106e09585bf94b36b4,Champions League,2026-11-25T20:00:00Z,Club Brugge,Liverpool,betmgm,4.1,4.4,1.65
+2026-11-24T15:39-05:00,99459b90f3e732106e09585bf94b36b4,Champions League,2026-11-25T20:00:00Z,Club Brugge,Liverpool,fanduel,4.4,4.8,1.62
+2026-11-24T15:39-05:00,99459b90f3e732106e09585bf94b36b4,Champions League,2026-11-25T20:00:00Z,Club Brugge,Liverpool,williamhill_us,4.6,4.2,1.62
+2026-11-24T15:39-05:00,49c66d76bc4085e63a181179cc47ef4d,Champions League,2026-11-25T20:00:00Z,Shakhtar Donetsk,Fenerbahce,fanatics,2.85,3.5,2.4
+2026-11-24T15:39-05:00,49c66d76bc4085e63a181179cc47ef4d,Champions League,2026-11-25T20:00:00Z,Shakhtar Donetsk,Fenerbahce,draftkings,2.85,3.55,2.4
+2026-11-24T15:39-05:00,49c66d76bc4085e63a181179cc47ef4d,Champions League,2026-11-25T20:00:00Z,Shakhtar Donetsk,Fenerbahce,betmgm,2.65,3.4,2.45
+2026-11-24T15:39-05:00,49c66d76bc4085e63a181179cc47ef4d,Champions League,2026-11-25T20:00:00Z,Shakhtar Donetsk,Fenerbahce,fanduel,2.9,3.5,2.4
+2026-11-24T15:39-05:00,e7e64568f6af00d395a3fdfc27de8ae3,Champions League,2026-11-25T20:00:00Z,Inter Milan,VfB Stuttgart,fanatics,1.4,5.5,6.0
+2026-11-24T15:39-05:00,e7e64568f6af00d395a3fdfc27de8ae3,Champions League,2026-11-25T20:00:00Z,Inter Milan,VfB Stuttgart,draftkings,1.42,5.5,6.0
+2026-11-24T15:39-05:00,e7e64568f6af00d395a3fdfc27de8ae3,Champions League,2026-11-25T20:00:00Z,Inter Milan,VfB Stuttgart,betmgm,1.4,5.5,6.0
+2026-11-24T15:39-05:00,e7e64568f6af00d395a3fdfc27de8ae3,Champions League,2026-11-25T20:00:00Z,Inter Milan,VfB Stuttgart,fanduel,1.42,5.6,6.0
+2026-11-24T15:39-05:00,e7e64568f6af00d395a3fdfc27de8ae3,Champions League,2026-11-25T20:00:00Z,Inter Milan,VfB Stuttgart,williamhill_us,1.4,5.0,6.25
+2026-11-24T15:39-05:00,01a61442fe04f8751b62eb251f234079,Champions League,2026-11-25T20:00:00Z,Sporting Lisbon,Manchester United,fanatics,2.5,3.8,2.5
+2026-11-24T15:39-05:00,01a61442fe04f8751b62eb251f234079,Champions League,2026-11-25T20:00:00Z,Sporting Lisbon,Manchester United,draftkings,2.55,3.75,2.6
+2026-11-24T15:39-05:00,01a61442fe04f8751b62eb251f234079,Champions League,2026-11-25T20:00:00Z,Sporting Lisbon,Manchester United,betmgm,2.38,3.7,2.65
+2026-11-24T15:39-05:00,01a61442fe04f8751b62eb251f234079,Champions League,2026-11-25T20:00:00Z,Sporting Lisbon,Manchester United,fanduel,2.5,3.8,2.55
+2026-11-24T15:39-05:00,01a61442fe04f8751b62eb251f234079,Champions League,2026-11-25T20:00:00Z,Sporting Lisbon,Manchester United,williamhill_us,2.45,3.5,2.6
+2026-11-24T15:39-05:00,31ebd41354699af625fa3372932206f0,Europa League,2026-11-26T17:45:00Z,Olympiakos Piraeus,AC Milan,betmgm,2.88,3.5,2.38
+2026-11-24T15:39-05:00,31ebd41354699af625fa3372932206f0,Europa League,2026-11-26T17:45:00Z,Olympiakos Piraeus,AC Milan,draftkings,2.9,3.45,2.45
+2026-11-24T15:39-05:00,31ebd41354699af625fa3372932206f0,Europa League,2026-11-26T17:45:00Z,Olympiakos Piraeus,AC Milan,fanatics,2.85,3.4,2.4
+2026-11-24T15:39-05:00,31ebd41354699af625fa3372932206f0,Europa League,2026-11-26T17:45:00Z,Olympiakos Piraeus,AC Milan,fanduel,2.8,3.4,2.45
+2026-11-24T15:39-05:00,31ebd41354699af625fa3372932206f0,Europa League,2026-11-26T17:45:00Z,Olympiakos Piraeus,AC Milan,williamhill_us,2.8,3.2,2.45
+2026-11-24T15:39-05:00,cdf4b848361b0374c2027326bd54d8eb,Europa League,2026-11-26T17:45:00Z,Dinamo Zagreb,Bayer Leverkusen,betmgm,4.33,4.1,1.71
+2026-11-24T15:39-05:00,cdf4b848361b0374c2027326bd54d8eb,Europa League,2026-11-26T17:45:00Z,Dinamo Zagreb,Bayer Leverkusen,draftkings,4.4,4.3,1.71
+2026-11-24T15:39-05:00,cdf4b848361b0374c2027326bd54d8eb,Europa League,2026-11-26T17:45:00Z,Dinamo Zagreb,Bayer Leverkusen,fanatics,4.3,4.1,1.69
+2026-11-24T15:39-05:00,cdf4b848361b0374c2027326bd54d8eb,Europa League,2026-11-26T17:45:00Z,Dinamo Zagreb,Bayer Leverkusen,fanduel,4.2,4.2,1.69
+2026-11-24T15:39-05:00,cdf4b848361b0374c2027326bd54d8eb,Europa League,2026-11-26T17:45:00Z,Dinamo Zagreb,Bayer Leverkusen,williamhill_us,4.4,4.0,1.67
+2026-11-24T15:39-05:00,38332e4cbb2b3991904b00a75dc3769d,Europa League,2026-11-26T17:45:00Z,Viktoria Plzeň,Benfica,betmgm,5.75,4.8,1.48
+2026-11-24T15:39-05:00,38332e4cbb2b3991904b00a75dc3769d,Europa League,2026-11-26T17:45:00Z,Viktoria Plzeň,Benfica,draftkings,5.75,5.0,1.49
+2026-11-24T15:39-05:00,38332e4cbb2b3991904b00a75dc3769d,Europa League,2026-11-26T17:45:00Z,Viktoria Plzeň,Benfica,fanatics,5.75,5.0,1.48
+2026-11-24T15:39-05:00,38332e4cbb2b3991904b00a75dc3769d,Europa League,2026-11-26T17:45:00Z,Viktoria Plzeň,Benfica,fanduel,5.8,5.0,1.43
+2026-11-24T15:39-05:00,38332e4cbb2b3991904b00a75dc3769d,Europa League,2026-11-26T17:45:00Z,Viktoria Plzeň,Benfica,williamhill_us,5.75,4.4,1.48
+2026-11-24T15:39-05:00,a18687d4f17a96a7732fb0c8673ea037,Europa League,2026-11-26T17:45:00Z,Besiktas JK,Hapoel Be'er Sheva,betmgm,1.22,7.0,10.5
+2026-11-24T15:39-05:00,a18687d4f17a96a7732fb0c8673ea037,Europa League,2026-11-26T17:45:00Z,Besiktas JK,Hapoel Be'er Sheva,draftkings,1.21,7.0,12.0
+2026-11-24T15:39-05:00,a18687d4f17a96a7732fb0c8673ea037,Europa League,2026-11-26T17:45:00Z,Besiktas JK,Hapoel Be'er Sheva,fanatics,1.2,7.0,11.5
+2026-11-24T15:39-05:00,a18687d4f17a96a7732fb0c8673ea037,Europa League,2026-11-26T17:45:00Z,Besiktas JK,Hapoel Be'er Sheva,fanduel,1.18,7.0,10.5
+2026-11-24T15:39-05:00,7da3be4f6fe50a39ecdf3a8dc12966c8,Europa League,2026-11-26T17:45:00Z,Celta Vigo,Bournemouth,betmgm,3.6,3.6,2.0
+2026-11-24T15:39-05:00,7da3be4f6fe50a39ecdf3a8dc12966c8,Europa League,2026-11-26T17:45:00Z,Celta Vigo,Bournemouth,draftkings,3.6,3.55,2.05
+2026-11-24T15:39-05:00,7da3be4f6fe50a39ecdf3a8dc12966c8,Europa League,2026-11-26T17:45:00Z,Celta Vigo,Bournemouth,fanatics,3.6,3.5,2.0
+2026-11-24T15:39-05:00,7da3be4f6fe50a39ecdf3a8dc12966c8,Europa League,2026-11-26T17:45:00Z,Celta Vigo,Bournemouth,fanduel,3.5,3.4,2.05
+2026-11-24T15:39-05:00,7da3be4f6fe50a39ecdf3a8dc12966c8,Europa League,2026-11-26T17:45:00Z,Celta Vigo,Bournemouth,williamhill_us,3.6,3.4,2.0
+2026-11-24T15:39-05:00,5902b4703e9ddc1f573091e14107834c,Europa League,2026-11-26T17:45:00Z,Salzburg,FC Ararat-Armenia,betmgm,1.19,8.25,12.0
+2026-11-24T15:39-05:00,5902b4703e9ddc1f573091e14107834c,Europa League,2026-11-26T17:45:00Z,Salzburg,FC Ararat-Armenia,draftkings,1.18,8.0,13.0
+2026-11-24T15:39-05:00,5902b4703e9ddc1f573091e14107834c,Europa League,2026-11-26T17:45:00Z,Salzburg,FC Ararat-Armenia,fanduel,1.14,8.0,12.0
+2026-11-24T15:39-05:00,5902b4703e9ddc1f573091e14107834c,Europa League,2026-11-26T17:45:00Z,Salzburg,FC Ararat-Armenia,fanatics,1.16,7.5,14.0
+2026-11-24T15:39-05:00,5902b4703e9ddc1f573091e14107834c,Europa League,2026-11-26T17:45:00Z,Salzburg,FC Ararat-Armenia,williamhill_us,1.15,7.0,15.0
+2026-11-24T15:39-05:00,3ee2bf8a6fa6add543f64ac3e9813976,Europa League,2026-11-26T17:45:00Z,Union Saint-Gilloise,Lech Poznań,betmgm,1.4,5.0,7.25
+2026-11-24T15:39-05:00,3ee2bf8a6fa6add543f64ac3e9813976,Europa League,2026-11-26T17:45:00Z,Union Saint-Gilloise,Lech Poznań,draftkings,1.36,5.5,7.5
+2026-11-24T15:39-05:00,3ee2bf8a6fa6add543f64ac3e9813976,Europa League,2026-11-26T17:45:00Z,Union Saint-Gilloise,Lech Poznań,fanatics,1.36,5.25,7.0
+2026-11-24T15:39-05:00,3ee2bf8a6fa6add543f64ac3e9813976,Europa League,2026-11-26T17:45:00Z,Union Saint-Gilloise,Lech Poznań,fanduel,1.33,5.4,7.5
+2026-11-24T15:39-05:00,3ee2bf8a6fa6add543f64ac3e9813976,Europa League,2026-11-26T17:45:00Z,Union Saint-Gilloise,Lech Poznań,williamhill_us,1.36,4.8,7.5
+2026-11-24T15:39-05:00,707c513bfa43b45b7813126e09ad08d8,Europa League,2026-11-26T17:45:00Z,Marseille,PFC Levski Sofia,betmgm,1.43,4.8,7.0
+2026-11-24T15:39-05:00,707c513bfa43b45b7813126e09ad08d8,Europa League,2026-11-26T17:45:00Z,Marseille,PFC Levski Sofia,draftkings,1.41,5.0,7.5
+2026-11-24T15:39-05:00,707c513bfa43b45b7813126e09ad08d8,Europa League,2026-11-26T17:45:00Z,Marseille,PFC Levski Sofia,fanatics,1.4,5.0,7.0
+2026-11-24T15:39-05:00,707c513bfa43b45b7813126e09ad08d8,Europa League,2026-11-26T17:45:00Z,Marseille,PFC Levski Sofia,fanduel,1.34,4.8,7.5
+2026-11-24T15:39-05:00,707c513bfa43b45b7813126e09ad08d8,Europa League,2026-11-26T17:45:00Z,Marseille,PFC Levski Sofia,williamhill_us,1.4,4.4,7.5
+2026-11-24T15:39-05:00,189401357a4b5e5920ca9ec1207a6566,Europa League,2026-11-26T20:00:00Z,Sparta Prague,AZ Alkmaar,betmgm,2.88,3.6,2.3
+2026-11-24T15:39-05:00,189401357a4b5e5920ca9ec1207a6566,Europa League,2026-11-26T20:00:00Z,Sparta Prague,AZ Alkmaar,draftkings,2.85,3.7,2.35
+2026-11-24T15:39-05:00,189401357a4b5e5920ca9ec1207a6566,Europa League,2026-11-26T20:00:00Z,Sparta Prague,AZ Alkmaar,fanatics,2.85,3.6,2.3
+2026-11-24T15:39-05:00,189401357a4b5e5920ca9ec1207a6566,Europa League,2026-11-26T20:00:00Z,Sparta Prague,AZ Alkmaar,fanduel,2.85,3.6,2.3
+2026-11-24T15:39-05:00,189401357a4b5e5920ca9ec1207a6566,Europa League,2026-11-26T20:00:00Z,Sparta Prague,AZ Alkmaar,williamhill_us,2.85,3.4,2.3
+2026-11-24T15:39-05:00,de10dd2e5917108a9478c07275ba8cdb,Europa League,2026-11-26T20:00:00Z,OFI Crete,Anderlecht,betmgm,4.33,3.8,1.77
+2026-11-24T15:39-05:00,de10dd2e5917108a9478c07275ba8cdb,Europa League,2026-11-26T20:00:00Z,OFI Crete,Anderlecht,draftkings,4.4,3.9,1.77
+2026-11-24T15:39-05:00,de10dd2e5917108a9478c07275ba8cdb,Europa League,2026-11-26T20:00:00Z,OFI Crete,Anderlecht,fanatics,4.3,3.8,1.8
+2026-11-24T15:39-05:00,de10dd2e5917108a9478c07275ba8cdb,Europa League,2026-11-26T20:00:00Z,OFI Crete,Anderlecht,fanduel,4.3,3.8,1.71
+2026-11-24T15:39-05:00,de10dd2e5917108a9478c07275ba8cdb,Europa League,2026-11-26T20:00:00Z,OFI Crete,Anderlecht,williamhill_us,4.2,3.5,1.8
+2026-11-24T15:39-05:00,e2036567ee9394a55f022358781dce15,Europa League,2026-11-26T20:00:00Z,Torreense,Celtic,betmgm,4.33,4.2,1.71
+2026-11-24T15:39-05:00,e2036567ee9394a55f022358781dce15,Europa League,2026-11-26T20:00:00Z,Torreense,Celtic,draftkings,4.7,4.2,1.67
+2026-11-24T15:39-05:00,e2036567ee9394a55f022358781dce15,Europa League,2026-11-26T20:00:00Z,Torreense,Celtic,fanatics,5.0,4.1,1.62
+2026-11-24T15:39-05:00,e2036567ee9394a55f022358781dce15,Europa League,2026-11-26T20:00:00Z,Torreense,Celtic,fanduel,4.8,4.1,1.59
+2026-11-24T15:39-05:00,e2036567ee9394a55f022358781dce15,Europa League,2026-11-26T20:00:00Z,Torreense,Celtic,williamhill_us,4.6,4.0,1.67
+2026-11-24T15:39-05:00,3fe17778f32b5fd0f218f9be6b0681cc,Europa League,2026-11-26T20:00:00Z,Crystal Palace,Real Sociedad,betmgm,2.05,3.75,3.3
+2026-11-24T15:39-05:00,3fe17778f32b5fd0f218f9be6b0681cc,Europa League,2026-11-26T20:00:00Z,Crystal Palace,Real Sociedad,draftkings,2.05,3.95,3.2
+2026-11-24T15:39-05:00,3fe17778f32b5fd0f218f9be6b0681cc,Europa League,2026-11-26T20:00:00Z,Crystal Palace,Real Sociedad,fanatics,2.05,3.8,3.2
+2026-11-24T15:39-05:00,3fe17778f32b5fd0f218f9be6b0681cc,Europa League,2026-11-26T20:00:00Z,Crystal Palace,Real Sociedad,fanduel,2.0,3.9,3.2
+2026-11-24T15:39-05:00,3fe17778f32b5fd0f218f9be6b0681cc,Europa League,2026-11-26T20:00:00Z,Crystal Palace,Real Sociedad,williamhill_us,2.05,3.6,3.2
+2026-11-24T15:39-05:00,0e5553b52ece07115fbdf8145df0c377,Europa League,2026-11-26T20:00:00Z,Ferencváros TC,NK Celje,betmgm,1.36,5.25,7.5
+2026-11-24T15:39-05:00,0e5553b52ece07115fbdf8145df0c377,Europa League,2026-11-26T20:00:00Z,Ferencváros TC,NK Celje,draftkings,1.37,5.5,7.5
+2026-11-24T15:39-05:00,0e5553b52ece07115fbdf8145df0c377,Europa League,2026-11-26T20:00:00Z,Ferencváros TC,NK Celje,fanatics,1.35,5.25,7.5
+2026-11-24T15:39-05:00,0e5553b52ece07115fbdf8145df0c377,Europa League,2026-11-26T20:00:00Z,Ferencváros TC,NK Celje,fanduel,1.33,5.3,7.5
+2026-11-24T15:39-05:00,0e5553b52ece07115fbdf8145df0c377,Europa League,2026-11-26T20:00:00Z,Ferencváros TC,NK Celje,williamhill_us,1.36,4.8,8.0
+2026-11-24T15:39-05:00,413409b43875d1bdb627a9e7fb6bc3fd,Europa League,2026-11-26T20:00:00Z,Sunderland,Jagiellonia Białystok,betmgm,1.25,6.25,11.5
+2026-11-24T15:39-05:00,413409b43875d1bdb627a9e7fb6bc3fd,Europa League,2026-11-26T20:00:00Z,Sunderland,Jagiellonia Białystok,draftkings,1.24,6.5,11.0
+2026-11-24T15:39-05:00,413409b43875d1bdb627a9e7fb6bc3fd,Europa League,2026-11-26T20:00:00Z,Sunderland,Jagiellonia Białystok,fanatics,1.24,6.0,11.5
+2026-11-24T15:39-05:00,413409b43875d1bdb627a9e7fb6bc3fd,Europa League,2026-11-26T20:00:00Z,Sunderland,Jagiellonia Białystok,fanduel,1.21,6.5,10.5
+2026-11-24T15:39-05:00,413409b43875d1bdb627a9e7fb6bc3fd,Europa League,2026-11-26T20:00:00Z,Sunderland,Jagiellonia Białystok,williamhill_us,1.25,5.25,12.0
+2026-11-24T15:39-05:00,d6377d30379e5d3053c1076646d83f78,Europa League,2026-11-26T20:00:00Z,Juventus,Omonoia FC,betmgm,1.21,7.0,12.5
+2026-11-24T15:39-05:00,d6377d30379e5d3053c1076646d83f78,Europa League,2026-11-26T20:00:00Z,Juventus,Omonoia FC,draftkings,1.18,7.5,14.0
+2026-11-24T15:39-05:00,d6377d30379e5d3053c1076646d83f78,Europa League,2026-11-26T20:00:00Z,Juventus,Omonoia FC,fanatics,1.17,7.5,14.0
+2026-11-24T15:39-05:00,d6377d30379e5d3053c1076646d83f78,Europa League,2026-11-26T20:00:00Z,Juventus,Omonoia FC,fanduel,1.15,7.5,12.0
+2026-11-24T15:39-05:00,d6377d30379e5d3053c1076646d83f78,Europa League,2026-11-26T20:00:00Z,Juventus,Omonoia FC,williamhill_us,1.15,6.5,17.0
+2026-11-24T15:39-05:00,a24c89b65c5a30fb9473735049589e64,Europa League,2026-11-26T20:00:00Z,Lyon,Lillestrom,betmgm,1.2,7.5,12.0
+2026-11-24T15:39-05:00,a24c89b65c5a30fb9473735049589e64,Europa League,2026-11-26T20:00:00Z,Lyon,Lillestrom,draftkings,1.18,8.0,14.0
+2026-11-24T15:39-05:00,a24c89b65c5a30fb9473735049589e64,Europa League,2026-11-26T20:00:00Z,Lyon,Lillestrom,fanduel,1.15,8.0,12.0
+2026-11-24T15:39-05:00,a24c89b65c5a30fb9473735049589e64,Europa League,2026-11-26T20:00:00Z,Lyon,Lillestrom,fanatics,1.17,7.5,13.0
+2026-11-24T15:39-05:00,a24c89b65c5a30fb9473735049589e64,Europa League,2026-11-26T20:00:00Z,Lyon,Lillestrom,williamhill_us,1.17,6.5,15.0
+2026-11-24T15:39-05:00,e836bc70afa19b0db28fb320a97662e4,Europa League,2026-11-26T20:00:00Z,NEC Nijmegen,Rennes,betmgm,3.0,3.75,2.15
+2026-11-24T15:39-05:00,e836bc70afa19b0db28fb320a97662e4,Europa League,2026-11-26T20:00:00Z,NEC Nijmegen,Rennes,draftkings,3.0,3.9,2.15
+2026-11-24T15:39-05:00,e836bc70afa19b0db28fb320a97662e4,Europa League,2026-11-26T20:00:00Z,NEC Nijmegen,Rennes,fanatics,3.0,3.8,2.15
+2026-11-24T15:39-05:00,e836bc70afa19b0db28fb320a97662e4,Europa League,2026-11-26T20:00:00Z,NEC Nijmegen,Rennes,fanduel,3.0,3.7,2.15
+2026-11-24T15:39-05:00,e836bc70afa19b0db28fb320a97662e4,Europa League,2026-11-26T20:00:00Z,NEC Nijmegen,Rennes,williamhill_us,3.0,3.7,2.1
+2026-11-24T15:39-05:00,df4947bbe49057782feacca38c03e790,Europa League,2026-11-26T20:00:00Z,TSG Hoffenheim,SK Sturm Graz,betmgm,1.36,5.5,7.5
+2026-11-24T15:39-05:00,df4947bbe49057782feacca38c03e790,Europa League,2026-11-26T20:00:00Z,TSG Hoffenheim,SK Sturm Graz,draftkings,1.35,5.75,7.5
+2026-11-24T15:39-05:00,df4947bbe49057782feacca38c03e790,Europa League,2026-11-26T20:00:00Z,TSG Hoffenheim,SK Sturm Graz,fanduel,1.32,5.7,7.5
+2026-11-24T15:39-05:00,df4947bbe49057782feacca38c03e790,Europa League,2026-11-26T20:00:00Z,TSG Hoffenheim,SK Sturm Graz,fanatics,1.33,5.5,7.5
+2026-11-24T15:39-05:00,df4947bbe49057782feacca38c03e790,Europa League,2026-11-26T20:00:00Z,TSG Hoffenheim,SK Sturm Graz,williamhill_us,1.33,5.0,8.0
+2026-11-24T15:39-05:00,31ebd41354699af625fa3372932206f0,Europa League,2026-11-26T17:45:00Z,Olympiakos Piraeus,AC Milan,kalshi,2.8943,3.3987,2.3992
+2026-11-24T15:39-05:00,cdf4b848361b0374c2027326bd54d8eb,Europa League,2026-11-26T17:45:00Z,Dinamo Zagreb,Bayer Leverkusen,kalshi,4.3144,4.3144,1.699
+2026-11-24T15:39-05:00,38332e4cbb2b3991904b00a75dc3769d,Europa League,2026-11-26T17:45:00Z,Viktoria Plzeň,Benfica,kalshi,5.9029,4.9778,1.4565
+2026-11-24T15:39-05:00,a18687d4f17a96a7732fb0c8673ea037,Europa League,2026-11-26T17:45:00Z,Besiktas JK,Hapoel Be'er Sheva,kalshi,1.2048,7.2486,11.7437
+2026-11-24T15:39-05:00,7da3be4f6fe50a39ecdf3a8dc12966c8,Europa League,2026-11-26T17:45:00Z,Celta Vigo,Bournemouth,kalshi,3.5202,3.3987,2.0911
+2026-11-24T15:39-05:00,5902b4703e9ddc1f573091e14107834c,Europa League,2026-11-26T17:45:00Z,Salzburg,FC Ararat-Armenia,kalshi,1.1768,7.8467,15.6408
+2026-11-24T15:39-05:00,3ee2bf8a6fa6add543f64ac3e9813976,Europa League,2026-11-26T17:45:00Z,Union Saint-Gilloise,Lech Poznań,kalshi,1.3632,5.5572,7.8467
+2026-11-24T15:39-05:00,707c513bfa43b45b7813126e09ad08d8,Europa League,2026-11-26T17:45:00Z,Marseille,PFC Levski Sofia,kalshi,1.4192,4.9778,7.8467
+2026-11-24T15:39-05:00,189401357a4b5e5920ca9ec1207a6566,Europa League,2026-11-26T20:00:00Z,Sparta Prague,AZ Alkmaar,kalshi,2.8102,3.5202,2.2872
+2026-11-24T15:39-05:00,de10dd2e5917108a9478c07275ba8cdb,Europa League,2026-11-26T20:00:00Z,OFI Crete,Anderlecht,kalshi,4.3144,3.8005,1.7924
+2026-11-24T15:39-05:00,e2036567ee9394a55f022358781dce15,Europa League,2026-11-26T20:00:00Z,Torreense,Celtic,kalshi,4.7348,4.1275,1.643
+2026-11-24T15:39-05:00,3fe17778f32b5fd0f218f9be6b0681cc,Europa League,2026-11-26T20:00:00Z,Crystal Palace,Real Sociedad,kalshi,2.0071,3.9593,3.2866
+2026-11-24T15:39-05:00,0e5553b52ece07115fbdf8145df0c377,Europa League,2026-11-26T20:00:00Z,Ferencváros TC,NK Celje,kalshi,1.3632,5.2581,7.8467
+2026-11-24T15:39-05:00,413409b43875d1bdb627a9e7fb6bc3fd,Europa League,2026-11-26T20:00:00Z,Sunderland,Jagiellonia Białystok,kalshi,1.2514,6.2954,13.4166
+2026-11-24T15:39-05:00,d6377d30379e5d3053c1076646d83f78,Europa League,2026-11-26T20:00:00Z,Juventus,Omonoia FC,kalshi,1.1862,7.8467,15.6408
+2026-11-24T15:39-05:00,a24c89b65c5a30fb9473735049589e64,Europa League,2026-11-26T20:00:00Z,Lyon,Lillestrom,kalshi,1.2048,7.8467,15.6408
+2026-11-24T15:39-05:00,e836bc70afa19b0db28fb320a97662e4,Europa League,2026-11-26T20:00:00Z,NEC Nijmegen,Rennes,kalshi,2.9783,3.8005,2.1378
+2026-11-24T15:39-05:00,df4947bbe49057782feacca38c03e790,Europa League,2026-11-26T20:00:00Z,TSG Hoffenheim,SK Sturm Graz,kalshi,1.3446,5.5572,7.2486
+2026-11-24T15:39-05:00,718e58b174c7879c387377c058c4e327,FA Cup,2026-12-04T19:30:00Z,Wimborne Town FC,Bradford City,fanduel,10.0,6.0,1.2
+2026-11-24T15:39-05:00,718e58b174c7879c387377c058c4e327,FA Cup,2026-12-04T19:30:00Z,Wimborne Town FC,Bradford City,draftkings,9.5,6.0,1.25
+2026-11-24T15:39-05:00,f7232202281c37772778e62550f1061e,FA Cup,2026-12-04T19:45:00Z,Wycombe Wanderers,Milton Keynes Dons,fanduel,2.05,3.6,3.0
+2026-11-24T15:39-05:00,f7232202281c37772778e62550f1061e,FA Cup,2026-12-04T19:45:00Z,Wycombe Wanderers,Milton Keynes Dons,draftkings,2.1,3.65,3.1
+2026-11-24T15:39-05:00,e7325acc7ac44d61344459f9eabd24d4,FA Cup,2026-12-05T15:00:00Z,Wigan Athletic,Barnsley,draftkings,2.2,3.6,3.0
+2026-11-24T15:39-05:00,9ae17786f4f0f1e6e74dd9898fb1d692,FA Cup,2026-12-05T15:00:00Z,Rotherham United,Bristol Rovers,fanduel,3.1,3.3,2.1
+2026-11-24T15:39-05:00,9ae17786f4f0f1e6e74dd9898fb1d692,FA Cup,2026-12-05T15:00:00Z,Rotherham United,Bristol Rovers,draftkings,3.15,3.5,2.15
+2026-11-24T15:39-05:00,f71003c97567d6f4bac88e093018288f,FA Cup,2026-12-05T15:00:00Z,Shrewsbury Town,Burton Albion,fanduel,2.05,3.5,3.0
+2026-11-24T15:39-05:00,f71003c97567d6f4bac88e093018288f,FA Cup,2026-12-05T15:00:00Z,Shrewsbury Town,Burton Albion,draftkings,2.1,3.65,3.15
+2026-11-24T15:39-05:00,fc0ac02348ce0cdf9b9252e545be89a7,FA Cup,2026-12-05T15:00:00Z,York City FC,Carlisle United,fanduel,1.91,4.0,3.2
+2026-11-24T15:39-05:00,fc0ac02348ce0cdf9b9252e545be89a7,FA Cup,2026-12-05T15:00:00Z,York City FC,Carlisle United,draftkings,1.95,4.1,3.2
+2026-11-24T15:39-05:00,95ef4a26017716ef6af049b43c5d3952,FA Cup,2026-12-05T15:00:00Z,Chesterfield FC,Cheltenham Town,fanduel,1.5,4.3,5.4
+2026-11-24T15:39-05:00,95ef4a26017716ef6af049b43c5d3952,FA Cup,2026-12-05T15:00:00Z,Chesterfield FC,Cheltenham Town,draftkings,1.51,4.4,5.5
+2026-11-24T15:39-05:00,0c4b1bbbe97a58640387ffc2edf9dc89,FA Cup,2026-12-05T15:00:00Z,Colchester United,Mansfield Town,fanduel,3.2,3.5,2.05
+2026-11-24T15:39-05:00,0c4b1bbbe97a58640387ffc2edf9dc89,FA Cup,2026-12-05T15:00:00Z,Colchester United,Mansfield Town,draftkings,3.15,3.55,2.15
+2026-11-24T15:39-05:00,725fd1617c5bc52e67c24e4266ab0154,FA Cup,2026-12-05T15:00:00Z,Exeter City,Stevenage,fanduel,3.1,3.3,2.1
+2026-11-24T15:39-05:00,725fd1617c5bc52e67c24e4266ab0154,FA Cup,2026-12-05T15:00:00Z,Exeter City,Stevenage,draftkings,3.2,3.35,2.2
+2026-11-24T15:39-05:00,e407cffa8a050c8e341503e1dc309a45,FA Cup,2026-12-05T15:00:00Z,Grimsby Town,Oldham Athletic,fanduel,1.8,3.7,3.7
+2026-11-24T15:39-05:00,e407cffa8a050c8e341503e1dc309a45,FA Cup,2026-12-05T15:00:00Z,Grimsby Town,Oldham Athletic,draftkings,1.83,3.8,3.8
+2026-11-24T15:39-05:00,9fa1dc13a8e781cca9caa75ad5e94b4a,FA Cup,2026-12-05T15:00:00Z,Port Vale,Leyton Orient,fanduel,2.4,3.6,2.5
+2026-11-24T15:39-05:00,9fa1dc13a8e781cca9caa75ad5e94b4a,FA Cup,2026-12-05T15:00:00Z,Port Vale,Leyton Orient,draftkings,2.4,3.75,2.6
+2026-11-24T15:39-05:00,4f6af5f7b5e321309f43198ba2383808,FA Cup,2026-12-05T15:00:00Z,Rochdale,Newport County,fanduel,2.3,3.4,2.75
+2026-11-24T15:39-05:00,4f6af5f7b5e321309f43198ba2383808,FA Cup,2026-12-05T15:00:00Z,Rochdale,Newport County,draftkings,2.35,3.5,2.8
+2026-11-24T15:39-05:00,651aaa3058acdb24ff449a9cb6fb7c01,FA Cup,2026-12-05T15:00:00Z,Reading,Stockport County FC,fanduel,2.65,3.4,2.4
+2026-11-24T15:39-05:00,651aaa3058acdb24ff449a9cb6fb7c01,FA Cup,2026-12-05T15:00:00Z,Reading,Stockport County FC,draftkings,2.7,3.5,2.4
+2026-11-24T15:39-05:00,7f35e6b5b60cdd53ff0767e8ec5c7d50,FA Cup,2026-12-05T17:15:00Z,Dover Athletic FC,Leicester City,fanduel,11.0,7.0,1.17
+2026-11-24T15:39-05:00,7f35e6b5b60cdd53ff0767e8ec5c7d50,FA Cup,2026-12-05T17:15:00Z,Dover Athletic FC,Leicester City,draftkings,11.0,7.0,1.18
+2026-11-24T15:39-05:00,6bab2818e4b7fcf988919fd80b87177b,FA Cup,2026-12-05T20:00:00Z,Barrow AFC,Kidderminster Harriers FC,fanduel,1.77,3.8,3.8
+2026-11-24T15:39-05:00,6bab2818e4b7fcf988919fd80b87177b,FA Cup,2026-12-05T20:00:00Z,Barrow AFC,Kidderminster Harriers FC,draftkings,1.8,3.9,3.9
+2026-11-24T15:39-05:00,2340b9cd6f5d4642539e1649205d9845,FA Cup,2026-12-06T12:15:00Z,Salisbury FC,Blackpool,fanduel,4.3,4.2,1.62
+2026-11-24T15:39-05:00,2340b9cd6f5d4642539e1649205d9845,FA Cup,2026-12-06T12:15:00Z,Salisbury FC,Blackpool,draftkings,4.3,4.3,1.67
+2026-11-24T15:39-05:00,9101e7a827a89f6e1deed9c9c59615bd,FA Cup,2026-12-06T14:30:00Z,AFC Fylde,Luton Town,fanduel,5.0,4.6,1.48
+2026-11-24T15:39-05:00,9101e7a827a89f6e1deed9c9c59615bd,FA Cup,2026-12-06T14:30:00Z,AFC Fylde,Luton Town,draftkings,5.0,4.7,1.51
+2026-11-24T15:39-05:00,ae7b345fdd4831586d7a2adb95bde2e7,FA Cup,2026-12-06T15:15:00Z,Crewe Alexandra,Plymouth Argyle,fanduel,3.4,3.6,1.91
+2026-11-24T15:39-05:00,ae7b345fdd4831586d7a2adb95bde2e7,FA Cup,2026-12-06T15:15:00Z,Crewe Alexandra,Plymouth Argyle,draftkings,3.5,3.7,1.95
+2026-11-24T15:39-05:00,33d9b7130a77cff449f37c5b9251d37c,FA Cup,2026-12-06T17:30:00Z,Plymouth Parkway FC,Barnet FC,fanduel,7.0,5.8,1.28
+2026-11-24T15:39-05:00,33d9b7130a77cff449f37c5b9251d37c,FA Cup,2026-12-06T17:30:00Z,Plymouth Parkway FC,Barnet FC,draftkings,7.0,6.0,1.31
+2026-11-24T15:39-05:00,65dc4828cb292f311e5252ec86277cf3,FA Cup,2026-12-07T19:30:00Z,Guiseley AFC,Notts County FC,fanduel,6.0,4.8,1.4
+2026-11-24T15:39-05:00,b5f465ecd8f5f2a7cdb74b729ab10b34,DFB-Pokal,2026-12-01T17:00:00Z,Holstein Kiel,1. FC Köln,betmgm,3.3,3.9,2.0
+2026-11-24T15:39-05:00,5501e3d975076b40a8346ad357f811bd,DFB-Pokal,2026-12-01T17:00:00Z,VfB Stuttgart,Dynamo Dresden,betmgm,1.22,7.25,11.5
+2026-11-24T15:39-05:00,e3cd8753068edfc9c469a3b3f6318a0f,DFB-Pokal,2026-12-01T19:45:00Z,Bayern Munich,Hertha Berlin,betmgm,1.12,11.0,16.5
+2026-11-24T15:39-05:00,9231a872e0ad940d6ac62c6f54fcf5ca,DFB-Pokal,2026-12-01T19:45:00Z,Borussia Monchengladbach,SV Darmstadt 98,betmgm,1.44,5.0,6.25
+2026-11-24T15:39-05:00,a320d0d3ffd249666c5920aa8e9a8c1a,DFB-Pokal,2026-12-02T17:00:00Z,1. FC Kaiserslautern,SC Freiburg,betmgm,5.0,4.6,1.57
+2026-11-24T15:39-05:00,0ae48d3e3c8b8418a16ce740bea526a8,DFB-Pokal,2026-12-02T17:00:00Z,Bayer Leverkusen,RB Leipzig,betmgm,1.83,4.2,3.7
+2026-11-24T15:39-05:00,c4512e2fdfb536f21ecd25d2fb23b8df,DFB-Pokal,2026-12-02T19:45:00Z,VfL Bochum,Augsburg,betmgm,3.0,3.5,2.25
+2026-11-24T15:39-05:00,1ddfef2420de06d39d39b6a5112d63da,DFB-Pokal,2026-12-02T19:45:00Z,Eintracht Frankfurt,Borussia Dortmund,betmgm,3.6,4.2,1.85
+2026-11-24T15:39-05:00,5529c4c09f4988630f9cb92b6b915a39,Carabao Cup,2026-12-15T18:00:00Z,Liverpool,Bournemouth,fanduel,1.54,4.1,5.7
+2026-11-24T15:39-05:00,29491d82c4bf601a7416206316ceb66e,Carabao Cup,2026-12-15T18:00:00Z,Manchester City,Bradford City,fanduel,1.07,10.0,23.0
+2026-11-24T15:39-05:00,76c2626b0acd4796dcd2bd23ff1c86c8,Carabao Cup,2026-12-15T18:00:00Z,Crystal Palace,Sunderland,fanduel,1.83,3.5,3.9
+2026-11-24T15:39-05:00,55386e8f44342460292aa8ab6ad76735,Carabao Cup,2026-12-17T20:00:00Z,Fleetwood Town,Everton,fanduel,11.0,6.0,1.21
+2026-11-24T15:39-05:00,b11e430b1d8052d0c718bcee69145f7a,Conference League,2026-11-26T15:30:00Z,FC Kairat,Mjällby AIF,betmgm,2.15,3.3,2.95
+2026-11-24T15:39-05:00,b11e430b1d8052d0c718bcee69145f7a,Conference League,2026-11-26T15:30:00Z,FC Kairat,Mjällby AIF,fanduel,2.25,3.4,3.0
+2026-11-24T15:39-05:00,b11e430b1d8052d0c718bcee69145f7a,Conference League,2026-11-26T15:30:00Z,FC Kairat,Mjällby AIF,draftkings,2.25,3.45,3.15
+2026-11-24T15:39-05:00,e1bfce2837ee873eec90dbefe31844ac,Conference League,2026-11-26T17:45:00Z,SK Brann,AGF Aarhus,betmgm,2.05,3.6,3.0
+2026-11-24T15:39-05:00,e1bfce2837ee873eec90dbefe31844ac,Conference League,2026-11-26T17:45:00Z,SK Brann,AGF Aarhus,fanduel,2.1,3.8,3.0
+2026-11-24T15:39-05:00,e1bfce2837ee873eec90dbefe31844ac,Conference League,2026-11-26T17:45:00Z,SK Brann,AGF Aarhus,draftkings,2.2,3.85,3.05
+2026-11-24T15:39-05:00,c587e5656d1f38f068cba1b168462ba4,Conference League,2026-11-26T17:45:00Z,Hearts,AS Monaco,betmgm,4.6,4.0,1.57
+2026-11-24T15:39-05:00,c587e5656d1f38f068cba1b168462ba4,Conference League,2026-11-26T17:45:00Z,Hearts,AS Monaco,fanduel,4.9,4.2,1.59
+2026-11-24T15:39-05:00,c587e5656d1f38f068cba1b168462ba4,Conference League,2026-11-26T17:45:00Z,Hearts,AS Monaco,draftkings,5.0,4.4,1.61
+2026-11-24T15:39-05:00,8a0dc963ce319d55751d4d07c5152600,Conference League,2026-11-26T17:45:00Z,Ajax,FC Thun,betmgm,1.18,7.5,10.5
+2026-11-24T15:39-05:00,8a0dc963ce319d55751d4d07c5152600,Conference League,2026-11-26T17:45:00Z,Ajax,FC Thun,fanduel,1.15,8.0,10.5
+2026-11-24T15:39-05:00,8a0dc963ce319d55751d4d07c5152600,Conference League,2026-11-26T17:45:00Z,Ajax,FC Thun,draftkings,1.19,8.0,12.0
+2026-11-24T15:39-05:00,bbab118a8c6ca33b6b0e7b5ed36fecd8,Conference League,2026-11-26T17:45:00Z,Brighton and Hove Albion,Universitatea Craiova,betmgm,1.14,7.75,13.5
+2026-11-24T15:39-05:00,bbab118a8c6ca33b6b0e7b5ed36fecd8,Conference League,2026-11-26T17:45:00Z,Brighton and Hove Albion,Universitatea Craiova,fanduel,1.11,8.5,14.0
+2026-11-24T15:39-05:00,bbab118a8c6ca33b6b0e7b5ed36fecd8,Conference League,2026-11-26T17:45:00Z,Brighton and Hove Albion,Universitatea Craiova,draftkings,1.14,9.0,16.0
+2026-11-24T15:39-05:00,cbe7d454dbea3c32de84901cced19bd4,Conference League,2026-11-26T17:45:00Z,FC Iberia 1999,Getafe,betmgm,6.0,4.1,1.45
+2026-11-24T15:39-05:00,cbe7d454dbea3c32de84901cced19bd4,Conference League,2026-11-26T17:45:00Z,FC Iberia 1999,Getafe,fanduel,7.5,4.4,1.42
+2026-11-24T15:39-05:00,cbe7d454dbea3c32de84901cced19bd4,Conference League,2026-11-26T17:45:00Z,FC Iberia 1999,Getafe,draftkings,7.0,4.4,1.48
+2026-11-24T15:39-05:00,4f5b1a808bafc37b7c0041e947c2e536,Conference League,2026-11-26T17:45:00Z,FK Jablonec,FC Lugano,betmgm,3.2,3.5,2.0
+2026-11-24T15:39-05:00,4f5b1a808bafc37b7c0041e947c2e536,Conference League,2026-11-26T17:45:00Z,FK Jablonec,FC Lugano,fanduel,3.4,3.6,2.05
+2026-11-24T15:39-05:00,4f5b1a808bafc37b7c0041e947c2e536,Conference League,2026-11-26T17:45:00Z,FK Jablonec,FC Lugano,draftkings,3.35,3.8,2.05
+2026-11-24T15:39-05:00,48a49061ae356d2a8b3b3976ec21508d,Conference League,2026-11-26T17:45:00Z,Pafos FC,FC Midtjylland,betmgm,2.88,3.5,2.15
+2026-11-24T15:39-05:00,48a49061ae356d2a8b3b3976ec21508d,Conference League,2026-11-26T17:45:00Z,Pafos FC,FC Midtjylland,fanduel,3.0,3.6,2.2
+2026-11-24T15:39-05:00,48a49061ae356d2a8b3b3976ec21508d,Conference League,2026-11-26T17:45:00Z,Pafos FC,FC Midtjylland,draftkings,2.95,3.7,2.3
+2026-11-24T15:39-05:00,679c499344805de09a59a2a2535cd0c8,Conference League,2026-11-26T17:45:00Z,FK Kauno Žalgiris,Riga FC,betmgm,3.1,3.3,2.1
+2026-11-24T15:39-05:00,679c499344805de09a59a2a2535cd0c8,Conference League,2026-11-26T17:45:00Z,FK Kauno Žalgiris,Riga FC,fanduel,3.4,3.3,2.15
+2026-11-24T15:39-05:00,679c499344805de09a59a2a2535cd0c8,Conference League,2026-11-26T17:45:00Z,FK Kauno Žalgiris,Riga FC,draftkings,3.5,3.4,2.15
+2026-11-24T15:39-05:00,cb6689f811b7ce08379eef028e2254a4,Conference League,2026-11-26T17:45:00Z,KF Egnatia,Lincoln Red Imps FC,betmgm,1.53,4.2,5.0
+2026-11-24T15:39-05:00,cb6689f811b7ce08379eef028e2254a4,Conference League,2026-11-26T17:45:00Z,KF Egnatia,Lincoln Red Imps FC,fanduel,1.54,4.3,5.3
+2026-11-24T15:39-05:00,cb6689f811b7ce08379eef028e2254a4,Conference League,2026-11-26T17:45:00Z,KF Egnatia,Lincoln Red Imps FC,draftkings,1.57,4.4,5.25
+2026-11-24T15:39-05:00,1f0d932ff8b08ed2c3b775e60d92bb4e,Conference League,2026-11-26T20:00:00Z,FK Borac Banja Luka,Atalanta BC,betmgm,5.75,4.33,1.45
+2026-11-24T15:39-05:00,1f0d932ff8b08ed2c3b775e60d92bb4e,Conference League,2026-11-26T20:00:00Z,FK Borac Banja Luka,Atalanta BC,fanduel,6.0,4.7,1.43
+2026-11-24T15:39-05:00,1f0d932ff8b08ed2c3b775e60d92bb4e,Conference League,2026-11-26T20:00:00Z,FK Borac Banja Luka,Atalanta BC,draftkings,5.5,4.8,1.53
+2026-11-24T15:39-05:00,4f10f55b47b83f7f4f2a8cd745a9e67f,Conference League,2026-11-26T20:00:00Z,Inter Club d'Escaldes,FC Copenhagen,betmgm,11.0,6.25,1.21
+2026-11-24T15:39-05:00,4f10f55b47b83f7f4f2a8cd745a9e67f,Conference League,2026-11-26T20:00:00Z,Inter Club d'Escaldes,FC Copenhagen,fanduel,11.0,6.5,1.18
+2026-11-24T15:39-05:00,4f10f55b47b83f7f4f2a8cd745a9e67f,Conference League,2026-11-26T20:00:00Z,Inter Club d'Escaldes,FC Copenhagen,draftkings,10.5,6.0,1.26
+2026-11-24T15:39-05:00,92db66d09fdcf10ff8561cb7ec09732e,Conference League,2026-11-26T20:00:00Z,FC Nordsjaelland,Panathinaikos FC,fanduel,2.7,3.5,2.45
+2026-11-24T15:39-05:00,92db66d09fdcf10ff8561cb7ec09732e,Conference League,2026-11-26T20:00:00Z,FC Nordsjaelland,Panathinaikos FC,betmgm,2.55,3.5,2.38
+2026-11-24T15:39-05:00,92db66d09fdcf10ff8561cb7ec09732e,Conference League,2026-11-26T20:00:00Z,FC Nordsjaelland,Panathinaikos FC,draftkings,2.7,3.55,2.5
+2026-11-24T15:39-05:00,dd5f6def5ea1aa9e0a0f45e3605ac64e,Conference League,2026-11-26T20:00:00Z,SC Freiburg,FC Twente Enschede,betmgm,2.0,3.6,3.1
+2026-11-24T15:39-05:00,dd5f6def5ea1aa9e0a0f45e3605ac64e,Conference League,2026-11-26T20:00:00Z,SC Freiburg,FC Twente Enschede,fanduel,2.05,3.9,3.1
+2026-11-24T15:39-05:00,dd5f6def5ea1aa9e0a0f45e3605ac64e,Conference League,2026-11-26T20:00:00Z,SC Freiburg,FC Twente Enschede,draftkings,2.05,3.95,3.2
+2026-11-24T15:39-05:00,3c6175802b9110c0abdb30f491965093,Conference League,2026-11-26T20:00:00Z,Gent,Red Star Belgrade,fanduel,2.1,3.5,3.3
+2026-11-24T15:39-05:00,3c6175802b9110c0abdb30f491965093,Conference League,2026-11-26T20:00:00Z,Gent,Red Star Belgrade,betmgm,2.05,3.4,3.1
+2026-11-24T15:39-05:00,3c6175802b9110c0abdb30f491965093,Conference League,2026-11-26T20:00:00Z,Gent,Red Star Belgrade,draftkings,2.15,3.55,3.3
+2026-11-24T15:39-05:00,9f2cd85ad777bea9550b987dc409b280,Conference League,2026-11-26T20:00:00Z,Hajduk Split,Sint Truiden,fanduel,2.15,3.5,3.2
+2026-11-24T15:39-05:00,9f2cd85ad777bea9550b987dc409b280,Conference League,2026-11-26T20:00:00Z,Hajduk Split,Sint Truiden,betmgm,2.05,3.5,3.1
+2026-11-24T15:39-05:00,9f2cd85ad777bea9550b987dc409b280,Conference League,2026-11-26T20:00:00Z,Hajduk Split,Sint Truiden,draftkings,2.15,3.55,3.3
+2026-11-24T15:39-05:00,1abbe02767589722b5de92e94e96429d,Conference League,2026-11-26T20:00:00Z,SC Braga,KuPS Kuopio,betmgm,1.13,8.75,14.0
+2026-11-24T15:39-05:00,1abbe02767589722b5de92e94e96429d,Conference League,2026-11-26T20:00:00Z,SC Braga,KuPS Kuopio,fanduel,1.12,8.0,14.0
+2026-11-24T15:39-05:00,1abbe02767589722b5de92e94e96429d,Conference League,2026-11-26T20:00:00Z,SC Braga,KuPS Kuopio,draftkings,1.14,9.0,16.0
+2026-11-24T15:39-05:00,491426b0dae5aecf2b92525815131cb2,Conference League,2026-11-26T20:00:00Z,PFC CSKA Sofia,Trabzonspor,fanduel,4.0,3.8,1.8
+2026-11-24T15:39-05:00,491426b0dae5aecf2b92525815131cb2,Conference League,2026-11-26T20:00:00Z,PFC CSKA Sofia,Trabzonspor,betmgm,3.7,3.75,1.8
+2026-11-24T15:39-05:00,491426b0dae5aecf2b92525815131cb2,Conference League,2026-11-26T20:00:00Z,PFC CSKA Sofia,Trabzonspor,draftkings,4.1,3.9,1.83
+2026-11-24T15:39-05:00,f7282ea5932abd0a1c41a5e3bc3d5072,Nations League,2027-03-25T19:45:00Z,Belgium,Germany,betmgm,2.65,3.6,2.45
+2026-11-24T15:39-05:00,728a661f4b458bc738d816438d564525,Nations League,2027-03-25T19:45:00Z,Spain,France,betmgm,2.25,3.5,2.95
+2026-11-24T15:39-05:00,a9d059deec41f2362872f49049287aea,Nations League,2027-03-27T17:00:00Z,Norway,England,betmgm,2.95,3.4,2.3
+2026-11-24T15:39-05:00,12edfcb24921dde76db7adc9d66f5c1e,Nations League,2027-03-27T19:45:00Z,Netherlands,Portugal,betmgm,2.35,3.5,2.8
